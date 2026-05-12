@@ -1,0 +1,237 @@
+// 360 Live Media Marketing Dashboard Schema
+// Based on Excel workbook analysis
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// USER & AUTHENTICATION
+// ============================================
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String
+  role          String    @default("MARKETER") // ADMIN, MANAGER, MARKETER
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  // Relations
+  websiteMetrics    WebsiteMetric[]
+  emailCampaigns    EmailCampaign[]
+  socialMetrics     SocialMetric[]
+  socialPosts       SocialPost[]
+  optimizations     Optimization[]
+}
+
+// ============================================
+// WEBSITE ANALYTICS
+// ============================================
+
+model WebsiteMetric {
+  id                    String    @id @default(cuid())
+  weekStarting          DateTime
+  
+  // SEMrush
+  healthScore           Float?
+  
+  // Google Analytics
+  totalUsers            Int
+  percentChangeUsers    Float?
+  newUsers              Int
+  percentChangeNewUsers Float?
+  
+  // Traffic Sources
+  referral              Int?
+  organicSearch         Int?
+  direct                Int?
+  organicSocial         Int?
+  email                 Int?
+  unassigned            Int?
+  
+  // Engagement
+  avgEngagementTimeSec  Int?
+  percentChangeEngTime  Float?
+  
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  createdBy             User      @relation(fields: [createdById], references: [id])
+  createdById           String
+  
+  @@index([weekStarting])
+}
+
+// ============================================
+// EMAIL CAMPAIGNS
+// ============================================
+
+model EmailCampaign {
+  id              String    @id @default(cuid())
+  name            String
+  deploymentDate  DateTime
+  
+  // Metrics
+  openRate        Float
+  clickRate       Float
+  deliveryRate    Float
+  unsubscribeRate Float
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  createdBy       User      @relation(fields: [createdById], references: [id])
+  createdById     String
+  
+  @@index([deploymentDate])
+}
+
+// ============================================
+// SOCIAL MEDIA
+// ============================================
+
+model SocialMetric {
+  id                    String    @id @default(cuid())
+  weekStarting          DateTime
+  
+  // LinkedIn
+  liFollowerGrowthRate  Float?
+  liImpressions         Int?
+  liEngagementRate      Float?
+  liPostsPerWeek        Int?
+  liFollowers           Int?
+  
+  // Instagram
+  igImpressions         Int?
+  igEngagementRate      Float?
+  igPostsPerWeek        Int?
+  igFollowers           Int?
+  
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  createdBy             User      @relation(fields: [createdById], references: [id])
+  createdById           String
+  
+  @@index([weekStarting])
+}
+
+model SocialPost {
+  id              String    @id @default(cuid())
+  weekStarting    DateTime
+  postUrl         String?
+  platform        String    // LINKEDIN or INSTAGRAM
+  
+  // Metrics
+  impressions     Int
+  engagements     Int
+  engagementRate  Float
+  linkClicks      Int?
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  createdBy       User      @relation(fields: [createdById], references: [id])
+  createdById     String
+  
+  // Relations
+  tags            PostTag[]
+  
+  @@index([weekStarting])
+  @@index([platform])
+}
+
+// ============================================
+// CONTENT TAGGING SYSTEM
+// ============================================
+
+model Tag {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  category    String    // AUDIENCE or CONTENT
+  description String?
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  // Relations
+  posts       PostTag[]
+}
+
+model PostTag {
+  id          String    @id @default(cuid())
+  post        SocialPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId      String
+  tag         Tag       @relation(fields: [tagId], references: [id])
+  tagId       String
+  
+  @@unique([postId, tagId])
+  @@index([postId])
+  @@index([tagId])
+}
+
+// ============================================
+// CAMPAIGN TRACKING
+// ============================================
+
+model Campaign {
+  id          String    @id @default(cuid())
+  month       String
+  source      String
+  pageViews   Int
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  @@index([month])
+  @@index([source])
+}
+
+// ============================================
+// CLIENT PROJECT TRACKING
+// ============================================
+
+model Client {
+  id                    String    @id @default(cuid())
+  name                  String
+  eventName             String?
+  year                  Int
+  campaignStatus        String
+  dashboardStatus       String
+  
+  // Tracking Status
+  utmTracking           Boolean   @default(false)
+  conversionTracking    String    // "Yes", "No", "Some"
+  
+  // Notes
+  issueDescription      String?
+  nextSteps             String?
+  
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  
+  @@index([year])
+}
+
+// ============================================
+// A/B TESTING & OPTIMIZATIONS
+// ============================================
+
+model Optimization {
+  id              String    @id @default(cuid())
+  month           String
+  channel         String?
+  controlTest     String?   // The "A"
+  testVariant     String?   // The "B"
+  results         String?
+  conclusions     String?
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  createdBy       User      @relation(fields: [createdById], references: [id])
+  createdById     String
+  
+  @@index([month])
+}

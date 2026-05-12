@@ -48,3 +48,5 @@ excel-analysis/detailed-analysis.json
 
 # OS
 Thumbs.db
+
+/lib/generated/prisma
