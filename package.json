@@ -8,7 +8,12 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "analyze:excel": "node excel-analysis/final-summary.js"
+    "analyze:excel": "node excel-analysis/final-summary.js",
+    "db:seed": "tsx prisma/seed.ts",
+    "db:studio": "prisma studio"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
   },
   "keywords": [
     "marketing",
@@ -19,12 +24,15 @@
   "author": "360 Live Media",
   "license": "UNLICENSED",
   "dependencies": {
+    "@prisma/client": "^5.22.0",
     "@radix-ui/react-separator": "^1.1.8",
     "@radix-ui/react-slot": "^1.2.4",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "dotenv": "^17.4.2",
     "lucide-react": "^1.14.0",
     "next": "^15.1.6",
+    "prisma": "^5.22.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "tailwind-merge": "^3.6.0",
@@ -40,6 +48,7 @@
     "eslint-config-next": "^15.1.6",
     "postcss": "^8.4.35",
     "tailwindcss": "^3.4.1",
+    "tsx": "^4.21.0",
     "typescript": "^5"
   }
 }
