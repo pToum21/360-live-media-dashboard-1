@@ -10,7 +10,10 @@
     "lint": "next lint",
     "analyze:excel": "node excel-analysis/final-summary.js",
     "db:seed": "tsx prisma/seed.ts",
-    "db:studio": "prisma studio"
+    "db:studio": "prisma studio",
+    "import:excel": "tsx scripts/import-excel.ts",
+    "import:excel:complete": "tsx scripts/import-excel-complete.ts",
+    "verify:import": "tsx scripts/verify-import.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
