@@ -1,3 +1,6 @@
+import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
+import { authOptions } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -15,7 +18,14 @@ import {
   Sparkles
 } from "lucide-react";
 
-export default function Home() {
+export default async function Home() {
+  const session = await getServerSession(authOptions);
+  
+  // Redirect logged-in users to dashboard
+  if (session) {
+    redirect("/dashboard");
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
       {/* Header */}
