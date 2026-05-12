@@ -46,6 +46,10 @@ next-env.d.ts
 # Excel Analysis (temporary)
 excel-analysis/detailed-analysis.json
 
+# Database files
+*.db
+*.db-journal
+
 # OS
 Thumbs.db
 
