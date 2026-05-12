@@ -1,0 +1,23 @@
+{
+  "name": "360-marketing-dashboard",
+  "version": "0.1.0",
+  "description": "Automated marketing analytics dashboard for 360 Live Media - replacing manual Excel workflows with real-time data sync and visualization",
+  "main": "index.js",
+  "scripts": {
+    "analyze:excel": "node excel-analysis/final-summary.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "marketing",
+    "analytics",
+    "dashboard",
+    "automation"
+  ],
+  "author": "360 Live Media",
+  "license": "UNLICENSED",
+  "type": "commonjs",
+  "private": true,
+  "dependencies": {
+    "xlsx": "^0.18.5"
+  }
+}
