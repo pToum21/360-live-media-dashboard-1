@@ -22,41 +22,57 @@ Currently, the marketing team spends **2-3 hours every week** manually copying d
 
 ## 🏗️ Tech Stack
 
-- **Frontend**: Next.js 14 (App Router), React, TypeScript
+- **Frontend**: Next.js 15 (App Router), React 19, TypeScript
 - **UI Components**: Shadcn/ui + Tailwind CSS
-- **Database**: PostgreSQL (Supabase or Vercel Postgres)
-- **ORM**: Prisma
-- **Authentication**: NextAuth.js / Clerk
-- **Charts**: Recharts
-- **Hosting**: Vercel
+- **Database**: SQLite (development) / PostgreSQL (production)
+- **ORM**: Prisma 5
+- **Authentication**: NextAuth.js (email magic links)
+- **Charts**: Recharts (planned)
+- **Hosting**: Vercel (planned)
 
 ## 📁 Project Structure
 
 ```
 360-marketing-dashboard/
-├── excel-analysis/          # Scripts used to analyze the original Excel file
-├── src/
-│   ├── app/                 # Next.js app directory
-│   ├── components/          # React components
-│   ├── lib/                 # Utilities and API clients
-│   └── db/                  # Database schema and queries
+├── app/                     # Next.js app directory (pages & routes)
+│   ├── api/                 # API routes (NextAuth)
+│   ├── auth/                # Authentication pages
+│   └── page.tsx             # Homepage
+├── components/              # React components
+│   ├── ui/                  # Shadcn/ui components
+│   └── auth/                # Auth components
+├── lib/                     # Utilities and API clients
+│   ├── prisma.ts            # Prisma client
+│   └── auth.ts              # NextAuth config
 ├── prisma/                  # Prisma schema and migrations
-├── public/                  # Static assets
+│   ├── schema.prisma        # Database schema
+│   ├── seed.ts              # Seed data
+│   └── migrations/          # Database migrations
+├── types/                   # TypeScript type definitions
+├── docs/                    # Documentation
+│   ├── AUTHENTICATION.md    # Auth setup guide
+│   ├── DATABASE.md          # Database documentation
+│   ├── BRAND.md             # Brand guidelines
+│   └── PROJECT_STRUCTURE.md # Architecture overview
+├── excel-analysis/          # Original Excel analysis scripts
 └── package.json
 ```
+
+## 📚 Documentation
+
+- **[Authentication Guide](docs/AUTHENTICATION.md)** - NextAuth setup and usage
+- **[Database Schema](docs/DATABASE.md)** - Prisma models and usage
+- **[Brand Guidelines](docs/BRAND.md)** - 360 Live Media design system
+- **[Project Structure](docs/PROJECT_STRUCTURE.md)** - Architecture and conventions
+- **[Auth Setup Status](docs/AUTH_SETUP_COMPLETE.md)** - Current authentication status
 
 ## 🚀 Getting Started
 
 ### Prerequisites
 
 - Node.js 18+ installed
-- PostgreSQL database (or Supabase account)
-- API keys for:
-  - Google Analytics 4
-  - SEMrush
-  - MailChimp
-  - LinkedIn
-  - Instagram (via Facebook Graph API)
+- OpenSSL (for generating auth secrets)
+- Email service for authentication (Ethereal/Gmail/SendGrid)
 
 ### Installation
 
@@ -65,44 +81,52 @@ Currently, the marketing team spends **2-3 hours every week** manually copying d
 npm install
 
 # Set up environment variables
-cp .env.example .env.local
-# Edit .env.local with your API keys
+# Edit .env with your configuration (see docs/AUTH_SETUP_COMPLETE.md)
 
-# Set up database
-npx prisma generate
-npx prisma db push
+# Generate NextAuth secret
+openssl rand -base64 32
+# Add the output to .env as NEXTAUTH_SECRET
+
+# Run database migrations
+npx prisma migrate dev
+
+# Seed initial data (tags and demo user)
+npm run db:seed
 
 # Run development server
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) to view the dashboard.
+Open [http://localhost:3001](http://localhost:3001) to view the dashboard.
 
-## 📋 Development Roadmap
+## 📋 Development Status
 
-### Phase 1: MVP (Weeks 1-2) ✅
-- [x] Analyze existing Excel workflow
-- [ ] Set up Next.js project structure
-- [ ] Design database schema
-- [ ] Build authentication system
-- [ ] Create main dashboard layout
-- [ ] Manual data entry forms
+### ✅ Completed
+- [x] Excel workflow analysis
+- [x] Next.js project setup
+- [x] Shadcn/ui components integration
+- [x] 360 Live Media branding applied
+- [x] Database schema design (10 models)
+- [x] Prisma ORM setup with SQLite
+- [x] Database migrations and seeding
+- [x] NextAuth.js email authentication
+- [x] User roles (ADMIN, MANAGER, MARKETER)
+- [x] Auth UI (sign-in, verification, error pages)
 
-### Phase 2: API Integration (Weeks 3-4)
-- [ ] Google Analytics 4 API
-- [ ] MailChimp API
-- [ ] LinkedIn API
-- [ ] Instagram Graph API
-- [ ] SEMrush API
-- [ ] Automated data sync (cron jobs)
+### 🚧 In Progress
+- [ ] Dashboard layout and navigation
+- [ ] Protected routes middleware
 
-### Phase 3: Advanced Features (Week 5)
-- [ ] Content tagging system
-- [ ] Client project tracker
-- [ ] Export to PDF/Excel
-- [ ] Email/Slack alerts
-- [ ] Historical data visualization
-- [ ] Goal tracking
+### 📅 Upcoming
+- [ ] Website Analytics page
+- [ ] Email Campaigns page
+- [ ] Social Media page
+- [ ] Content Tagging interface
+- [ ] Client Projects tracker
+- [ ] A/B Testing page
+- [ ] API integrations (Google Analytics, MailChimp, LinkedIn, Instagram, SEMrush)
+- [ ] Data visualization charts
+- [ ] Excel data migration script
 
 ## 🔌 API Setup Guides
 

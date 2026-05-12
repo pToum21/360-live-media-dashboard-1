@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { UserNav } from "@/components/auth/user-nav";
 import { 
   BarChart3, 
   Mail, 
@@ -26,9 +27,7 @@ export default function Home() {
             </div>
             <span className="font-bold text-xl text-[#0C1C14]">Live Media</span>
           </div>
-          <Button variant="ghost" className="text-[#2E8741] hover:text-[#2E8741] hover:bg-[#2E8741]/10">
-            Sign In
-          </Button>
+          <UserNav />
         </div>
       </header>
 
