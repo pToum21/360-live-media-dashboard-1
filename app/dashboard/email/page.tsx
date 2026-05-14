@@ -1,6 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Mail, TrendingUp, MousePointerClick, Send } from "lucide-react"
 import { prisma } from "@/lib/prisma"
+import { EmailPerformanceChart } from "@/components/charts/email-performance-chart"
 
 export default async function EmailCampaignsPage() {
   // Fetch email campaigns (most recent 12)
@@ -13,6 +14,13 @@ export default async function EmailCampaignsPage() {
   const avgOpenRate = campaigns.reduce((sum, c) => sum + c.openRate, 0) / campaigns.length
   const avgClickRate = campaigns.reduce((sum, c) => sum + c.clickRate, 0) / campaigns.length
   const avgDeliveryRate = campaigns.reduce((sum, c) => sum + c.deliveryRate, 0) / campaigns.length
+
+  // Format data for chart
+  const chartData = campaigns.slice().reverse().map(c => ({
+    name: c.name.replace('360 - ', '').replace(' Mission Brief', '').substring(0, 20),
+    openRate: c.openRate,
+    clickRate: c.clickRate,
+  }))
 
   return (
     <div className="space-y-6">
@@ -70,6 +78,19 @@ export default async function EmailCampaignsPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Performance Chart */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Campaign Performance Comparison</CardTitle>
+          <CardDescription>
+            Interactive comparison of open and click rates across campaigns
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <EmailPerformanceChart data={chartData} />
+        </CardContent>
+      </Card>
 
       {/* Campaign Performance Table */}
       <Card>
