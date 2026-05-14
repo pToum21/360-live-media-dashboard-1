@@ -15,6 +15,10 @@ import {
   FlaskConical,
 } from "lucide-react"
 import Link from "next/link"
+import { WebsiteTrendChart } from "@/components/charts/website-trend-chart"
+import { EmailPerformanceChart } from "@/components/charts/email-performance-chart"
+import { TrafficSourceChart } from "@/components/charts/traffic-source-chart"
+import { SocialGrowthChart } from "@/components/charts/social-growth-chart"
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions)
@@ -29,8 +33,8 @@ export default async function DashboardPage() {
     prisma.socialMetric.findFirst({
       where: {
         OR: [
-          { liImpressions: { not: null } },
-          { igImpressions: { not: null } }
+          { liEngagementRate: { not: null } },
+          { igEngagementRate: { not: null } }
         ]
       },
       orderBy: { weekStarting: 'desc' }
@@ -43,6 +47,76 @@ export default async function DashboardPage() {
   const avgSocialEngagement = latestSocial
     ? ((latestSocial.liEngagementRate || 0) + (latestSocial.igEngagementRate || 0)) / 2
     : 0
+
+  // Prepare chart data
+  const websiteChartData = await prisma.websiteMetric.findMany({
+    where: { totalUsers: { gt: 0 } },
+    orderBy: { weekStarting: 'asc' },
+    take: 12,
+    select: {
+      weekStarting: true,
+      totalUsers: true,
+      newUsers: true,
+      organicSearch: true,
+      direct: true,
+      referral: true,
+      organicSocial: true,
+      email: true,
+    }
+  })
+
+  const emailChartData = await prisma.emailCampaign.findMany({
+    orderBy: { deploymentDate: 'desc' },
+    take: 8,
+    select: {
+      name: true,
+      openRate: true,
+      clickRate: true,
+    }
+  })
+
+  const socialChartData = await prisma.socialMetric.findMany({
+    where: {
+      OR: [
+        { liImpressions: { not: null } },
+        { igImpressions: { not: null } }
+      ]
+    },
+    orderBy: { weekStarting: 'asc' },
+    take: 12,
+    select: {
+      weekStarting: true,
+      liImpressions: true,
+      igImpressions: true,
+    }
+  })
+
+  // Format data for charts
+  const formattedWebsiteData = websiteChartData.map(m => ({
+    week: m.weekStarting.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+    users: m.totalUsers || 0,
+    newUsers: m.newUsers || 0,
+  }))
+
+  const formattedEmailData = emailChartData.reverse().map(c => ({
+    name: c.name.replace('360 - ', '').replace(' Mission Brief', ''),
+    openRate: c.openRate,
+    clickRate: c.clickRate,
+  }))
+
+  const formattedTrafficData = latestWebsite ? [
+    { name: 'Organic Search', value: latestWebsite.organicSearch || 0 },
+    { name: 'Direct', value: latestWebsite.direct || 0 },
+    { name: 'Referral', value: latestWebsite.referral || 0 },
+    { name: 'Social', value: latestWebsite.organicSocial || 0 },
+    { name: 'Email', value: latestWebsite.email || 0 },
+  ].filter(item => item.value > 0) : []
+
+  const formattedSocialData = socialChartData.map(s => ({
+    week: s.weekStarting.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+    linkedIn: s.liImpressions || 0,
+    instagram: s.igImpressions || 0,
+  }))
 
   return (
     <div className="space-y-6">
@@ -59,15 +133,15 @@ export default async function DashboardPage() {
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Link href="/dashboard/website">
-          <Card className="border-2 hover:border-[#2E8741] transition-colors cursor-pointer">
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <CardDescription>Website Visitors</CardDescription>
-                <div className="w-10 h-10 bg-[#2E8741]/10 rounded-lg flex items-center justify-center">
-                  <BarChart3 className="w-5 h-5 text-[#2E8741]" />
-                </div>
+          <Card className="border-2 hover:border-[#2E8741] transition-all duration-300 cursor-pointer card-hover bg-gradient-to-br from-white to-green-50">
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <CardDescription className="font-medium">Website Visitors</CardDescription>
+              <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center shadow-lg shadow-green-500/50">
+                <BarChart3 className="w-6 h-6 text-white" />
               </div>
-            </CardHeader>
+            </div>
+          </CardHeader>
             <CardContent>
               <div className="flex items-baseline justify-between">
                 <div>
@@ -98,15 +172,15 @@ export default async function DashboardPage() {
         </Link>
 
         <Link href="/dashboard/email">
-          <Card className="border-2 hover:border-[#2E8741] transition-colors cursor-pointer">
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <CardDescription>Email Open Rate</CardDescription>
-                <div className="w-10 h-10 bg-[#2E8741]/10 rounded-lg flex items-center justify-center">
-                  <Mail className="w-5 h-5 text-[#2E8741]" />
-                </div>
+          <Card className="border-2 hover:border-[#2E8741] transition-all duration-300 cursor-pointer card-hover bg-gradient-to-br from-white to-blue-50">
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <CardDescription className="font-medium">Email Open Rate</CardDescription>
+              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/50">
+                <Mail className="w-6 h-6 text-white" />
               </div>
-            </CardHeader>
+            </div>
+          </CardHeader>
             <CardContent>
               <div className="flex items-baseline justify-between">
                 <div>
@@ -137,15 +211,15 @@ export default async function DashboardPage() {
         </Link>
 
         <Link href="/dashboard/social">
-          <Card className="border-2 hover:border-[#2E8741] transition-colors cursor-pointer">
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <CardDescription>Social Engagement</CardDescription>
-                <div className="w-10 h-10 bg-[#2E8741]/10 rounded-lg flex items-center justify-center">
-                  <Users className="w-5 h-5 text-[#2E8741]" />
-                </div>
+          <Card className="border-2 hover:border-[#2E8741] transition-all duration-300 cursor-pointer card-hover bg-gradient-to-br from-white to-purple-50">
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <CardDescription className="font-medium">Social Engagement</CardDescription>
+              <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/50">
+                <Users className="w-6 h-6 text-white" />
               </div>
-            </CardHeader>
+            </div>
+          </CardHeader>
             <CardContent>
               <div className="flex items-baseline justify-between">
                 <div>
@@ -167,11 +241,13 @@ export default async function DashboardPage() {
       {/* Secondary Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Link href="/dashboard/clients">
-          <Card className="hover:bg-gray-50 transition-colors cursor-pointer">
+          <Card className="hover:bg-gray-50 transition-all duration-300 cursor-pointer card-hover border-2 border-orange-100 bg-gradient-to-br from-white to-orange-50">
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-base">Client Projects</CardTitle>
-                <Building2 className="w-5 h-5 text-[#2E8741]" />
+                <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg flex items-center justify-center shadow-md shadow-orange-500/30">
+                  <Building2 className="w-5 h-5 text-white" />
+                </div>
               </div>
             </CardHeader>
             <CardContent>
@@ -182,11 +258,13 @@ export default async function DashboardPage() {
         </Link>
 
         <Link href="/dashboard/testing">
-          <Card className="hover:bg-gray-50 transition-colors cursor-pointer">
+          <Card className="hover:bg-gray-50 transition-all duration-300 cursor-pointer card-hover border-2 border-teal-100 bg-gradient-to-br from-white to-teal-50">
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-base">A/B Tests Run</CardTitle>
-                <FlaskConical className="w-5 h-5 text-[#2E8741]" />
+                <div className="w-10 h-10 bg-gradient-to-br from-teal-500 to-teal-600 rounded-lg flex items-center justify-center shadow-md shadow-teal-500/30">
+                  <FlaskConical className="w-5 h-5 text-white" />
+                </div>
               </div>
             </CardHeader>
             <CardContent>
@@ -195,6 +273,66 @@ export default async function DashboardPage() {
             </CardContent>
           </Card>
         </Link>
+      </div>
+
+      {/* Interactive Charts */}
+      <div className="grid gap-6 md:grid-cols-2">
+        <Card className="md:col-span-2 chart-card border-2 border-green-100 overflow-hidden">
+          <CardHeader className="bg-gradient-to-r from-green-50 to-transparent">
+            <CardTitle>Website Traffic Trend</CardTitle>
+            <CardDescription>
+              Total and new users over the last 12 weeks
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <WebsiteTrendChart data={formattedWebsiteData} />
+          </CardContent>
+        </Card>
+
+        <Card className="chart-card border-2 border-blue-100 overflow-hidden">
+          <CardHeader className="bg-gradient-to-r from-blue-50 to-transparent">
+            <CardTitle className="flex items-center gap-2">
+              <Mail className="w-5 h-5 text-blue-600" />
+              Email Campaign Performance
+            </CardTitle>
+            <CardDescription>
+              Open and click rates for recent campaigns
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <EmailPerformanceChart data={formattedEmailData} />
+          </CardContent>
+        </Card>
+
+        <Card className="chart-card border-2 border-purple-100 overflow-hidden">
+          <CardHeader className="bg-gradient-to-r from-purple-50 to-transparent">
+            <CardTitle className="flex items-center gap-2">
+              <BarChart3 className="w-5 h-5 text-purple-600" />
+              Traffic Sources
+            </CardTitle>
+            <CardDescription>
+              Where your visitors are coming from (latest week)
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <TrafficSourceChart data={formattedTrafficData} />
+          </CardContent>
+        </Card>
+
+        <Card className="md:col-span-2 chart-card border-2 border-pink-100 overflow-hidden">
+          <CardHeader className="bg-gradient-to-r from-pink-50 to-transparent">
+            <CardTitle className="flex items-center gap-2">
+              <Users className="w-5 h-5 text-pink-600" />
+              Social Media Growth
+            </CardTitle>
+            <CardDescription>
+              LinkedIn and Instagram impressions over time
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <SocialGrowthChart data={formattedSocialData} />
+          </CardContent>
+        </Card>
       </div>
 
       {/* Quick Actions */}

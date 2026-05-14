@@ -1,6 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Users, TrendingUp, Eye, Heart } from "lucide-react"
 import { prisma } from "@/lib/prisma"
+import { SocialGrowthChart } from "@/components/charts/social-growth-chart"
 
 export default async function SocialMediaPage() {
   // Fetch social metrics (most recent 12 weeks WITH DATA)
@@ -22,6 +23,13 @@ export default async function SocialMediaPage() {
   const avgIgEngagement = metrics.reduce((sum, m) => sum + (m.igEngagementRate || 0), 0) / metrics.length
   const totalLiImpressions = metrics.reduce((sum, m) => sum + (m.liImpressions || 0), 0)
   const totalIgImpressions = metrics.reduce((sum, m) => sum + (m.igImpressions || 0), 0)
+
+  // Format data for chart
+  const chartData = metrics.slice().reverse().map(m => ({
+    week: m.weekStarting.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+    linkedIn: m.liImpressions || 0,
+    instagram: m.igImpressions || 0,
+  }))
 
   return (
     <div className="space-y-6">
@@ -72,9 +80,11 @@ export default async function SocialMediaPage() {
               <Heart className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{latestWeek?.liEngagementRate?.toFixed(1) || 0}%</div>
+              <div className="text-2xl font-bold">
+                {latestWeek?.liEngagementRate ? (latestWeek.liEngagementRate * 100).toFixed(1) : 0}%
+              </div>
               <p className="text-xs text-muted-foreground">
-                {avgLiEngagement.toFixed(1)}% avg over 12 weeks
+                {(avgLiEngagement * 100).toFixed(1)}% avg over 12 weeks
               </p>
             </CardContent>
           </Card>
@@ -135,9 +145,11 @@ export default async function SocialMediaPage() {
               <Heart className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{latestWeek?.igEngagementRate?.toFixed(1) || 0}%</div>
+              <div className="text-2xl font-bold">
+                {latestWeek?.igEngagementRate ? (latestWeek.igEngagementRate * 100).toFixed(1) : 0}%
+              </div>
               <p className="text-xs text-muted-foreground">
-                {avgIgEngagement.toFixed(1)}% avg over 12 weeks
+                {(avgIgEngagement * 100).toFixed(1)}% avg over 12 weeks
               </p>
             </CardContent>
           </Card>
@@ -156,6 +168,19 @@ export default async function SocialMediaPage() {
           </Card>
         </div>
       </div>
+
+      {/* Social Growth Chart */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Social Media Growth Trend</CardTitle>
+          <CardDescription>
+            LinkedIn and Instagram impressions over time
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <SocialGrowthChart data={chartData} />
+        </CardContent>
+      </Card>
 
       {/* Weekly Performance Table */}
       <Card>
@@ -184,10 +209,14 @@ export default async function SocialMediaPage() {
                   <tr key={metric.id} className="border-b hover:bg-gray-50">
                     <td className="py-3 px-4">{new Date(metric.weekStarting).toLocaleDateString()}</td>
                     <td className="text-right py-3 px-4">{metric.liImpressions?.toLocaleString() || '-'}</td>
-                    <td className="text-right py-3 px-4">{metric.liEngagementRate?.toFixed(1)}%</td>
+                    <td className="text-right py-3 px-4">
+                      {metric.liEngagementRate ? (metric.liEngagementRate * 100).toFixed(1) + '%' : '-'}
+                    </td>
                     <td className="text-right py-3 px-4">{metric.liPostsPerWeek || '-'}</td>
                     <td className="text-right py-3 px-4">{metric.igImpressions?.toLocaleString() || '-'}</td>
-                    <td className="text-right py-3 px-4">{metric.igEngagementRate?.toFixed(1)}%</td>
+                    <td className="text-right py-3 px-4">
+                      {metric.igEngagementRate ? (metric.igEngagementRate * 100).toFixed(1) + '%' : '-'}
+                    </td>
                     <td className="text-right py-3 px-4">{metric.igPostsPerWeek || '-'}</td>
                   </tr>
                 ))}

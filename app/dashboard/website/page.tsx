@@ -1,6 +1,8 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { BarChart3, TrendingUp, Users, Clock } from "lucide-react"
 import { prisma } from "@/lib/prisma"
+import { WebsiteTrendChart } from "@/components/charts/website-trend-chart"
+import { TrafficSourceChart } from "@/components/charts/traffic-source-chart"
 
 export default async function WebsiteAnalyticsPage() {
   // Fetch website metrics (most recent 12 weeks WITH DATA)
@@ -18,6 +20,21 @@ export default async function WebsiteAnalyticsPage() {
     metrics.reduce((sum, m) => sum + (m.avgEngagementTimeSec || 0), 0) / metrics.length
   ) : 0
   const latestWeek = metrics[0] || null
+
+  // Format data for charts
+  const chartData = metrics.reverse().map(m => ({
+    week: m.weekStarting.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+    users: m.totalUsers || 0,
+    newUsers: m.newUsers || 0,
+  }))
+
+  const trafficData = latestWeek ? [
+    { name: 'Organic Search', value: latestWeek.organicSearch || 0 },
+    { name: 'Direct', value: latestWeek.direct || 0 },
+    { name: 'Referral', value: latestWeek.referral || 0 },
+    { name: 'Organic Social', value: latestWeek.organicSocial || 0 },
+    { name: 'Email', value: latestWeek.email || 0 },
+  ].filter(item => item.value > 0) : []
 
   return (
     <div className="space-y-6">
@@ -88,29 +105,29 @@ export default async function WebsiteAnalyticsPage() {
         </Card>
       </div>
 
-      {/* Traffic Sources */}
+      {/* Traffic Trend Chart */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Traffic Trend</CardTitle>
+          <CardDescription>
+            Website visitors over the last 12 weeks
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <WebsiteTrendChart data={chartData} />
+        </CardContent>
+      </Card>
+
+      {/* Traffic Sources Chart */}
       <Card>
         <CardHeader>
           <CardTitle>Traffic Sources (Latest Week)</CardTitle>
           <CardDescription>
-            Breakdown of where your visitors are coming from
+            Interactive breakdown of where your visitors are coming from
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            {latestWeek && (
-              <>
-                <TrafficSourceBar label="Organic Search" value={latestWeek.organicSearch || 0} color="bg-blue-500" />
-                <TrafficSourceBar label="Direct" value={latestWeek.direct || 0} color="bg-green-500" />
-                <TrafficSourceBar label="Referral" value={latestWeek.referral || 0} color="bg-purple-500" />
-                <TrafficSourceBar label="Organic Social" value={latestWeek.organicSocial || 0} color="bg-pink-500" />
-                <TrafficSourceBar label="Email" value={latestWeek.email || 0} color="bg-orange-500" />
-                {latestWeek.unassigned ? (
-                  <TrafficSourceBar label="Unassigned" value={latestWeek.unassigned} color="bg-gray-400" />
-                ) : null}
-              </>
-            )}
-          </div>
+          <TrafficSourceChart data={trafficData} />
         </CardContent>
       </Card>
 
