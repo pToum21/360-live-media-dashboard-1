@@ -2,6 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Mail, TrendingUp, MousePointerClick, Send } from "lucide-react"
 import { prisma } from "@/lib/prisma"
 import { EmailPerformanceChart } from "@/components/charts/email-performance-chart"
+import { EmailManagement } from "@/components/dashboard/email-management"
 
 export default async function EmailCampaignsPage() {
   // Fetch email campaigns (most recent 12)
@@ -23,82 +24,104 @@ export default async function EmailCampaignsPage() {
   }))
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 animate-in">
       {/* Key Metrics */}
-      <div className="grid gap-4 md:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Campaigns Sent</CardTitle>
-            <Mail className="h-4 w-4 text-muted-foreground" />
+      <div className="grid gap-6 md:grid-cols-4">
+        <Card className="stat-card border-0 overflow-hidden relative group">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-blue-400/10 to-transparent rounded-bl-full"></div>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
+            <CardTitle className="text-sm font-semibold text-gray-700">Campaigns Sent</CardTitle>
+            <div className="w-10 h-10 gradient-blue rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/30 group-hover:scale-110 transition-transform">
+              <Mail className="h-5 w-5 text-white" />
+            </div>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{campaigns.length}</div>
-            <p className="text-xs text-muted-foreground">
-              Total campaigns tracked
-            </p>
+          <CardContent className="relative z-10">
+            <div className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
+              {campaigns.length}
+            </div>
+            <p className="text-xs text-gray-500 mt-2">Total campaigns tracked</p>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Avg. Open Rate</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+        <Card className="stat-card border-0 overflow-hidden relative group">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-green-400/10 to-transparent rounded-bl-full"></div>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
+            <CardTitle className="text-sm font-semibold text-gray-700">Avg. Open Rate</CardTitle>
+            <div className="w-10 h-10 gradient-green rounded-xl flex items-center justify-center shadow-lg shadow-green-500/30 group-hover:scale-110 transition-transform">
+              <TrendingUp className="h-5 w-5 text-white" />
+            </div>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{(avgOpenRate * 100).toFixed(1)}%</div>
-            <p className="text-xs text-muted-foreground">
-              Across all campaigns
-            </p>
+          <CardContent className="relative z-10">
+            <div className="text-3xl font-bold bg-gradient-to-r from-green-600 to-green-800 bg-clip-text text-transparent">
+              {(avgOpenRate * 100).toFixed(1)}%
+            </div>
+            <p className="text-xs text-gray-500 mt-2">Across all campaigns</p>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Avg. Click Rate</CardTitle>
-            <MousePointerClick className="h-4 w-4 text-muted-foreground" />
+        <Card className="stat-card border-0 overflow-hidden relative group">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-purple-400/10 to-transparent rounded-bl-full"></div>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
+            <CardTitle className="text-sm font-semibold text-gray-700">Avg. Click Rate</CardTitle>
+            <div className="w-10 h-10 gradient-purple rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/30 group-hover:scale-110 transition-transform">
+              <MousePointerClick className="h-5 w-5 text-white" />
+            </div>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{(avgClickRate * 100).toFixed(1)}%</div>
-            <p className="text-xs text-muted-foreground">
-              Across all campaigns
-            </p>
+          <CardContent className="relative z-10">
+            <div className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-purple-800 bg-clip-text text-transparent">
+              {(avgClickRate * 100).toFixed(1)}%
+            </div>
+            <p className="text-xs text-gray-500 mt-2">Across all campaigns</p>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Avg. Delivery Rate</CardTitle>
-            <Send className="h-4 w-4 text-muted-foreground" />
+        <Card className="stat-card border-0 overflow-hidden relative group">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-teal-400/10 to-transparent rounded-bl-full"></div>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
+            <CardTitle className="text-sm font-semibold text-gray-700">Avg. Delivery Rate</CardTitle>
+            <div className="w-10 h-10 gradient-teal rounded-xl flex items-center justify-center shadow-lg shadow-teal-500/30 group-hover:scale-110 transition-transform">
+              <Send className="h-5 w-5 text-white" />
+            </div>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{(avgDeliveryRate * 100).toFixed(1)}%</div>
-            <p className="text-xs text-muted-foreground">
-              Successfully delivered
-            </p>
+          <CardContent className="relative z-10">
+            <div className="text-3xl font-bold bg-gradient-to-r from-teal-600 to-teal-800 bg-clip-text text-transparent">
+              {(avgDeliveryRate * 100).toFixed(1)}%
+            </div>
+            <p className="text-xs text-gray-500 mt-2">Successfully delivered</p>
           </CardContent>
         </Card>
       </div>
 
       {/* Performance Chart */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Campaign Performance Comparison</CardTitle>
-          <CardDescription>
-            Interactive comparison of open and click rates across campaigns
-          </CardDescription>
+      <Card className="chart-card border-0 overflow-hidden shadow-lg">
+        <CardHeader className="bg-gradient-to-r from-blue-50 to-transparent border-b">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 gradient-blue rounded-xl flex items-center justify-center shadow-md">
+              <Mail className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <CardTitle className="text-lg">Campaign Performance Comparison</CardTitle>
+              <CardDescription>Interactive comparison of open and click rates across campaigns</CardDescription>
+            </div>
+          </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-6">
           <EmailPerformanceChart data={chartData} />
         </CardContent>
       </Card>
 
       {/* Campaign Performance Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Campaign Performance</CardTitle>
-          <CardDescription>
-            Recent email campaign metrics and engagement
-          </CardDescription>
+      <Card className="stat-card border-0 shadow-lg">
+        <CardHeader className="bg-gradient-to-r from-green-50 to-transparent border-b">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 gradient-green rounded-xl flex items-center justify-center shadow-md">
+              <TrendingUp className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <CardTitle className="text-lg">Campaign Performance</CardTitle>
+              <CardDescription>Recent email campaign metrics and engagement</CardDescription>
+            </div>
+          </div>
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
@@ -180,6 +203,17 @@ export default async function EmailCampaignsPage() {
                 </div>
               ))}
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Data Management Section */}
+      <Card className="chart-card">
+        <CardHeader>
+          <CardTitle>Manage Email Campaigns</CardTitle>
+          <CardDescription>Add, edit, or remove email campaign data</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <EmailManagement campaigns={campaigns} />
         </CardContent>
       </Card>
     </div>

@@ -3,6 +3,7 @@ import { BarChart3, TrendingUp, Users, Clock } from "lucide-react"
 import { prisma } from "@/lib/prisma"
 import { WebsiteTrendChart } from "@/components/charts/website-trend-chart"
 import { TrafficSourceChart } from "@/components/charts/traffic-source-chart"
+import { WebsiteManagement } from "@/components/dashboard/website-management"
 
 export default async function WebsiteAnalyticsPage() {
   // Fetch website metrics (most recent 12 weeks WITH DATA)
@@ -37,94 +38,120 @@ export default async function WebsiteAnalyticsPage() {
   ].filter(item => item.value > 0) : []
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 animate-in">
       {/* Key Metrics */}
-      <div className="grid gap-4 md:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Users (Latest)</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
+      <div className="grid gap-6 md:grid-cols-4">
+        <Card className="stat-card border-0 overflow-hidden relative group">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-green-400/10 to-transparent rounded-bl-full"></div>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
+            <CardTitle className="text-sm font-semibold text-gray-700">Total Users</CardTitle>
+            <div className="w-10 h-10 gradient-green rounded-xl flex items-center justify-center shadow-lg shadow-green-500/30 group-hover:scale-110 transition-transform">
+              <Users className="h-5 w-5 text-white" />
+            </div>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{latestWeek?.totalUsers?.toLocaleString() || 'No data'}</div>
-            <p className="text-xs text-muted-foreground">
+          <CardContent className="relative z-10">
+            <div className="text-3xl font-bold bg-gradient-to-r from-green-600 to-green-800 bg-clip-text text-transparent">
+              {latestWeek?.totalUsers?.toLocaleString() || 'No data'}
+            </div>
+            <p className="text-xs text-gray-500 mt-2 flex items-center gap-1">
               {latestWeek?.percentChangeUsers ? (
-                <span className={latestWeek.percentChangeUsers > 0 ? 'text-green-600' : 'text-red-600'}>
+                <span className={latestWeek.percentChangeUsers > 0 ? 'text-emerald-600 font-medium' : 'text-red-600 font-medium'}>
                   {latestWeek.percentChangeUsers > 0 ? '+' : ''}{(latestWeek.percentChangeUsers * 100).toFixed(1)}% from previous
                 </span>
               ) : (
-                'No change data'
+                <span className="flex items-center gap-1"><Clock className="w-3 h-3" />Latest week</span>
               )}
             </p>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">New Users</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+        <Card className="stat-card border-0 overflow-hidden relative group">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-blue-400/10 to-transparent rounded-bl-full"></div>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
+            <CardTitle className="text-sm font-semibold text-gray-700">New Users</CardTitle>
+            <div className="w-10 h-10 gradient-blue rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/30 group-hover:scale-110 transition-transform">
+              <TrendingUp className="h-5 w-5 text-white" />
+            </div>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{latestWeek?.newUsers?.toLocaleString() || 0}</div>
-            <p className="text-xs text-muted-foreground">
+          <CardContent className="relative z-10">
+            <div className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
+              {latestWeek?.newUsers?.toLocaleString() || 0}
+            </div>
+            <p className="text-xs text-gray-500 mt-2">
               {latestWeek?.percentChangeNewUsers ? (
-                <span className={latestWeek.percentChangeNewUsers > 0 ? 'text-green-600' : 'text-red-600'}>
+                <span className={latestWeek.percentChangeNewUsers > 0 ? 'text-emerald-600 font-medium' : 'text-red-600 font-medium'}>
                   {latestWeek.percentChangeNewUsers > 0 ? '+' : ''}{(latestWeek.percentChangeNewUsers * 100).toFixed(1)}% from previous
                 </span>
               ) : (
-                'No change data'
+                <span className="flex items-center gap-1"><Clock className="w-3 h-3" />Latest week</span>
               )}
             </p>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Avg. Engagement Time</CardTitle>
-            <Clock className="h-4 w-4 text-muted-foreground" />
+        <Card className="stat-card border-0 overflow-hidden relative group">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-purple-400/10 to-transparent rounded-bl-full"></div>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
+            <CardTitle className="text-sm font-semibold text-gray-700">Avg. Engagement</CardTitle>
+            <div className="w-10 h-10 gradient-purple rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/30 group-hover:scale-110 transition-transform">
+              <Clock className="h-5 w-5 text-white" />
+            </div>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{avgEngagementTime}s</div>
-            <p className="text-xs text-muted-foreground">
-              Average across last 12 weeks
-            </p>
+          <CardContent className="relative z-10">
+            <div className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-purple-800 bg-clip-text text-transparent">
+              {avgEngagementTime}s
+            </div>
+            <p className="text-xs text-gray-500 mt-2">Average across last 12 weeks</p>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Health Score</CardTitle>
-            <BarChart3 className="h-4 w-4 text-muted-foreground" />
+        <Card className="stat-card border-0 overflow-hidden relative group">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-orange-400/10 to-transparent rounded-bl-full"></div>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
+            <CardTitle className="text-sm font-semibold text-gray-700">Health Score</CardTitle>
+            <div className="w-10 h-10 gradient-orange rounded-xl flex items-center justify-center shadow-lg shadow-orange-500/30 group-hover:scale-110 transition-transform">
+              <BarChart3 className="h-5 w-5 text-white" />
+            </div>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{latestWeek?.healthScore?.toFixed(1) || 'N/A'}</div>
-            <p className="text-xs text-muted-foreground">
-              Latest week score
-            </p>
+          <CardContent className="relative z-10">
+            <div className="text-3xl font-bold bg-gradient-to-r from-orange-600 to-orange-800 bg-clip-text text-transparent">
+              {latestWeek?.healthScore?.toFixed(1) || 'N/A'}
+            </div>
+            <p className="text-xs text-gray-500 mt-2">Latest week score</p>
           </CardContent>
         </Card>
       </div>
 
       {/* Traffic Trend Chart */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Traffic Trend</CardTitle>
-          <CardDescription>
-            Website visitors over the last 12 weeks
-          </CardDescription>
+      <Card className="chart-card border-0 overflow-hidden shadow-lg">
+        <CardHeader className="bg-gradient-to-r from-green-50 to-transparent border-b">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 gradient-green rounded-xl flex items-center justify-center shadow-md">
+              <BarChart3 className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <CardTitle className="text-lg">Traffic Trend</CardTitle>
+              <CardDescription>Website visitors over the last 12 weeks</CardDescription>
+            </div>
+          </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-6">
           <WebsiteTrendChart data={chartData} />
         </CardContent>
       </Card>
 
       {/* Traffic Sources Chart */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Traffic Sources (Latest Week)</CardTitle>
-          <CardDescription>
-            Interactive breakdown of where your visitors are coming from
-          </CardDescription>
+      <Card className="chart-card border-0 overflow-hidden shadow-lg">
+        <CardHeader className="bg-gradient-to-r from-purple-50 to-transparent border-b">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 gradient-purple rounded-xl flex items-center justify-center shadow-md">
+              <BarChart3 className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <CardTitle className="text-lg">Traffic Sources (Latest Week)</CardTitle>
+              <CardDescription>Interactive breakdown of where your visitors are coming from</CardDescription>
+            </div>
+          </div>
         </CardHeader>
         <CardContent>
           <TrafficSourceChart data={trafficData} />
@@ -164,6 +191,17 @@ export default async function WebsiteAnalyticsPage() {
               </tbody>
             </table>
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Data Management Section */}
+      <Card className="chart-card">
+        <CardHeader>
+          <CardTitle>Manage Website Data</CardTitle>
+          <CardDescription>Add, edit, or remove website analytics data</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <WebsiteManagement metrics={metrics} />
         </CardContent>
       </Card>
     </div>

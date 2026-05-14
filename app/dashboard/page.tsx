@@ -119,44 +119,52 @@ export default async function DashboardPage() {
   }))
 
   return (
-    <div className="space-y-6">
-      {/* Welcome Section */}
-      <div>
-        <h2 className="text-2xl font-bold text-[#0C1C14] mb-2">
-          Welcome back, {session?.user.name || session?.user.email}!
-        </h2>
-        <p className="text-gray-600">
-          Here's what's happening with your marketing this week
-        </p>
+    <div className="space-y-8 animate-in">
+      {/* Welcome Section with gradient */}
+      <div className="relative">
+        <div className="absolute -top-4 -left-4 w-72 h-72 bg-green-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse"></div>
+        <div className="absolute -bottom-8 right-0 w-72 h-72 bg-blue-100 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse" style={{ animationDelay: '1s' }}></div>
+        <div className="relative">
+          <h2 className="text-3xl font-bold bg-gradient-to-r from-[#0C1C14] via-[#2E8741] to-[#0C1C14] bg-clip-text text-transparent mb-2">
+            Welcome back, {session?.user.name || session?.user.email}!
+          </h2>
+          <p className="text-gray-600 text-lg">
+            Here's what's happening with your marketing this week
+          </p>
+        </div>
       </div>
 
-      {/* Stats Grid */}
+      {/* Stats Grid - Modern asymmetric layout */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Link href="/dashboard/website">
-          <Card className="border-2 hover:border-[#2E8741] transition-all duration-300 cursor-pointer card-hover bg-gradient-to-br from-white to-green-50">
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
-              <CardDescription className="font-medium">Website Visitors</CardDescription>
-              <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center shadow-lg shadow-green-500/50">
-                <BarChart3 className="w-6 h-6 text-white" />
+        <Link href="/dashboard/website" className="group">
+          <Card className="stat-card cursor-pointer overflow-hidden relative border-0">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-green-400/10 to-transparent rounded-bl-full"></div>
+            <CardHeader className="pb-3 relative z-10">
+              <div className="flex items-center justify-between">
+                <CardDescription className="font-semibold text-gray-700">Website Visitors</CardDescription>
+                <div className="w-14 h-14 gradient-green rounded-2xl flex items-center justify-center shadow-xl shadow-green-500/40 icon-float group-hover:scale-110 transition-transform duration-500">
+                  <BarChart3 className="w-7 h-7 text-white" />
+                </div>
               </div>
-            </div>
-          </CardHeader>
-            <CardContent>
+            </CardHeader>
+            <CardContent className="relative z-10">
               <div className="flex items-baseline justify-between">
                 <div>
-                  <div className="text-3xl font-bold text-[#0C1C14]">
+                  <div className="text-4xl font-bold bg-gradient-to-r from-green-600 to-green-800 bg-clip-text text-transparent">
                     {latestWebsite?.totalUsers?.toLocaleString() || 0}
                   </div>
-                  <p className="text-sm text-gray-500 mt-1">Latest week</p>
+                  <p className="text-xs text-gray-500 mt-2 flex items-center gap-1">
+                    <Clock className="w-3 h-3" />
+                    Latest week
+                  </p>
                 </div>
                 {latestWebsite?.percentChangeUsers && (
                   <Badge
-                    className={
+                    className={`${
                       latestWebsite.percentChangeUsers > 0
-                        ? "bg-green-100 text-green-700 hover:bg-green-100"
-                        : "bg-red-100 text-red-700 hover:bg-red-100"
-                    }
+                        ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                        : "bg-red-50 text-red-700 border-red-200"
+                    } border px-3 py-1 font-semibold`}
                   >
                     {latestWebsite.percentChangeUsers > 0 ? (
                       <TrendingUp className="w-3 h-3 mr-1" />
@@ -171,31 +179,35 @@ export default async function DashboardPage() {
           </Card>
         </Link>
 
-        <Link href="/dashboard/email">
-          <Card className="border-2 hover:border-[#2E8741] transition-all duration-300 cursor-pointer card-hover bg-gradient-to-br from-white to-blue-50">
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
-              <CardDescription className="font-medium">Email Open Rate</CardDescription>
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/50">
-                <Mail className="w-6 h-6 text-white" />
+        <Link href="/dashboard/email" className="group">
+          <Card className="stat-card cursor-pointer overflow-hidden relative border-0">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-400/10 to-transparent rounded-bl-full"></div>
+            <CardHeader className="pb-3 relative z-10">
+              <div className="flex items-center justify-between">
+                <CardDescription className="font-semibold text-gray-700">Email Open Rate</CardDescription>
+                <div className="w-14 h-14 gradient-blue rounded-2xl flex items-center justify-center shadow-xl shadow-blue-500/40 icon-float group-hover:scale-110 transition-transform duration-500">
+                  <Mail className="w-7 h-7 text-white" />
+                </div>
               </div>
-            </div>
-          </CardHeader>
-            <CardContent>
+            </CardHeader>
+            <CardContent className="relative z-10">
               <div className="flex items-baseline justify-between">
                 <div>
-                  <div className="text-3xl font-bold text-[#0C1C14]">
+                  <div className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
                     {latestEmail ? `${(latestEmail.openRate * 100).toFixed(1)}%` : '--'}
                   </div>
-                  <p className="text-sm text-gray-500 mt-1">Last campaign</p>
+                  <p className="text-xs text-gray-500 mt-2 flex items-center gap-1">
+                    <Clock className="w-3 h-3" />
+                    Last campaign
+                  </p>
                 </div>
                 {latestEmail && (
                   <Badge
-                    className={
+                    className={`${
                       latestEmail.openRate >= 0.15
-                        ? "bg-green-100 text-green-700 hover:bg-green-100"
-                        : "bg-orange-100 text-orange-700 hover:bg-orange-100"
-                    }
+                        ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                        : "bg-amber-50 text-amber-700 border-amber-200"
+                    } border px-3 py-1 font-semibold`}
                   >
                     {latestEmail.openRate >= 0.15 ? (
                       <TrendingUp className="w-3 h-3 mr-1" />
@@ -210,25 +222,29 @@ export default async function DashboardPage() {
           </Card>
         </Link>
 
-        <Link href="/dashboard/social">
-          <Card className="border-2 hover:border-[#2E8741] transition-all duration-300 cursor-pointer card-hover bg-gradient-to-br from-white to-purple-50">
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
-              <CardDescription className="font-medium">Social Engagement</CardDescription>
-              <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/50">
-                <Users className="w-6 h-6 text-white" />
+        <Link href="/dashboard/social" className="group">
+          <Card className="stat-card cursor-pointer overflow-hidden relative border-0">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-purple-400/10 to-transparent rounded-bl-full"></div>
+            <CardHeader className="pb-3 relative z-10">
+              <div className="flex items-center justify-between">
+                <CardDescription className="font-semibold text-gray-700">Social Engagement</CardDescription>
+                <div className="w-14 h-14 gradient-purple rounded-2xl flex items-center justify-center shadow-xl shadow-purple-500/40 icon-float group-hover:scale-110 transition-transform duration-500">
+                  <Users className="w-7 h-7 text-white" />
+                </div>
               </div>
-            </div>
-          </CardHeader>
-            <CardContent>
+            </CardHeader>
+            <CardContent className="relative z-10">
               <div className="flex items-baseline justify-between">
                 <div>
-                  <div className="text-3xl font-bold text-[#0C1C14]">
-                    {avgSocialEngagement.toFixed(1)}%
+                  <div className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-purple-800 bg-clip-text text-transparent">
+                    {(avgSocialEngagement * 100).toFixed(1)}%
                   </div>
-                  <p className="text-sm text-gray-500 mt-1">Average rate</p>
+                  <p className="text-xs text-gray-500 mt-2 flex items-center gap-1">
+                    <Clock className="w-3 h-3" />
+                    Average rate
+                  </p>
                 </div>
-                <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-100">
+                <Badge className="bg-violet-50 text-violet-700 border-violet-200 border px-3 py-1 font-semibold">
                   <Users className="w-3 h-3 mr-1" />
                   LI + IG
                 </Badge>

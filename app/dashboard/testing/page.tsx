@@ -2,6 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { FlaskConical, TrendingUp, Target } from "lucide-react"
 import { prisma } from "@/lib/prisma"
+import { TestManagement } from "@/components/dashboard/test-management"
 
 export default async function ABTestingPage() {
   // Fetch A/B tests
@@ -17,43 +18,58 @@ export default async function ABTestingPage() {
   }, {} as Record<string, number>)
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 animate-in">
       {/* Summary Stats */}
-      <div className="grid gap-4 md:grid-cols-3">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Tests</CardTitle>
-            <FlaskConical className="h-4 w-4 text-muted-foreground" />
+      <div className="grid gap-6 md:grid-cols-3">
+        <Card className="stat-card border-0 overflow-hidden relative group">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-teal-400/10 to-transparent rounded-bl-full"></div>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
+            <CardTitle className="text-sm font-semibold text-gray-700">Total Tests</CardTitle>
+            <div className="w-10 h-10 gradient-teal rounded-xl flex items-center justify-center shadow-lg shadow-teal-500/30 group-hover:scale-110 transition-transform">
+              <FlaskConical className="h-5 w-5 text-white" />
+            </div>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{tests.length}</div>
-            <p className="text-xs text-muted-foreground">
+          <CardContent className="relative z-10">
+            <div className="text-3xl font-bold bg-gradient-to-r from-teal-600 to-teal-800 bg-clip-text text-transparent">
+              {tests.length}
+            </div>
+            <p className="text-xs text-gray-500 mt-2">
               Optimization experiments run
             </p>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Channels Tested</CardTitle>
-            <Target className="h-4 w-4 text-muted-foreground" />
+        <Card className="stat-card border-0 overflow-hidden relative group">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-purple-400/10 to-transparent rounded-bl-full"></div>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
+            <CardTitle className="text-sm font-semibold text-gray-700">Channels Tested</CardTitle>
+            <div className="w-10 h-10 gradient-purple rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/30 group-hover:scale-110 transition-transform">
+              <Target className="h-5 w-5 text-white" />
+            </div>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{Object.keys(testsByChannel).length}</div>
-            <p className="text-xs text-muted-foreground">
+          <CardContent className="relative z-10">
+            <div className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-purple-800 bg-clip-text text-transparent">
+              {Object.keys(testsByChannel).length}
+            </div>
+            <p className="text-xs text-gray-500 mt-2">
               Different marketing channels
             </p>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Learning Rate</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+        <Card className="stat-card border-0 overflow-hidden relative group">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-green-400/10 to-transparent rounded-bl-full"></div>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
+            <CardTitle className="text-sm font-semibold text-gray-700">Learning Rate</CardTitle>
+            <div className="w-10 h-10 gradient-green rounded-xl flex items-center justify-center shadow-lg shadow-green-500/30 group-hover:scale-110 transition-transform">
+              <TrendingUp className="h-5 w-5 text-white" />
+            </div>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{(tests.length / 12).toFixed(1)}</div>
-            <p className="text-xs text-muted-foreground">
+          <CardContent className="relative z-10">
+            <div className="text-3xl font-bold bg-gradient-to-r from-green-600 to-green-800 bg-clip-text text-transparent">
+              {(tests.length / 12).toFixed(1)}
+            </div>
+            <p className="text-xs text-gray-500 mt-2">
               Tests per month average
             </p>
           </CardContent>
@@ -139,6 +155,17 @@ export default async function ABTestingPage() {
               </div>
             ))}
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Data Management Section */}
+      <Card className="chart-card">
+        <CardHeader>
+          <CardTitle>Manage A/B Tests</CardTitle>
+          <CardDescription>Add, edit, or remove optimization tests</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <TestManagement tests={tests} />
         </CardContent>
       </Card>
     </div>

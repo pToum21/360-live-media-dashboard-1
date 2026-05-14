@@ -2,6 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Building2, CheckCircle2, XCircle, AlertCircle } from "lucide-react"
 import { prisma } from "@/lib/prisma"
+import { ClientManagement } from "@/components/dashboard/client-management"
 
 export default async function ClientProjectsPage() {
   // Fetch client projects
@@ -12,45 +13,58 @@ export default async function ClientProjectsPage() {
   const utmEnabledCount = clients.filter(c => c.utmTracking).length
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 animate-in">
       {/* Summary Stats */}
-      <div className="grid gap-4 md:grid-cols-3">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Clients</CardTitle>
-            <Building2 className="h-4 w-4 text-muted-foreground" />
+      <div className="grid gap-6 md:grid-cols-3">
+        <Card className="stat-card border-0 overflow-hidden relative group">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-orange-400/10 to-transparent rounded-bl-full"></div>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
+            <CardTitle className="text-sm font-semibold text-gray-700">Total Clients</CardTitle>
+            <div className="w-10 h-10 gradient-orange rounded-xl flex items-center justify-center shadow-lg shadow-orange-500/30 group-hover:scale-110 transition-transform">
+              <Building2 className="h-5 w-5 text-white" />
+            </div>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{clients.length}</div>
-            <p className="text-xs text-muted-foreground">
+          <CardContent className="relative z-10">
+            <div className="text-3xl font-bold bg-gradient-to-r from-orange-600 to-orange-800 bg-clip-text text-transparent">
+              {clients.length}
+            </div>
+            <p className="text-xs text-gray-500 mt-2">
               Active client projects
             </p>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">UTM Tracking</CardTitle>
-            <CheckCircle2 className="h-4 w-4 text-muted-foreground" />
+        <Card className="stat-card border-0 overflow-hidden relative group">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-green-400/10 to-transparent rounded-bl-full"></div>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
+            <CardTitle className="text-sm font-semibold text-gray-700">UTM Tracking</CardTitle>
+            <div className="w-10 h-10 gradient-green rounded-xl flex items-center justify-center shadow-lg shadow-green-500/30 group-hover:scale-110 transition-transform">
+              <CheckCircle2 className="h-5 w-5 text-white" />
+            </div>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-600">{utmEnabledCount}</div>
-            <p className="text-xs text-muted-foreground">
+          <CardContent className="relative z-10">
+            <div className="text-3xl font-bold bg-gradient-to-r from-green-600 to-green-800 bg-clip-text text-transparent">
+              {utmEnabledCount}
+            </div>
+            <p className="text-xs text-gray-500 mt-2">
               Clients with UTM tracking enabled
             </p>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Coverage</CardTitle>
-            <AlertCircle className="h-4 w-4 text-muted-foreground" />
+        <Card className="stat-card border-0 overflow-hidden relative group">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-blue-400/10 to-transparent rounded-bl-full"></div>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
+            <CardTitle className="text-sm font-semibold text-gray-700">Coverage</CardTitle>
+            <div className="w-10 h-10 gradient-blue rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/30 group-hover:scale-110 transition-transform">
+              <AlertCircle className="h-5 w-5 text-white" />
+            </div>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
+          <CardContent className="relative z-10">
+            <div className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
               {((utmEnabledCount / clients.length) * 100).toFixed(0)}%
             </div>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-gray-500 mt-2">
               UTM tracking coverage
             </p>
           </CardContent>
@@ -173,6 +187,17 @@ export default async function ClientProjectsPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Data Management Section */}
+      <Card className="chart-card">
+        <CardHeader>
+          <CardTitle>Manage Client Projects</CardTitle>
+          <CardDescription>Add, edit, or remove client projects</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ClientManagement clients={clients} />
+        </CardContent>
+      </Card>
     </div>
   )
 }
