@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 
 interface ClientFormDialogProps {
   open: boolean
@@ -40,11 +41,12 @@ export function ClientFormDialog({ open, onOpenChange, data, mode }: ClientFormD
 
       if (!response.ok) throw new Error('Failed to save')
 
+      toast.success(mode === 'create' ? 'Client created successfully!' : 'Client updated successfully!')
       router.refresh()
       onOpenChange(false)
     } catch (error) {
       console.error('Error saving client:', error)
-      alert('Failed to save. Please try again.')
+      toast.error('Failed to save client. Please try again.')
     } finally {
       setLoading(false)
     }

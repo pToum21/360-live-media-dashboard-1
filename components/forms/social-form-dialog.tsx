@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 
 interface SocialFormDialogProps {
   open: boolean
@@ -51,11 +52,12 @@ export function SocialFormDialog({ open, onOpenChange, data, mode }: SocialFormD
 
       if (!response.ok) throw new Error('Failed to save')
 
+      toast.success(mode === 'create' ? 'Metric created successfully!' : 'Metric updated successfully!')
       router.refresh()
       onOpenChange(false)
     } catch (error) {
       console.error('Error saving social metric:', error)
-      alert('Failed to save. Please try again.')
+      toast.error('Failed to save metric. Please try again.')
     } finally {
       setLoading(false)
     }

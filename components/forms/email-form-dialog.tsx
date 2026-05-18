@@ -49,11 +49,12 @@ export function EmailFormDialog({ open, onOpenChange, data, mode }: EmailFormDia
 
       if (!response.ok) throw new Error('Failed to save')
 
+      toast.success(mode === 'create' ? 'Campaign created successfully!' : 'Campaign updated successfully!')
       router.refresh()
       onOpenChange(false)
     } catch (error) {
       console.error('Error saving email campaign:', error)
-      alert('Failed to save. Please try again.')
+      toast.error('Failed to save campaign. Please try again.')
     } finally {
       setLoading(false)
     }

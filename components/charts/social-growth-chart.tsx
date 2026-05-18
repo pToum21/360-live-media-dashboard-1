@@ -14,19 +14,22 @@ export function SocialGrowthChart({ data }: SocialGrowthChartProps) {
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-white p-4 rounded-lg shadow-lg border border-gray-200">
-          <p className="font-semibold text-gray-900 mb-2">{label}</p>
+        <div className="bg-white/95 backdrop-blur-md p-5 rounded-xl shadow-2xl border border-pink-100/50 animate-scale-in">
+          <p className="font-bold text-gray-900 mb-3 text-sm tracking-wide uppercase">{label}</p>
           {payload.map((entry: any, index: number) => (
-            <div key={index} className="flex items-center justify-between gap-4 py-1">
-              <div className="flex items-center gap-2">
+            <div key={index} className="flex items-center justify-between gap-6 py-1.5">
+              <div className="flex items-center gap-2.5">
                 <div 
-                  className="w-3 h-3 rounded-full" 
-                  style={{ backgroundColor: entry.color }}
+                  className="w-3.5 h-3.5 rounded-full shadow-lg" 
+                  style={{ 
+                    backgroundColor: entry.color,
+                    boxShadow: `0 0 10px ${entry.color}40`
+                  }}
                 />
-                <span className="text-sm text-gray-600">{entry.name}:</span>
+                <span className="text-sm text-gray-600 font-medium">{entry.name}:</span>
               </div>
-              <span className="font-semibold text-gray-900">
-                {entry.value.toLocaleString()} impressions
+              <span className="font-bold text-gray-900 text-base">
+                {entry.value.toLocaleString()}
               </span>
             </div>
           ))}
@@ -66,21 +69,23 @@ export function SocialGrowthChart({ data }: SocialGrowthChartProps) {
           type="monotone" 
           dataKey="linkedIn" 
           stroke="#0077b5" 
-          strokeWidth={3}
-          dot={{ fill: '#0077b5', r: 5, strokeWidth: 2, stroke: '#fff' }}
-          activeDot={{ r: 7, strokeWidth: 2, stroke: '#fff' }}
+          strokeWidth={3.5}
+          dot={{ fill: '#0077b5', r: 5, strokeWidth: 3, stroke: '#fff' }}
+          activeDot={{ r: 7, strokeWidth: 3, stroke: '#fff', style: { filter: 'drop-shadow(0 0 8px #0077b5)' } }}
           name="LinkedIn Impressions"
-          animationDuration={1500}
+          animationDuration={1800}
+          animationEasing="ease-in-out"
         />
         <Line 
           type="monotone" 
           dataKey="instagram" 
           stroke="#E1306C" 
-          strokeWidth={3}
-          dot={{ fill: '#E1306C', r: 5, strokeWidth: 2, stroke: '#fff' }}
-          activeDot={{ r: 7, strokeWidth: 2, stroke: '#fff' }}
+          strokeWidth={3.5}
+          dot={{ fill: '#E1306C', r: 5, strokeWidth: 3, stroke: '#fff' }}
+          activeDot={{ r: 7, strokeWidth: 3, stroke: '#fff', style: { filter: 'drop-shadow(0 0 8px #E1306C)' } }}
           name="Instagram Impressions"
-          animationDuration={1500}
+          animationDuration={1800}
+          animationEasing="ease-in-out"
         />
       </LineChart>
     </ResponsiveContainer>
