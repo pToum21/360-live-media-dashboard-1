@@ -6,6 +6,7 @@ import { Plus, Pencil, Trash2 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { ClientFormDialog } from '@/components/forms/client-form-dialog'
 import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 
 interface ClientManagementProps {
   clients: any[]
@@ -32,6 +33,8 @@ export function ClientManagement({ clients }: ClientManagementProps) {
   const handleDelete = async (id: string) => {
     if (!confirm('Are you sure you want to delete this client?')) return
 
+    const toastId = toast.loading('Deleting client...')
+
     try {
       const response = await fetch(`/api/clients/${id}`, {
         method: 'DELETE',
@@ -39,10 +42,11 @@ export function ClientManagement({ clients }: ClientManagementProps) {
 
       if (!response.ok) throw new Error('Failed to delete')
 
+      toast.success('Client deleted successfully!', { id: toastId })
       router.refresh()
     } catch (error) {
       console.error('Error deleting client:', error)
-      alert('Failed to delete. Please try again.')
+      toast.error('Failed to delete client. Please try again.', { id: toastId })
     }
   }
 

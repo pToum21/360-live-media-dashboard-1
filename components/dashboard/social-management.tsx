@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Plus, Pencil, Trash2 } from 'lucide-react'
 import { SocialFormDialog } from '@/components/forms/social-form-dialog'
 import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 
 interface SocialManagementProps {
   metrics: any[]
@@ -31,6 +32,8 @@ export function SocialManagement({ metrics }: SocialManagementProps) {
   const handleDelete = async (id: string) => {
     if (!confirm('Are you sure you want to delete this metric?')) return
 
+    const toastId = toast.loading('Deleting metric...')
+
     try {
       const response = await fetch(`/api/social/${id}`, {
         method: 'DELETE',
@@ -38,10 +41,11 @@ export function SocialManagement({ metrics }: SocialManagementProps) {
 
       if (!response.ok) throw new Error('Failed to delete')
 
+      toast.success('Metric deleted successfully!', { id: toastId })
       router.refresh()
     } catch (error) {
       console.error('Error deleting metric:', error)
-      alert('Failed to delete. Please try again.')
+      toast.error('Failed to delete metric. Please try again.', { id: toastId })
     }
   }
 

@@ -16,23 +16,26 @@ export function TrafficSourceChart({ data }: TrafficSourceChartProps) {
     if (active && payload && payload.length) {
       const item = payload[0]
       return (
-        <div className="bg-white p-4 rounded-lg shadow-lg border border-gray-200">
-          <div className="flex items-center gap-3 mb-2">
+        <div className="bg-white/95 backdrop-blur-md p-5 rounded-xl shadow-2xl border border-purple-100/50 animate-scale-in">
+          <div className="flex items-center gap-3 mb-3">
             <div 
-              className="w-4 h-4 rounded-full" 
-              style={{ backgroundColor: item.payload.fill }}
+              className="w-5 h-5 rounded-full shadow-lg" 
+              style={{ 
+                backgroundColor: item.payload.fill,
+                boxShadow: `0 0 12px ${item.payload.fill}60`
+              }}
             />
-            <p className="font-semibold text-gray-900">{item.name}</p>
+            <p className="font-bold text-gray-900 text-base">{item.name}</p>
           </div>
-          <div className="flex items-center justify-between gap-6 border-t border-gray-100 pt-2 mt-2">
-            <span className="text-sm text-gray-600">Visitors:</span>
+          <div className="flex items-center justify-between gap-6 border-t border-gray-100 pt-3 mt-2">
+            <span className="text-sm text-gray-600 font-medium">Visitors:</span>
             <span className="font-bold text-lg text-gray-900">
               {item.value.toLocaleString()}
             </span>
           </div>
-          <div className="flex items-center justify-between gap-6 mt-1">
-            <span className="text-sm text-gray-600">Percentage:</span>
-            <span className="font-semibold text-gray-900">
+          <div className="flex items-center justify-between gap-6 mt-2">
+            <span className="text-sm text-gray-600 font-medium">Percentage:</span>
+            <span className="font-bold text-gray-900">
               {((item.value / data.reduce((sum, d) => sum + d.value, 0)) * 100).toFixed(1)}%
             </span>
           </div>
@@ -99,10 +102,11 @@ export function TrafficSourceChart({ data }: TrafficSourceChartProps) {
               fill={COLORS[index % COLORS.length]}
               style={{ 
                 cursor: 'pointer',
-                filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))'
+                filter: 'drop-shadow(0 4px 6px rgba(0, 0, 0, 0.15))',
+                transition: 'all 0.3s ease',
               }}
               stroke="#fff"
-              strokeWidth={3}
+              strokeWidth={4}
             />
           ))}
         </Pie>

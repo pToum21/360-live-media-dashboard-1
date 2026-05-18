@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Plus, Pencil, Trash2 } from 'lucide-react'
 import { EmailFormDialog } from '@/components/forms/email-form-dialog'
 import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 
 interface EmailManagementProps {
   campaigns: any[]
@@ -31,6 +32,8 @@ export function EmailManagement({ campaigns }: EmailManagementProps) {
   const handleDelete = async (id: string) => {
     if (!confirm('Are you sure you want to delete this campaign?')) return
 
+    const toastId = toast.loading('Deleting campaign...')
+
     try {
       const response = await fetch(`/api/email/${id}`, {
         method: 'DELETE',
@@ -38,10 +41,11 @@ export function EmailManagement({ campaigns }: EmailManagementProps) {
 
       if (!response.ok) throw new Error('Failed to delete')
 
+      toast.success('Campaign deleted successfully!', { id: toastId })
       router.refresh()
     } catch (error) {
       console.error('Error deleting campaign:', error)
-      alert('Failed to delete. Please try again.')
+      toast.error('Failed to delete campaign. Please try again.', { id: toastId })
     }
   }
 

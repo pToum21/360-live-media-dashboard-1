@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 
 interface TestFormDialogProps {
   open: boolean
@@ -45,11 +46,12 @@ export function TestFormDialog({ open, onOpenChange, data, mode }: TestFormDialo
 
       if (!response.ok) throw new Error('Failed to save')
 
+      toast.success(mode === 'create' ? 'Test created successfully!' : 'Test updated successfully!')
       router.refresh()
       onOpenChange(false)
     } catch (error) {
       console.error('Error saving A/B test:', error)
-      alert('Failed to save. Please try again.')
+      toast.error('Failed to save test. Please try again.')
     } finally {
       setLoading(false)
     }

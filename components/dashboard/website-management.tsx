@@ -4,7 +4,9 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Plus, Pencil, Trash2 } from 'lucide-react'
 import { WebsiteFormDialog } from '@/components/forms/website-form-dialog'
+import { ExportButton } from '@/components/ui/export-button'
 import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 
 interface WebsiteManagementProps {
   metrics: any[]
@@ -31,6 +33,8 @@ export function WebsiteManagement({ metrics }: WebsiteManagementProps) {
   const handleDelete = async (id: string) => {
     if (!confirm('Are you sure you want to delete this metric?')) return
 
+    const toastId = toast.loading('Deleting metric...')
+
     try {
       const response = await fetch(`/api/website/${id}`, {
         method: 'DELETE',
@@ -38,24 +42,28 @@ export function WebsiteManagement({ metrics }: WebsiteManagementProps) {
 
       if (!response.ok) throw new Error('Failed to delete')
 
+      toast.success('Metric deleted successfully!', { id: toastId })
       router.refresh()
     } catch (error) {
       console.error('Error deleting metric:', error)
-      alert('Failed to delete. Please try again.')
+      toast.error('Failed to delete metric. Please try again.', { id: toastId })
     }
   }
 
   return (
     <>
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex justify-between items-center mb-6 flex-wrap gap-3">
         <h3 className="text-lg font-semibold text-gray-900">Recent Weeks</h3>
-        <Button 
-          onClick={handleAdd}
-          className="bg-[#2E8741] hover:bg-[#236933]"
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Add Week
-        </Button>
+        <div className="flex gap-2">
+          <ExportButton data={metrics} filename="website-analytics" type="website" />
+          <Button 
+            onClick={handleAdd}
+            className="bg-[#2E8741] hover:bg-[#236933]"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Add Week
+          </Button>
+        </div>
       </div>
 
       <div className="space-y-3">
