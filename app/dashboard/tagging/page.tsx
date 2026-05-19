@@ -39,12 +39,12 @@ export default async function ContentTaggingPage() {
       <div className="grid gap-4 md:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Audience Tags</CardTitle>
-            <Tag className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium text-gray-900 dark:text-gray-100">Audience Tags</CardTitle>
+            <Tag className="h-4 w-4 text-muted-foreground dark:text-gray-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{audienceTags.length}</div>
-            <p className="text-xs text-muted-foreground">
+            <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">{audienceTags.length}</div>
+            <p className="text-xs text-muted-foreground dark:text-gray-400">
               Target audience categories
             </p>
           </CardContent>
@@ -52,12 +52,12 @@ export default async function ContentTaggingPage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Content Tags</CardTitle>
-            <Tag className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium text-gray-900 dark:text-gray-100">Content Tags</CardTitle>
+            <Tag className="h-4 w-4 text-muted-foreground dark:text-gray-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{contentTags.length}</div>
-            <p className="text-xs text-muted-foreground">
+            <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">{contentTags.length}</div>
+            <p className="text-xs text-muted-foreground dark:text-gray-400">
               Content type categories
             </p>
           </CardContent>
@@ -65,12 +65,12 @@ export default async function ContentTaggingPage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Posts Tracked</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium text-gray-900 dark:text-gray-100">Posts Tracked</CardTitle>
+            <TrendingUp className="h-4 w-4 text-muted-foreground dark:text-gray-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{socialPosts.length}</div>
-            <p className="text-xs text-muted-foreground">
+            <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">{socialPosts.length}</div>
+            <p className="text-xs text-muted-foreground dark:text-gray-400">
               Social posts with metrics
             </p>
           </CardContent>
@@ -81,8 +81,8 @@ export default async function ContentTaggingPage() {
       <div className="grid gap-6 md:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>Audience Tags</CardTitle>
-            <CardDescription>
+            <CardTitle className="text-gray-900 dark:text-gray-100">Audience Tags</CardTitle>
+            <CardDescription className="dark:text-gray-400">
               Target audience segments for content categorization
             </CardDescription>
           </CardHeader>
@@ -99,8 +99,8 @@ export default async function ContentTaggingPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Content Tags</CardTitle>
-            <CardDescription>
+            <CardTitle className="text-gray-900 dark:text-gray-100">Content Tags</CardTitle>
+            <CardDescription className="dark:text-gray-400">
               Content type categories for post classification
             </CardDescription>
           </CardHeader>
@@ -119,46 +119,46 @@ export default async function ContentTaggingPage() {
       {/* Social Posts */}
       <Card>
         <CardHeader>
-          <CardTitle>Recent Social Posts</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-gray-900 dark:text-gray-100">Recent Social Posts</CardTitle>
+          <CardDescription className="dark:text-gray-400">
             Posts tracked from your social media channels
           </CardDescription>
         </CardHeader>
         <CardContent>
           {socialPosts.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
+            <div className="text-center py-8 text-gray-500 dark:text-gray-400">
               No social posts with metrics found
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b">
-                    <th className="text-left py-3 px-4">Week</th>
-                    <th className="text-left py-3 px-4">Platform</th>
-                    <th className="text-right py-3 px-4">Impressions</th>
-                    <th className="text-right py-3 px-4">Engagements</th>
-                    <th className="text-right py-3 px-4">Engagement Rate</th>
-                    <th className="text-right py-3 px-4">Link Clicks</th>
+                  <tr className="border-b border-gray-200 dark:border-gray-700">
+                    <th className="text-left py-3 px-4 text-gray-700 dark:text-gray-300 font-semibold">Week</th>
+                    <th className="text-left py-3 px-4 text-gray-700 dark:text-gray-300 font-semibold">Platform</th>
+                    <th className="text-right py-3 px-4 text-gray-700 dark:text-gray-300 font-semibold">Impressions</th>
+                    <th className="text-right py-3 px-4 text-gray-700 dark:text-gray-300 font-semibold">Engagements</th>
+                    <th className="text-right py-3 px-4 text-gray-700 dark:text-gray-300 font-semibold">Engagement Rate</th>
+                    <th className="text-right py-3 px-4 text-gray-700 dark:text-gray-300 font-semibold">Link Clicks</th>
                   </tr>
                 </thead>
                 <tbody>
                   {socialPosts.map((post) => (
-                    <tr key={post.id} className="border-b hover:bg-gray-50">
-                      <td className="py-3 px-4">
+                    <tr key={post.id} className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/50 hover-glass-shine transition-colors">
+                      <td className="py-3 px-4 text-gray-900 dark:text-gray-100">
                         {new Date(post.weekStarting).toLocaleDateString()}
                       </td>
                       <td className="py-3 px-4">
-                        <Badge variant="outline">{post.platform}</Badge>
+                        <Badge variant="outline" className="dark:border-gray-600 dark:text-gray-300">{post.platform}</Badge>
                       </td>
-                      <td className="text-right py-3 px-4">{post.impressions.toLocaleString()}</td>
-                      <td className="text-right py-3 px-4">{post.engagements.toLocaleString()}</td>
+                      <td className="text-right py-3 px-4 text-gray-900 dark:text-gray-100">{post.impressions.toLocaleString()}</td>
+                      <td className="text-right py-3 px-4 text-gray-900 dark:text-gray-100">{post.engagements.toLocaleString()}</td>
                       <td className="text-right py-3 px-4">
-                        <span className={post.engagementRate >= 0.1 ? 'text-green-600' : ''}>
+                        <span className={post.engagementRate >= 0.1 ? 'text-green-600 dark:text-green-400' : 'text-gray-900 dark:text-gray-100'}>
                           {(post.engagementRate * 100).toFixed(1)}%
                         </span>
                       </td>
-                      <td className="text-right py-3 px-4">{post.linkClicks || '-'}</td>
+                      <td className="text-right py-3 px-4 text-gray-900 dark:text-gray-100">{post.linkClicks || '-'}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -171,12 +171,12 @@ export default async function ContentTaggingPage() {
       {/* Tag Usage Info */}
       <Card>
         <CardHeader>
-          <CardTitle>How to Use Tags</CardTitle>
+          <CardTitle className="text-gray-900 dark:text-gray-100">How to Use Tags</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-3 text-sm text-gray-600">
+          <div className="space-y-3 text-sm text-gray-600 dark:text-gray-400">
             <p>
-              <strong className="text-gray-900">Audience Tags</strong> help you identify which audience segment a piece of content is targeting:
+              <strong className="text-gray-900 dark:text-gray-100">Audience Tags</strong> help you identify which audience segment a piece of content is targeting:
             </p>
             <ul className="list-disc list-inside pl-4 space-y-1">
               <li>Event Planners - Content aimed at event planning professionals</li>
@@ -184,7 +184,7 @@ export default async function ContentTaggingPage() {
               <li>Clients - Content showcasing client work or targeting potential clients</li>
             </ul>
             <p className="mt-4">
-              <strong className="text-gray-900">Content Tags</strong> help you categorize the type of content:
+              <strong className="text-gray-900 dark:text-gray-100">Content Tags</strong> help you categorize the type of content:
             </p>
             <ul className="list-disc list-inside pl-4 space-y-1">
               <li>Thought Leadership - Industry insights and expert perspectives</li>

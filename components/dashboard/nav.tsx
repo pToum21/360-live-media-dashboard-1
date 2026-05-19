@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import {
@@ -16,7 +17,7 @@ import {
 
 const navItems = [
   {
-    title: "Dashboard",
+    title: "360° Command",
     href: "/dashboard",
     icon: LayoutDashboard,
   },
@@ -61,22 +62,25 @@ export function DashboardNav() {
   const pathname = usePathname()
 
   return (
-    <aside className="fixed left-0 top-0 h-full w-72 flex flex-col border-r border-white/20 shadow-2xl z-30 backdrop-blur-2xl bg-white/60" style={{ backdropFilter: 'blur(40px) saturate(180%)' }}>
+    <aside className="fixed left-0 top-0 h-full w-72 flex flex-col border-r border-white/20 dark:border-white/10 shadow-2xl z-30 backdrop-blur-3xl bg-white/15 dark:bg-black/30" style={{ backdropFilter: 'blur(100px) saturate(180%)' }}>
       {/* Logo */}
-      <div className="h-20 flex items-center px-6 border-b border-white/20">
-        <Link href="/dashboard" className="flex items-center gap-3 group">
-          <div className="w-10 h-10 bg-gradient-to-br from-[#2E8741] to-[#84BE41] rounded-xl flex items-center justify-center shadow-xl group-hover:scale-110 group-hover:shadow-2xl transition-all duration-300">
-            <span className="text-white font-bold text-sm">360</span>
-          </div>
-          <div>
-            <span className="font-bold text-gray-900 text-lg block tracking-tight">Live Media</span>
-            <span className="text-xs text-green-600 font-medium">Marketing Dashboard</span>
+      <div className="h-20 flex items-center justify-center px-6 border-b border-white/30 dark:border-white/10">
+        <Link href="/dashboard" className="group">
+          <div className="w-32 flex items-center justify-center group-hover:scale-105 transition-all duration-300">
+            <Image 
+              src="/Logos/Info=Basic, Color=Green.png" 
+              alt="360 Live Media Logo" 
+              width={128}
+              height={128}
+              className="w-full h-auto object-contain"
+              priority
+            />
           </div>
         </Link>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 p-6 space-y-1.5">
+      <nav className="flex-1 p-5 space-y-1">
         {navItems.map((item) => {
           const isActive = pathname === item.href || pathname?.startsWith(item.href + "/")
           const Icon = item.icon
@@ -86,20 +90,17 @@ export function DashboardNav() {
               key={item.href}
               href={item.href}
               className={cn(
-                "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-300 group relative overflow-hidden",
+                "flex items-center gap-3 px-4 py-2.5 rounded-2xl text-sm font-medium transition-all duration-300 group relative overflow-hidden",
                 isActive
-                  ? "bg-gradient-to-r from-[#2E8741] to-[#3a9c54] text-white shadow-xl"
-                  : "text-gray-700 hover:bg-white/50 hover:text-gray-900 hover:shadow-lg"
+                  ? "bg-white/40 dark:bg-white/10 text-gray-800 dark:text-gray-200 shadow-lg border border-white/50 dark:border-white/20"
+                  : "text-gray-600 dark:text-gray-400 hover:bg-white/30 dark:hover:bg-white/5 hover:text-gray-800 dark:hover:text-gray-200"
               )}
-              style={isActive ? {} : { backdropFilter: 'blur(10px)' }}
+              style={{ backdropFilter: isActive ? 'blur(20px) saturate(150%)' : 'none' }}
             >
+              <Icon className={cn("w-5 h-5 relative z-10 transition-all", isActive ? "text-green-600 dark:text-green-500" : "text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300")} />
+              <span className="relative z-10 font-medium tracking-tight">{item.title}</span>
               {isActive && (
-                <div className="absolute inset-0 bg-gradient-to-r from-[#2E8741] to-[#84BE41] opacity-0 group-hover:opacity-20 transition-opacity"></div>
-              )}
-              <Icon className={cn("w-5 h-5 relative z-10 transition-transform group-hover:scale-110", isActive ? "text-white" : "text-gray-600 group-hover:text-green-600")} />
-              <span className="relative z-10 font-semibold tracking-tight">{item.title}</span>
-              {isActive && (
-                <div className="ml-auto w-2 h-2 rounded-full bg-green-200 animate-pulse shadow-lg shadow-green-400/50"></div>
+                <div className="ml-auto w-1.5 h-1.5 rounded-full bg-green-500 dark:bg-green-400"></div>
               )}
             </Link>
           )
@@ -107,10 +108,19 @@ export function DashboardNav() {
       </nav>
 
       {/* Footer */}
-      <div className="p-6 border-t border-white/20">
-        <div className="text-xs text-gray-600 text-center">
-          <p className="font-semibold text-green-600 mb-1">360 Live Media</p>
-          <p className="font-medium">© 2026 • Marketing Dashboard</p>
+      <div className="p-5 border-t border-white/30 dark:border-white/10">
+        <div className="flex items-center gap-3">
+          <Image 
+            src="/Logos/Info=Basic, Color=Green.png" 
+            alt="360 Live Media" 
+            width={40}
+            height={40}
+            className="w-10 h-10 object-contain"
+          />
+          <div className="text-xs text-gray-500 dark:text-gray-400">
+            <p className="font-medium text-gray-600 dark:text-gray-300 mb-0.5">360 Live Media</p>
+            <p className="font-normal text-gray-400 dark:text-gray-500">© 2026</p>
+          </div>
         </div>
       </div>
     </aside>

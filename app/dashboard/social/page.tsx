@@ -54,16 +54,16 @@ export default async function SocialMediaPage() {
           <Card className="stat-card border-0 overflow-hidden relative group">
             <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-blue-400/10 to-transparent rounded-bl-full"></div>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
-              <CardTitle className="text-sm font-semibold text-gray-700">Followers</CardTitle>
+              <CardTitle className="text-sm font-semibold text-gray-700 dark:text-gray-300">Followers</CardTitle>
               <div className="w-10 h-10 gradient-blue rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/30 group-hover:scale-110 transition-transform">
                 <Users className="h-5 w-5 text-white" />
               </div>
             </CardHeader>
             <CardContent className="relative z-10">
-              <div className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
+              <div className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 dark:from-blue-400 dark:to-blue-600 bg-clip-text text-transparent">
                 {latestWeek?.liFollowers?.toLocaleString() || 0}
               </div>
-              <p className="text-xs text-gray-500 mt-2">
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
                 {latestWeek?.liFollowerGrowthRate ? (
                   <span className={latestWeek.liFollowerGrowthRate > 0 ? 'text-emerald-600 font-medium' : 'text-red-600 font-medium'}>
                     {latestWeek.liFollowerGrowthRate > 0 ? '+' : ''}{(latestWeek.liFollowerGrowthRate).toFixed(1)}% growth rate
@@ -78,16 +78,16 @@ export default async function SocialMediaPage() {
           <Card className="stat-card border-0 overflow-hidden relative group">
             <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-green-400/10 to-transparent rounded-bl-full"></div>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
-              <CardTitle className="text-sm font-semibold text-gray-700">Impressions</CardTitle>
+              <CardTitle className="text-sm font-semibold text-gray-700 dark:text-gray-300">Impressions</CardTitle>
               <div className="w-10 h-10 gradient-green rounded-xl flex items-center justify-center shadow-lg shadow-green-500/30 group-hover:scale-110 transition-transform">
                 <Eye className="h-5 w-5 text-white" />
               </div>
             </CardHeader>
             <CardContent className="relative z-10">
-              <div className="text-3xl font-bold bg-gradient-to-r from-green-600 to-green-800 bg-clip-text text-transparent">
+              <div className="text-3xl font-bold bg-gradient-to-r from-green-600 to-green-800 dark:from-green-400 dark:to-green-600 bg-clip-text text-transparent">
                 {latestWeek?.liImpressions?.toLocaleString() || 0}
               </div>
-              <p className="text-xs text-gray-500 mt-2">
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
                 {totalLiImpressions.toLocaleString()} total (12 weeks)
               </p>
             </CardContent>
@@ -96,16 +96,16 @@ export default async function SocialMediaPage() {
           <Card className="stat-card border-0 overflow-hidden relative group">
             <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-purple-400/10 to-transparent rounded-bl-full"></div>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
-              <CardTitle className="text-sm font-semibold text-gray-700">Engagement Rate</CardTitle>
+              <CardTitle className="text-sm font-semibold text-gray-700 dark:text-gray-300">Engagement Rate</CardTitle>
               <div className="w-10 h-10 gradient-purple rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/30 group-hover:scale-110 transition-transform">
                 <Heart className="h-5 w-5 text-white" />
               </div>
             </CardHeader>
             <CardContent className="relative z-10">
-              <div className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-purple-800 bg-clip-text text-transparent">
+              <div className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-purple-800 dark:from-purple-400 dark:to-purple-600 bg-clip-text text-transparent">
                 {latestWeek?.liEngagementRate ? (latestWeek.liEngagementRate * 100).toFixed(1) : 0}%
               </div>
-              <p className="text-xs text-gray-500 mt-2">
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
                 {(avgLiEngagement * 100).toFixed(1)}% avg over 12 weeks
               </p>
             </CardContent>
@@ -114,16 +114,16 @@ export default async function SocialMediaPage() {
           <Card className="stat-card border-0 overflow-hidden relative group">
             <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-orange-400/10 to-transparent rounded-bl-full"></div>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
-              <CardTitle className="text-sm font-semibold text-gray-700">Posts Per Week</CardTitle>
+              <CardTitle className="text-sm font-semibold text-gray-700 dark:text-gray-300">Posts Per Week</CardTitle>
               <div className="w-10 h-10 gradient-orange rounded-xl flex items-center justify-center shadow-lg shadow-orange-500/30 group-hover:scale-110 transition-transform">
                 <TrendingUp className="h-5 w-5 text-white" />
               </div>
             </CardHeader>
             <CardContent className="relative z-10">
-              <div className="text-3xl font-bold bg-gradient-to-r from-orange-600 to-orange-800 bg-clip-text text-transparent">
+              <div className="text-3xl font-bold bg-gradient-to-r from-orange-600 to-orange-800 dark:from-orange-400 dark:to-orange-600 bg-clip-text text-transparent">
                 {latestWeek?.liPostsPerWeek || 0}
               </div>
-              <p className="text-xs text-gray-500 mt-2">
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
                 Latest week posting frequency
               </p>
             </CardContent>
@@ -143,16 +143,16 @@ export default async function SocialMediaPage() {
           <Card className="stat-card border-0 overflow-hidden relative group">
             <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-purple-400/10 to-transparent rounded-bl-full"></div>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
-              <CardTitle className="text-sm font-semibold text-gray-700">Followers</CardTitle>
+              <CardTitle className="text-sm font-semibold text-gray-700 dark:text-gray-300">Followers</CardTitle>
               <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-pink-600 rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/30 group-hover:scale-110 transition-transform">
                 <Users className="h-5 w-5 text-white" />
               </div>
             </CardHeader>
             <CardContent className="relative z-10">
-              <div className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+              <div className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 dark:from-purple-400 dark:to-pink-400 bg-clip-text text-transparent">
                 {latestWeek?.igFollowers?.toLocaleString() || 0}
               </div>
-              <p className="text-xs text-gray-500 mt-2">
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
                 Current followers
               </p>
             </CardContent>
@@ -161,13 +161,13 @@ export default async function SocialMediaPage() {
           <Card className="stat-card border-0 overflow-hidden relative group">
             <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-pink-400/10 to-transparent rounded-bl-full"></div>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
-              <CardTitle className="text-sm font-semibold text-gray-700">Impressions</CardTitle>
+              <CardTitle className="text-sm font-semibold text-gray-700 dark:text-gray-300">Impressions</CardTitle>
               <div className="w-10 h-10 bg-gradient-to-br from-pink-500 to-orange-500 rounded-xl flex items-center justify-center shadow-lg shadow-pink-500/30 group-hover:scale-110 transition-transform">
                 <Eye className="h-5 w-5 text-white" />
               </div>
             </CardHeader>
             <CardContent className="relative z-10">
-              <div className="text-3xl font-bold bg-gradient-to-r from-pink-600 to-orange-600 bg-clip-text text-transparent">
+              <div className="text-3xl font-bold bg-gradient-to-r from-pink-600 to-orange-600 dark:from-pink-400 dark:to-orange-400 bg-clip-text text-transparent">
                 {latestWeek?.igImpressions?.toLocaleString() || 0}</div>
               <p className="text-xs text-muted-foreground">
                 {totalIgImpressions.toLocaleString()} total (12 weeks)
@@ -230,30 +230,30 @@ export default async function SocialMediaPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b">
-                  <th className="text-left py-3 px-4">Week Starting</th>
-                  <th className="text-right py-3 px-4">LI Impressions</th>
-                  <th className="text-right py-3 px-4">LI Engagement</th>
-                  <th className="text-right py-3 px-4">LI Posts</th>
-                  <th className="text-right py-3 px-4">IG Impressions</th>
-                  <th className="text-right py-3 px-4">IG Engagement</th>
-                  <th className="text-right py-3 px-4">IG Posts</th>
+                <tr className="border-b border-gray-200 dark:border-gray-700">
+                  <th className="text-left py-3 px-4 text-gray-700 dark:text-gray-300 font-semibold">Week Starting</th>
+                  <th className="text-right py-3 px-4 text-gray-700 dark:text-gray-300 font-semibold">LI Impressions</th>
+                  <th className="text-right py-3 px-4 text-gray-700 dark:text-gray-300 font-semibold">LI Engagement</th>
+                  <th className="text-right py-3 px-4 text-gray-700 dark:text-gray-300 font-semibold">LI Posts</th>
+                  <th className="text-right py-3 px-4 text-gray-700 dark:text-gray-300 font-semibold">IG Impressions</th>
+                  <th className="text-right py-3 px-4 text-gray-700 dark:text-gray-300 font-semibold">IG Engagement</th>
+                  <th className="text-right py-3 px-4 text-gray-700 dark:text-gray-300 font-semibold">IG Posts</th>
                 </tr>
               </thead>
               <tbody>
                 {metrics.map((metric) => (
-                  <tr key={metric.id} className="border-b hover:bg-gray-50">
-                    <td className="py-3 px-4">{new Date(metric.weekStarting).toLocaleDateString()}</td>
-                    <td className="text-right py-3 px-4">{metric.liImpressions?.toLocaleString() || '-'}</td>
-                    <td className="text-right py-3 px-4">
+                  <tr key={metric.id} className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                    <td className="py-3 px-4 text-gray-900 dark:text-gray-100">{new Date(metric.weekStarting).toLocaleDateString()}</td>
+                    <td className="text-right py-3 px-4 text-gray-900 dark:text-gray-100">{metric.liImpressions?.toLocaleString() || '-'}</td>
+                    <td className="text-right py-3 px-4 text-gray-900 dark:text-gray-100">
                       {metric.liEngagementRate ? (metric.liEngagementRate * 100).toFixed(1) + '%' : '-'}
                     </td>
-                    <td className="text-right py-3 px-4">{metric.liPostsPerWeek || '-'}</td>
-                    <td className="text-right py-3 px-4">{metric.igImpressions?.toLocaleString() || '-'}</td>
-                    <td className="text-right py-3 px-4">
+                    <td className="text-right py-3 px-4 text-gray-900 dark:text-gray-100">{metric.liPostsPerWeek || '-'}</td>
+                    <td className="text-right py-3 px-4 text-gray-900 dark:text-gray-100">{metric.igImpressions?.toLocaleString() || '-'}</td>
+                    <td className="text-right py-3 px-4 text-gray-900 dark:text-gray-100">
                       {metric.igEngagementRate ? (metric.igEngagementRate * 100).toFixed(1) + '%' : '-'}
                     </td>
-                    <td className="text-right py-3 px-4">{metric.igPostsPerWeek || '-'}</td>
+                    <td className="text-right py-3 px-4 text-gray-900 dark:text-gray-100">{metric.igPostsPerWeek || '-'}</td>
                   </tr>
                 ))}
               </tbody>

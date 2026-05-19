@@ -47,28 +47,28 @@ export function UserNav() {
           </Avatar>
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-64 backdrop-blur-xl bg-white/90 border border-white/20 shadow-2xl" align="end" forceMount style={{ backdropFilter: 'blur(20px) saturate(180%)' }}>
+      <DropdownMenuContent className="w-64 backdrop-blur-2xl bg-white/40 dark:bg-gray-900/80 border border-white/50 dark:border-white/20 shadow-xl" align="end" forceMount style={{ backdropFilter: 'blur(40px) saturate(150%)' }}>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1.5 p-2">
-            <p className="text-sm font-semibold leading-none tracking-tight text-gray-900">{session.user.name || session.user.email?.split('@')[0]}</p>
-            <p className="text-xs leading-none text-gray-600 font-medium">
+            <p className="text-sm font-semibold leading-none tracking-tight text-gray-700 dark:text-gray-200">{session.user.name || session.user.email?.split('@')[0]}</p>
+            <p className="text-xs leading-none text-gray-500 dark:text-gray-400 font-normal">
               {session.user.email}
             </p>
-            <div className="flex items-center gap-2 mt-2 pt-2 border-t border-gray-200">
-              <span className="text-xs text-gray-600">Role:</span>
-              <span className="text-xs font-semibold px-2 py-1 rounded-md bg-green-100 text-green-700">{session.user.role}</span>
+            <div className="flex items-center gap-2 mt-2 pt-2 border-t border-white/40 dark:border-gray-700">
+              <span className="text-xs text-gray-500 dark:text-gray-400">Role:</span>
+              <span className="text-xs font-medium px-2 py-0.5 rounded-lg bg-green-500/10 dark:bg-green-500/20 text-green-600 dark:text-green-400">{session.user.role}</span>
             </div>
           </div>
         </DropdownMenuLabel>
-        <DropdownMenuSeparator className="bg-gray-200" />
+        <DropdownMenuSeparator className="bg-white/40 dark:bg-gray-700" />
         <DropdownMenuItem 
           onClick={() => router.push('/dashboard/settings')}
-          className="cursor-pointer hover:bg-green-50 transition-colors"
+          className="cursor-pointer hover:bg-white/30 dark:hover:bg-gray-800 transition-colors text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100"
         >
           <Settings className="mr-2 h-4 w-4" />
-          <span>Settings</span>
+          <span className="font-medium">Settings</span>
         </DropdownMenuItem>
-        <DropdownMenuSeparator className="bg-gray-200" />
+        <DropdownMenuSeparator className="bg-white/40 dark:bg-gray-700" />
         <DropdownMenuItem asChild>
           <SignOutButton />
         </DropdownMenuItem>

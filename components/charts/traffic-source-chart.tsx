@@ -16,7 +16,7 @@ export function TrafficSourceChart({ data }: TrafficSourceChartProps) {
     if (active && payload && payload.length) {
       const item = payload[0]
       return (
-        <div className="bg-white/95 backdrop-blur-md p-5 rounded-xl shadow-2xl border border-purple-100/50 animate-scale-in">
+        <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-md p-5 rounded-xl shadow-2xl border border-purple-100/50 dark:border-purple-900/50 animate-scale-in">
           <div className="flex items-center gap-3 mb-3">
             <div 
               className="w-5 h-5 rounded-full shadow-lg" 
@@ -25,17 +25,17 @@ export function TrafficSourceChart({ data }: TrafficSourceChartProps) {
                 boxShadow: `0 0 12px ${item.payload.fill}60`
               }}
             />
-            <p className="font-bold text-gray-900 text-base">{item.name}</p>
+            <p className="font-bold text-gray-900 dark:text-gray-100 text-base">{item.name}</p>
           </div>
-          <div className="flex items-center justify-between gap-6 border-t border-gray-100 pt-3 mt-2">
-            <span className="text-sm text-gray-600 font-medium">Visitors:</span>
-            <span className="font-bold text-lg text-gray-900">
+          <div className="flex items-center justify-between gap-6 border-t border-gray-100 dark:border-gray-700 pt-3 mt-2">
+            <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">Visitors:</span>
+            <span className="font-bold text-lg text-gray-900 dark:text-gray-100">
               {item.value.toLocaleString()}
             </span>
           </div>
           <div className="flex items-center justify-between gap-6 mt-2">
-            <span className="text-sm text-gray-600 font-medium">Percentage:</span>
-            <span className="font-bold text-gray-900">
+            <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">Percentage:</span>
+            <span className="font-bold text-gray-900 dark:text-gray-100">
               {((item.value / data.reduce((sum, d) => sum + d.value, 0)) * 100).toFixed(1)}%
             </span>
           </div>
@@ -48,7 +48,7 @@ export function TrafficSourceChart({ data }: TrafficSourceChartProps) {
   // Show placeholder if no data
   if (!data || data.length === 0) {
     return (
-      <div className="flex items-center justify-center h-[350px] text-gray-400">
+      <div className="flex items-center justify-center h-[350px] text-gray-400 dark:text-gray-500">
         <div className="text-center">
           <div className="text-4xl mb-2">📊</div>
           <p className="text-sm font-medium">No traffic data available</p>
@@ -116,7 +116,7 @@ export function TrafficSourceChart({ data }: TrafficSourceChartProps) {
           height={60}
           iconType="circle"
           iconSize={10}
-          formatter={(value) => <span style={{ color: '#374151', fontWeight: 500, fontSize: '13px' }}>{value}</span>}
+          formatter={(value) => <span className="text-gray-700 dark:text-gray-300 font-medium text-[13px]">{value}</span>}
           wrapperStyle={{ paddingTop: '20px' }}
         />
       </PieChart>
