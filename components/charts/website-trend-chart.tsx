@@ -14,8 +14,8 @@ export function WebsiteTrendChart({ data }: WebsiteTrendChartProps) {
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-white/95 backdrop-blur-md p-5 rounded-xl shadow-2xl border border-green-100/50 animate-scale-in">
-          <p className="font-bold text-gray-900 mb-3 text-sm tracking-wide uppercase">{label}</p>
+        <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-md p-5 rounded-xl shadow-2xl border border-green-100/50 dark:border-green-900/50 animate-scale-in">
+          <p className="font-bold text-gray-900 dark:text-gray-100 mb-3 text-sm tracking-wide uppercase">{label}</p>
           {payload.map((entry: any, index: number) => (
             <div key={index} className="flex items-center justify-between gap-6 py-1.5">
               <div className="flex items-center gap-2.5">
@@ -26,9 +26,9 @@ export function WebsiteTrendChart({ data }: WebsiteTrendChartProps) {
                     boxShadow: `0 0 10px ${entry.color}40`
                   }}
                 />
-                <span className="text-sm text-gray-600 font-medium">{entry.name}:</span>
+                <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">{entry.name}:</span>
               </div>
-              <span className="font-bold text-gray-900 text-base">
+              <span className="font-bold text-gray-900 dark:text-gray-100 text-base">
                 {entry.value.toLocaleString()}
               </span>
             </div>
@@ -77,7 +77,7 @@ export function WebsiteTrendChart({ data }: WebsiteTrendChartProps) {
           iconType="rect"
           iconSize={14}
           wrapperStyle={{ paddingBottom: '10px', fontSize: '13px' }}
-          formatter={(value) => <span style={{ color: '#374151', fontWeight: 600 }}>{value}</span>}
+          formatter={(value) => <span className="text-gray-700 dark:text-gray-300 font-semibold">{value}</span>}
         />
         <Area 
           type="monotone" 

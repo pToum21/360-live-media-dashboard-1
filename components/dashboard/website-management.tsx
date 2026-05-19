@@ -53,12 +53,12 @@ export function WebsiteManagement({ metrics }: WebsiteManagementProps) {
   return (
     <>
       <div className="flex justify-between items-center mb-6 flex-wrap gap-3">
-        <h3 className="text-lg font-semibold text-gray-900">Recent Weeks</h3>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Recent Weeks</h3>
         <div className="flex gap-2">
           <ExportButton data={metrics} filename="website-analytics" type="website" />
           <Button 
             onClick={handleAdd}
-            className="bg-[#2E8741] hover:bg-[#236933]"
+            className="bg-[#2E8741] hover:bg-[#236933] dark:bg-[#2E8741] dark:hover:bg-[#3a9d54]"
           >
             <Plus className="h-4 w-4 mr-2" />
             Add Week
@@ -70,11 +70,11 @@ export function WebsiteManagement({ metrics }: WebsiteManagementProps) {
         {metrics.slice(0, 10).map((metric) => (
           <div
             key={metric.id}
-            className="border rounded-lg p-4 hover:bg-gray-50 transition-colors flex items-center justify-between"
+            className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors flex items-center justify-between relative overflow-hidden group"
           >
             <div className="flex-1 grid grid-cols-5 gap-4 text-sm">
               <div>
-                <p className="font-medium text-gray-900">
+                <p className="font-medium text-gray-900 dark:text-gray-100">
                   {new Date(metric.weekStarting).toLocaleDateString('en-US', {
                     month: 'short',
                     day: 'numeric',
@@ -83,20 +83,20 @@ export function WebsiteManagement({ metrics }: WebsiteManagementProps) {
                 </p>
               </div>
               <div>
-                <p className="text-gray-500">Total Users</p>
-                <p className="font-semibold">{metric.totalUsers?.toLocaleString() || 0}</p>
+                <p className="text-gray-500 dark:text-gray-400">Total Users</p>
+                <p className="font-semibold text-gray-900 dark:text-gray-100">{metric.totalUsers?.toLocaleString() || 0}</p>
               </div>
               <div>
-                <p className="text-gray-500">New Users</p>
-                <p className="font-semibold">{metric.newUsers?.toLocaleString() || 0}</p>
+                <p className="text-gray-500 dark:text-gray-400">New Users</p>
+                <p className="font-semibold text-gray-900 dark:text-gray-100">{metric.newUsers?.toLocaleString() || 0}</p>
               </div>
               <div>
-                <p className="text-gray-500">Engagement (sec)</p>
-                <p className="font-semibold">{metric.avgEngagementTimeSec || '-'}</p>
+                <p className="text-gray-500 dark:text-gray-400">Engagement (sec)</p>
+                <p className="font-semibold text-gray-900 dark:text-gray-100">{metric.avgEngagementTimeSec || '-'}</p>
               </div>
               <div>
-                <p className="text-gray-500">Health Score</p>
-                <p className="font-semibold">{metric.healthScore?.toFixed(1) || '-'}</p>
+                <p className="text-gray-500 dark:text-gray-400">Health Score</p>
+                <p className="font-semibold text-gray-900 dark:text-gray-100">{metric.healthScore?.toFixed(1) || '-'}</p>
               </div>
             </div>
 
@@ -105,14 +105,15 @@ export function WebsiteManagement({ metrics }: WebsiteManagementProps) {
                 variant="ghost"
                 size="sm"
                 onClick={() => handleEdit(metric)}
+                className="hover:bg-gray-100 dark:hover:bg-gray-700"
               >
-                <Pencil className="h-4 w-4" />
+                <Pencil className="h-4 w-4 text-gray-600 dark:text-gray-400" />
               </Button>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => handleDelete(metric.id)}
-                className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                className="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/30"
               >
                 <Trash2 className="h-4 w-4" />
               </Button>

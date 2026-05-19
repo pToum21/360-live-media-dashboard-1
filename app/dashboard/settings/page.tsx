@@ -15,10 +15,10 @@ export default async function SettingsPage() {
   return (
     <div className="space-y-6 animate-in">
       <div>
-        <h2 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-gray-900 via-green-700 to-gray-900 bg-clip-text text-transparent">
+        <h2 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-gray-900 via-green-700 to-gray-900 dark:from-gray-100 dark:via-green-400 dark:to-gray-100 bg-clip-text text-transparent">
           Settings
         </h2>
-        <p className="text-gray-600 mt-2">
+        <p className="text-gray-600 dark:text-gray-400 mt-2">
           Manage your account settings and preferences
         </p>
       </div>
@@ -31,7 +31,7 @@ export default async function SettingsPage() {
           <Card className="card-hover border-white/20 shadow-xl">
             <CardHeader>
               <CardTitle className="text-xl font-semibold tracking-tight">Profile Information</CardTitle>
-              <CardDescription className="text-gray-600">
+              <CardDescription className="text-gray-600 dark:text-gray-400">
                 Update your personal information and how others see you
               </CardDescription>
             </CardHeader>
@@ -49,22 +49,22 @@ export default async function SettingsPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <p className="text-sm font-medium text-gray-600">Email</p>
-                <p className="text-sm text-gray-900 font-semibold mt-1">{session.user.email}</p>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Email</p>
+                <p className="text-sm text-gray-900 dark:text-gray-100 font-semibold mt-1">{session.user.email}</p>
               </div>
               <Separator />
               <div>
-                <p className="text-sm font-medium text-gray-600">Role</p>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Role</p>
                 <div className="mt-1">
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-semibold bg-green-100 text-green-700">
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-semibold bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-800">
                     {session.user.role}
                   </span>
                 </div>
               </div>
               <Separator />
               <div>
-                <p className="text-sm font-medium text-gray-600">User ID</p>
-                <p className="text-xs text-gray-500 font-mono mt-1">{session.user.id}</p>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">User ID</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 font-mono mt-1">{session.user.id}</p>
               </div>
             </CardContent>
           </Card>
@@ -76,18 +76,18 @@ export default async function SettingsPage() {
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-900">Email Notifications</p>
-                  <p className="text-xs text-gray-600 mt-0.5">Receive email updates</p>
+                  <p className="text-sm font-medium text-gray-900 dark:text-gray-100">Email Notifications</p>
+                  <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">Receive email updates</p>
                 </div>
-                <div className="text-xs text-gray-500">Coming soon</div>
+                <div className="text-xs text-gray-500 dark:text-gray-400">Coming soon</div>
               </div>
               <Separator />
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-900">Weekly Reports</p>
-                  <p className="text-xs text-gray-600 mt-0.5">Get weekly summaries</p>
+                  <p className="text-sm font-medium text-gray-900 dark:text-gray-100">Weekly Reports</p>
+                  <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">Get weekly summaries</p>
                 </div>
-                <div className="text-xs text-gray-500">Coming soon</div>
+                <div className="text-xs text-gray-500 dark:text-gray-400">Coming soon</div>
               </div>
             </CardContent>
           </Card>

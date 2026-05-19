@@ -19,12 +19,12 @@ export default async function DashboardLayout({
 
   return (
     <div className="flex min-h-screen relative overflow-hidden">
-      {/* Animated gradient background */}
-      <div className="fixed inset-0 -z-10">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-green-50/40 to-purple-50/30"></div>
-        <div className="absolute top-0 -left-4 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
-        <div className="absolute top-0 -right-4 w-72 h-72 bg-green-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
-        <div className="absolute -bottom-8 left-20 w-72 h-72 bg-blue-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
+      {/* Ultra Soft gradient background - Apple Liquid Glass style */}
+      <div className="fixed inset-0 -z-10 bg-gradient-to-br from-blue-100/40 via-purple-100/30 to-pink-100/25 dark:from-gray-950 dark:via-gray-900 dark:to-black">
+        {/* Large soft floating orbs */}
+        <div className="absolute -top-20 left-1/4 w-[500px] h-[500px] bg-blue-300/20 dark:bg-gray-800/30 rounded-full filter blur-[120px] opacity-50 animate-blob"></div>
+        <div className="absolute top-1/3 right-1/4 w-[600px] h-[600px] bg-purple-300/15 dark:bg-gray-700/25 rounded-full filter blur-[150px] opacity-40 animate-blob animation-delay-2000"></div>
+        <div className="absolute bottom-0 left-1/2 w-[550px] h-[550px] bg-green-200/15 dark:bg-green-950/40 rounded-full filter blur-[140px] opacity-35 animate-blob animation-delay-4000"></div>
       </div>
       
       {/* Desktop Sidebar */}

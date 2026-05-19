@@ -32,8 +32,12 @@ export default async function Home() {
       <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-10 h-10 bg-gradient-to-br from-[#2E8741] to-[#84BE41] rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-xl">360</span>
+            <div className="w-10 h-10 rounded-lg flex items-center justify-center">
+              <img 
+                src="/Logos/Info=Basic, Color=Green.png" 
+                alt="360 Live Media Logo" 
+                className="w-full h-full object-contain"
+              />
             </div>
             <span className="font-bold text-xl text-[#0C1C14]">Live Media</span>
           </div>
@@ -280,8 +284,12 @@ export default async function Home() {
       <footer className="border-t bg-white py-12">
         <div className="container mx-auto px-4 text-center">
           <div className="flex items-center justify-center gap-2 mb-4">
-            <div className="w-8 h-8 bg-gradient-to-br from-[#2E8741] to-[#84BE41] rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold">360</span>
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center">
+              <img 
+                src="/Logos/Info=Basic, Color=Green.png" 
+                alt="360 Live Media Logo" 
+                className="w-full h-full object-contain"
+              />
             </div>
             <span className="font-bold text-lg text-[#0C1C14]">Live Media</span>
           </div>

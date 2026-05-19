@@ -49,7 +49,7 @@ export function UserSettingsForm({ user }: UserSettingsFormProps) {
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="space-y-2">
-        <Label htmlFor="name" className="text-sm font-semibold text-gray-900">
+        <Label htmlFor="name" className="text-sm font-semibold text-gray-900 dark:text-gray-100">
           Full Name
         </Label>
         <Input
@@ -58,16 +58,16 @@ export function UserSettingsForm({ user }: UserSettingsFormProps) {
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="Enter your full name"
-          className="backdrop-blur-sm bg-white/60 border-white/30 focus:border-green-500 focus:ring-green-500"
+          className="backdrop-blur-sm bg-white/60 dark:bg-gray-800/60 border-white/30 dark:border-gray-700 focus:border-green-500 focus:ring-green-500 dark:text-gray-100"
           required
         />
-        <p className="text-xs text-gray-600">
+        <p className="text-xs text-gray-600 dark:text-gray-400">
           This is the name that will be displayed throughout the dashboard
         </p>
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="email" className="text-sm font-semibold text-gray-900">
+        <Label htmlFor="email" className="text-sm font-semibold text-gray-900 dark:text-gray-100">
           Email Address
         </Label>
         <Input
@@ -75,9 +75,9 @@ export function UserSettingsForm({ user }: UserSettingsFormProps) {
           type="email"
           value={user.email || ''}
           disabled
-          className="backdrop-blur-sm bg-gray-100/60 border-white/30 cursor-not-allowed"
+          className="backdrop-blur-sm bg-gray-100/60 dark:bg-gray-800/40 border-white/30 dark:border-gray-700 cursor-not-allowed dark:text-gray-400"
         />
-        <p className="text-xs text-gray-600">
+        <p className="text-xs text-gray-600 dark:text-gray-400">
           Email cannot be changed. Contact an administrator if you need to update it.
         </p>
       </div>

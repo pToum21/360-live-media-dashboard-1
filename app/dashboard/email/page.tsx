@@ -30,78 +30,78 @@ export default async function EmailCampaignsPage() {
         <Card className="stat-card border-0 overflow-hidden relative group">
           <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-blue-400/10 to-transparent rounded-bl-full"></div>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
-            <CardTitle className="text-sm font-semibold text-gray-700">Campaigns Sent</CardTitle>
+            <CardTitle className="text-sm font-semibold text-gray-700 dark:text-gray-300">Campaigns Sent</CardTitle>
             <div className="w-10 h-10 gradient-blue rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/30 group-hover:scale-110 transition-transform">
               <Mail className="h-5 w-5 text-white" />
             </div>
           </CardHeader>
           <CardContent className="relative z-10">
-            <div className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
+            <div className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 dark:from-blue-400 dark:to-blue-600 bg-clip-text text-transparent">
               {campaigns.length}
             </div>
-            <p className="text-xs text-gray-500 mt-2">Total campaigns tracked</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">Total campaigns tracked</p>
           </CardContent>
         </Card>
 
         <Card className="stat-card border-0 overflow-hidden relative group">
           <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-green-400/10 to-transparent rounded-bl-full"></div>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
-            <CardTitle className="text-sm font-semibold text-gray-700">Avg. Open Rate</CardTitle>
+            <CardTitle className="text-sm font-semibold text-gray-700 dark:text-gray-300">Avg. Open Rate</CardTitle>
             <div className="w-10 h-10 gradient-green rounded-xl flex items-center justify-center shadow-lg shadow-green-500/30 group-hover:scale-110 transition-transform">
               <TrendingUp className="h-5 w-5 text-white" />
             </div>
           </CardHeader>
           <CardContent className="relative z-10">
-            <div className="text-3xl font-bold bg-gradient-to-r from-green-600 to-green-800 bg-clip-text text-transparent">
+            <div className="text-3xl font-bold bg-gradient-to-r from-green-600 to-green-800 dark:from-green-400 dark:to-green-600 bg-clip-text text-transparent">
               {(avgOpenRate * 100).toFixed(1)}%
             </div>
-            <p className="text-xs text-gray-500 mt-2">Across all campaigns</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">Across all campaigns</p>
           </CardContent>
         </Card>
 
         <Card className="stat-card border-0 overflow-hidden relative group">
           <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-purple-400/10 to-transparent rounded-bl-full"></div>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
-            <CardTitle className="text-sm font-semibold text-gray-700">Avg. Click Rate</CardTitle>
+            <CardTitle className="text-sm font-semibold text-gray-700 dark:text-gray-300">Avg. Click Rate</CardTitle>
             <div className="w-10 h-10 gradient-purple rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/30 group-hover:scale-110 transition-transform">
               <MousePointerClick className="h-5 w-5 text-white" />
             </div>
           </CardHeader>
           <CardContent className="relative z-10">
-            <div className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-purple-800 bg-clip-text text-transparent">
+            <div className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-purple-800 dark:from-purple-400 dark:to-purple-600 bg-clip-text text-transparent">
               {(avgClickRate * 100).toFixed(1)}%
             </div>
-            <p className="text-xs text-gray-500 mt-2">Across all campaigns</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">Across all campaigns</p>
           </CardContent>
         </Card>
 
         <Card className="stat-card border-0 overflow-hidden relative group">
           <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-teal-400/10 to-transparent rounded-bl-full"></div>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
-            <CardTitle className="text-sm font-semibold text-gray-700">Avg. Delivery Rate</CardTitle>
+            <CardTitle className="text-sm font-semibold text-gray-700 dark:text-gray-300">Avg. Delivery Rate</CardTitle>
             <div className="w-10 h-10 gradient-teal rounded-xl flex items-center justify-center shadow-lg shadow-teal-500/30 group-hover:scale-110 transition-transform">
               <Send className="h-5 w-5 text-white" />
             </div>
           </CardHeader>
           <CardContent className="relative z-10">
-            <div className="text-3xl font-bold bg-gradient-to-r from-teal-600 to-teal-800 bg-clip-text text-transparent">
+            <div className="text-3xl font-bold bg-gradient-to-r from-teal-600 to-teal-800 dark:from-teal-400 dark:to-teal-600 bg-clip-text text-transparent">
               {(avgDeliveryRate * 100).toFixed(1)}%
             </div>
-            <p className="text-xs text-gray-500 mt-2">Successfully delivered</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">Successfully delivered</p>
           </CardContent>
         </Card>
       </div>
 
       {/* Performance Chart */}
       <Card className="chart-card border-0 overflow-hidden shadow-lg">
-        <CardHeader className="bg-gradient-to-r from-blue-50 to-transparent border-b">
+        <CardHeader className="bg-gradient-to-r from-blue-50/10 dark:from-blue-900/20 to-transparent border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 gradient-blue rounded-xl flex items-center justify-center shadow-md">
               <Mail className="w-5 h-5 text-white" />
             </div>
             <div>
-              <CardTitle className="text-lg">Campaign Performance Comparison</CardTitle>
-              <CardDescription>Interactive comparison of open and click rates across campaigns</CardDescription>
+              <CardTitle className="text-lg text-gray-900 dark:text-gray-100">Campaign Performance Comparison</CardTitle>
+              <CardDescription className="dark:text-gray-400">Interactive comparison of open and click rates across campaigns</CardDescription>
             </div>
           </div>
         </CardHeader>
@@ -112,14 +112,14 @@ export default async function EmailCampaignsPage() {
 
       {/* Campaign Performance Table */}
       <Card className="stat-card border-0 shadow-lg">
-        <CardHeader className="bg-gradient-to-r from-green-50 to-transparent border-b">
+        <CardHeader className="bg-gradient-to-r from-green-50/10 dark:from-green-900/20 to-transparent border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 gradient-green rounded-xl flex items-center justify-center shadow-md">
               <TrendingUp className="w-5 h-5 text-white" />
             </div>
             <div>
-              <CardTitle className="text-lg">Campaign Performance</CardTitle>
-              <CardDescription>Recent email campaign metrics and engagement</CardDescription>
+              <CardTitle className="text-lg text-gray-900 dark:text-gray-100">Campaign Performance</CardTitle>
+              <CardDescription className="dark:text-gray-400">Recent email campaign metrics and engagement</CardDescription>
             </div>
           </div>
         </CardHeader>
@@ -127,39 +127,39 @@ export default async function EmailCampaignsPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b">
-                  <th className="text-left py-3 px-4">Campaign Name</th>
-                  <th className="text-right py-3 px-4">Deployment Date</th>
-                  <th className="text-right py-3 px-4">Open Rate</th>
-                  <th className="text-right py-3 px-4">Click Rate</th>
-                  <th className="text-right py-3 px-4">Delivery Rate</th>
-                  <th className="text-right py-3 px-4">Unsub. Rate</th>
+                <tr className="border-b border-gray-200 dark:border-gray-700">
+                  <th className="text-left py-3 px-4 text-gray-700 dark:text-gray-300 font-semibold">Campaign Name</th>
+                  <th className="text-right py-3 px-4 text-gray-700 dark:text-gray-300 font-semibold">Deployment Date</th>
+                  <th className="text-right py-3 px-4 text-gray-700 dark:text-gray-300 font-semibold">Open Rate</th>
+                  <th className="text-right py-3 px-4 text-gray-700 dark:text-gray-300 font-semibold">Click Rate</th>
+                  <th className="text-right py-3 px-4 text-gray-700 dark:text-gray-300 font-semibold">Delivery Rate</th>
+                  <th className="text-right py-3 px-4 text-gray-700 dark:text-gray-300 font-semibold">Unsub. Rate</th>
                 </tr>
               </thead>
               <tbody>
                 {campaigns.map((campaign) => (
-                  <tr key={campaign.id} className="border-b hover:bg-gray-50">
-                    <td className="py-3 px-4 font-medium">{campaign.name}</td>
-                    <td className="text-right py-3 px-4">
+                  <tr key={campaign.id} className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                    <td className="py-3 px-4 font-medium text-gray-900 dark:text-gray-100">{campaign.name}</td>
+                    <td className="text-right py-3 px-4 text-gray-900 dark:text-gray-100">
                       {new Date(campaign.deploymentDate).toLocaleDateString()}
                     </td>
                     <td className="text-right py-3 px-4">
-                      <span className={campaign.openRate >= 0.15 ? 'text-green-600' : ''}>
+                      <span className={campaign.openRate >= 0.15 ? 'text-green-600 dark:text-green-400' : 'text-gray-900 dark:text-gray-100'}>
                         {(campaign.openRate * 100).toFixed(1)}%
                       </span>
                     </td>
                     <td className="text-right py-3 px-4">
-                      <span className={campaign.clickRate >= 0.025 ? 'text-green-600' : ''}>
+                      <span className={campaign.clickRate >= 0.025 ? 'text-green-600 dark:text-green-400' : 'text-gray-900 dark:text-gray-100'}>
                         {(campaign.clickRate * 100).toFixed(1)}%
                       </span>
                     </td>
                     <td className="text-right py-3 px-4">
-                      <span className={campaign.deliveryRate >= 0.99 ? 'text-green-600' : 'text-orange-600'}>
+                      <span className={campaign.deliveryRate >= 0.99 ? 'text-green-600 dark:text-green-400' : 'text-orange-600 dark:text-orange-400'}>
                         {(campaign.deliveryRate * 100).toFixed(1)}%
                       </span>
                     </td>
                     <td className="text-right py-3 px-4">
-                      <span className={campaign.unsubscribeRate <= 0.005 ? '' : 'text-red-600'}>
+                      <span className={campaign.unsubscribeRate <= 0.005 ? 'text-gray-900 dark:text-gray-100' : 'text-red-600 dark:text-red-400'}>
                         {(campaign.unsubscribeRate * 100).toFixed(2)}%
                       </span>
                     </td>
@@ -187,16 +187,16 @@ export default async function EmailCampaignsPage() {
               .map((campaign) => (
                 <div key={campaign.id} className="flex items-center justify-between">
                   <div>
-                    <div className="font-medium">{campaign.name}</div>
-                    <div className="text-sm text-muted-foreground">
+                    <div className="font-medium text-gray-900 dark:text-gray-100">{campaign.name}</div>
+                    <div className="text-sm text-muted-foreground dark:text-gray-400">
                       {new Date(campaign.deploymentDate).toLocaleDateString()}
                     </div>
                   </div>
                   <div className="text-right">
-                    <div className="font-bold text-green-600">
+                    <div className="font-bold text-green-600 dark:text-green-400">
                       {(campaign.openRate * 100).toFixed(1)}% open
                     </div>
-                    <div className="text-sm text-muted-foreground">
+                    <div className="text-sm text-muted-foreground dark:text-gray-400">
                       {(campaign.clickRate * 100).toFixed(1)}% click
                     </div>
                   </div>

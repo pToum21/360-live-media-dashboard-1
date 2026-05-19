@@ -19,6 +19,10 @@ import { WebsiteTrendChart } from "@/components/charts/website-trend-chart"
 import { EmailPerformanceChart } from "@/components/charts/email-performance-chart"
 import { TrafficSourceChart } from "@/components/charts/traffic-source-chart"
 import { SocialGrowthChart } from "@/components/charts/social-growth-chart"
+import { PerformanceInsights } from "@/components/dashboard/performance-insights"
+import { GoalTracking } from "@/components/dashboard/goal-tracking"
+import { TopPerformers } from "@/components/dashboard/top-performers"
+import { GrowthTrends } from "@/components/dashboard/growth-trends"
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions)
@@ -119,41 +123,38 @@ export default async function DashboardPage() {
   }))
 
   return (
-    <div className="space-y-8 animate-in">
-      {/* Welcome Section with gradient */}
+    <div className="space-y-6 animate-in">
+      {/* Welcome Section - Minimal */}
       <div className="relative">
-        <div className="absolute -top-4 -left-4 w-72 h-72 bg-green-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse"></div>
-        <div className="absolute -bottom-8 right-0 w-72 h-72 bg-blue-100 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse" style={{ animationDelay: '1s' }}></div>
         <div className="relative">
-          <h2 className="text-3xl font-bold bg-gradient-to-r from-[#0C1C14] via-[#2E8741] to-[#0C1C14] bg-clip-text text-transparent mb-2">
-            Welcome back, {session?.user.name || session?.user.email}!
+          <h2 className="text-2xl font-semibold text-gray-700 dark:text-gray-200 mb-1 tracking-tight">
+            Welcome back, {session?.user.name || session?.user.email?.split('@')[0]}!
           </h2>
-          <p className="text-gray-600 text-lg">
+          <p className="text-gray-500 dark:text-gray-400 text-sm font-normal">
             Here's what's happening with your marketing this week
           </p>
         </div>
       </div>
 
-      {/* Stats Grid - Modern asymmetric layout */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {/* Stats Grid - Liquid Glass */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Link href="/dashboard/website" className="group">
-          <Card className="stat-card cursor-pointer overflow-hidden relative border-0">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-green-400/10 to-transparent rounded-bl-full"></div>
-            <CardHeader className="pb-3 relative z-10">
+          <Card className="stat-card cursor-pointer overflow-hidden relative">
+            <CardHeader className="pb-2 relative z-10">
               <div className="flex items-center justify-between">
-                <CardDescription className="font-semibold text-gray-700">Website Visitors</CardDescription>
-                <div className="w-14 h-14 gradient-green rounded-2xl flex items-center justify-center shadow-xl shadow-green-500/40 icon-float group-hover:scale-110 transition-transform duration-500">
-                  <BarChart3 className="w-7 h-7 text-white" />
+                <CardDescription className="font-medium text-gray-600 dark:text-gray-400 text-sm">Website Visitors</CardDescription>
+                <div className="w-10 h-10 bg-green-500/10 dark:bg-green-500/20 rounded-xl flex items-center justify-center group-hover:bg-green-500/20 dark:group-hover:bg-green-500/30 transition-all">
+                  <BarChart3 className="w-5 h-5 text-green-600 dark:text-green-500" />
                 </div>
               </div>
             </CardHeader>
             <CardContent className="relative z-10">
               <div className="flex items-baseline justify-between">
                 <div>
-                  <div className="text-4xl font-bold bg-gradient-to-r from-green-600 to-green-800 bg-clip-text text-transparent">
+                  <div className="text-3xl font-semibold text-gray-700 dark:text-gray-200">
                     {latestWebsite?.totalUsers?.toLocaleString() || 0}
                   </div>
-                  <p className="text-xs text-gray-500 mt-2 flex items-center gap-1">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1.5 flex items-center gap-1">
                     <Clock className="w-3 h-3" />
                     Latest week
                   </p>
@@ -162,14 +163,14 @@ export default async function DashboardPage() {
                   <Badge
                     className={`${
                       latestWebsite.percentChangeUsers > 0
-                        ? "bg-emerald-50 text-emerald-700 border-emerald-200"
-                        : "bg-red-50 text-red-700 border-red-200"
-                    } border px-3 py-1 font-semibold`}
+                        ? "bg-green-500/10 text-green-600 border-green-500/20"
+                        : "bg-red-500/10 text-red-600 border-red-500/20"
+                    } border px-2 py-0.5 font-medium text-xs`}
                   >
                     {latestWebsite.percentChangeUsers > 0 ? (
-                      <TrendingUp className="w-3 h-3 mr-1" />
+                      <TrendingUp className="w-3 h-3 mr-0.5" />
                     ) : (
-                      <TrendingDown className="w-3 h-3 mr-1" />
+                      <TrendingDown className="w-3 h-3 mr-0.5" />
                     )}
                     {Math.abs(latestWebsite.percentChangeUsers * 100).toFixed(0)}%
                   </Badge>
@@ -180,23 +181,22 @@ export default async function DashboardPage() {
         </Link>
 
         <Link href="/dashboard/email" className="group">
-          <Card className="stat-card cursor-pointer overflow-hidden relative border-0">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-400/10 to-transparent rounded-bl-full"></div>
-            <CardHeader className="pb-3 relative z-10">
+          <Card className="stat-card cursor-pointer overflow-hidden relative">
+            <CardHeader className="pb-2 relative z-10">
               <div className="flex items-center justify-between">
-                <CardDescription className="font-semibold text-gray-700">Email Open Rate</CardDescription>
-                <div className="w-14 h-14 gradient-blue rounded-2xl flex items-center justify-center shadow-xl shadow-blue-500/40 icon-float group-hover:scale-110 transition-transform duration-500">
-                  <Mail className="w-7 h-7 text-white" />
+                <CardDescription className="font-medium text-gray-600 dark:text-gray-400 text-sm">Email Open Rate</CardDescription>
+                <div className="w-10 h-10 bg-green-500/10 dark:bg-green-500/20 rounded-xl flex items-center justify-center group-hover:bg-green-500/20 dark:group-hover:bg-green-500/30 transition-all">
+                  <Mail className="w-5 h-5 text-green-600 dark:text-green-500" />
                 </div>
               </div>
             </CardHeader>
             <CardContent className="relative z-10">
               <div className="flex items-baseline justify-between">
                 <div>
-                  <div className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
+                  <div className="text-3xl font-semibold text-gray-700 dark:text-gray-200">
                     {latestEmail ? `${(latestEmail.openRate * 100).toFixed(1)}%` : '--'}
                   </div>
-                  <p className="text-xs text-gray-500 mt-2 flex items-center gap-1">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1.5 flex items-center gap-1">
                     <Clock className="w-3 h-3" />
                     Last campaign
                   </p>
@@ -205,16 +205,16 @@ export default async function DashboardPage() {
                   <Badge
                     className={`${
                       latestEmail.openRate >= 0.15
-                        ? "bg-emerald-50 text-emerald-700 border-emerald-200"
-                        : "bg-amber-50 text-amber-700 border-amber-200"
-                    } border px-3 py-1 font-semibold`}
+                        ? "bg-green-500/10 text-green-600 border-green-500/20"
+                        : "bg-amber-500/10 text-amber-600 border-amber-500/20"
+                    } border px-2 py-0.5 font-medium text-xs`}
                   >
                     {latestEmail.openRate >= 0.15 ? (
-                      <TrendingUp className="w-3 h-3 mr-1" />
+                      <TrendingUp className="w-3 h-3 mr-0.5" />
                     ) : (
-                      <TrendingDown className="w-3 h-3 mr-1" />
+                      <TrendingDown className="w-3 h-3 mr-0.5" />
                     )}
-                    {latestEmail.openRate >= 0.15 ? "Good" : "Below avg"}
+                    {latestEmail.openRate >= 0.15 ? "Good" : "Low"}
                   </Badge>
                 )}
               </div>
@@ -223,29 +223,28 @@ export default async function DashboardPage() {
         </Link>
 
         <Link href="/dashboard/social" className="group">
-          <Card className="stat-card cursor-pointer overflow-hidden relative border-0">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-purple-400/10 to-transparent rounded-bl-full"></div>
-            <CardHeader className="pb-3 relative z-10">
+          <Card className="stat-card cursor-pointer overflow-hidden relative">
+            <CardHeader className="pb-2 relative z-10">
               <div className="flex items-center justify-between">
-                <CardDescription className="font-semibold text-gray-700">Social Engagement</CardDescription>
-                <div className="w-14 h-14 gradient-purple rounded-2xl flex items-center justify-center shadow-xl shadow-purple-500/40 icon-float group-hover:scale-110 transition-transform duration-500">
-                  <Users className="w-7 h-7 text-white" />
+                <CardDescription className="font-medium text-gray-600 dark:text-gray-400 text-sm">Social Engagement</CardDescription>
+                <div className="w-10 h-10 bg-green-500/10 dark:bg-green-500/20 rounded-xl flex items-center justify-center group-hover:bg-green-500/20 dark:group-hover:bg-green-500/30 transition-all">
+                  <Users className="w-5 h-5 text-green-600 dark:text-green-500" />
                 </div>
               </div>
             </CardHeader>
             <CardContent className="relative z-10">
               <div className="flex items-baseline justify-between">
                 <div>
-                  <div className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-purple-800 bg-clip-text text-transparent">
+                  <div className="text-3xl font-semibold text-gray-700 dark:text-gray-200">
                     {(avgSocialEngagement * 100).toFixed(1)}%
                   </div>
-                  <p className="text-xs text-gray-500 mt-2 flex items-center gap-1">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1.5 flex items-center gap-1">
                     <Clock className="w-3 h-3" />
                     Average rate
                   </p>
                 </div>
-                <Badge className="bg-violet-50 text-violet-700 border-violet-200 border px-3 py-1 font-semibold">
-                  <Users className="w-3 h-3 mr-1" />
+                <Badge className="bg-gray-500/10 dark:bg-gray-500/20 text-gray-600 dark:text-gray-400 border-gray-500/20 dark:border-gray-500/30 border px-2 py-0.5 font-medium text-xs">
+                  <Users className="w-3 h-3 mr-0.5" />
                   LI + IG
                 </Badge>
               </div>
@@ -255,48 +254,48 @@ export default async function DashboardPage() {
       </div>
 
       {/* Secondary Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Link href="/dashboard/clients">
-          <Card className="hover:bg-gray-50 transition-all duration-300 cursor-pointer card-hover border-2 border-orange-100 bg-gradient-to-br from-white to-orange-50">
-            <CardHeader className="pb-3">
+          <Card className="transition-all duration-300 cursor-pointer card-hover">
+            <CardHeader className="pb-2">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-base">Client Projects</CardTitle>
-                <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg flex items-center justify-center shadow-md shadow-orange-500/30">
-                  <Building2 className="w-5 h-5 text-white" />
+                <CardTitle className="text-sm font-medium text-gray-700 dark:text-gray-300">Client Projects</CardTitle>
+                <div className="w-9 h-9 bg-green-500/10 dark:bg-green-500/20 rounded-xl flex items-center justify-center">
+                  <Building2 className="w-4 h-4 text-green-600 dark:text-green-500" />
                 </div>
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{totalClients}</div>
-              <p className="text-sm text-gray-500 mt-1">Active projects tracking</p>
+              <div className="text-2xl font-semibold text-gray-700 dark:text-gray-200">{totalClients}</div>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Active projects tracking</p>
             </CardContent>
           </Card>
         </Link>
 
         <Link href="/dashboard/testing">
-          <Card className="hover:bg-gray-50 transition-all duration-300 cursor-pointer card-hover border-2 border-teal-100 bg-gradient-to-br from-white to-teal-50">
-            <CardHeader className="pb-3">
+          <Card className="transition-all duration-300 cursor-pointer card-hover">
+            <CardHeader className="pb-2">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-base">A/B Tests Run</CardTitle>
-                <div className="w-10 h-10 bg-gradient-to-br from-teal-500 to-teal-600 rounded-lg flex items-center justify-center shadow-md shadow-teal-500/30">
-                  <FlaskConical className="w-5 h-5 text-white" />
+                <CardTitle className="text-sm font-medium text-gray-700 dark:text-gray-300">A/B Tests Run</CardTitle>
+                <div className="w-9 h-9 bg-green-500/10 dark:bg-green-500/20 rounded-xl flex items-center justify-center">
+                  <FlaskConical className="w-4 h-4 text-green-600 dark:text-green-500" />
                 </div>
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{totalTests}</div>
-              <p className="text-sm text-gray-500 mt-1">Optimization experiments</p>
+              <div className="text-2xl font-semibold text-gray-700 dark:text-gray-200">{totalTests}</div>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Optimization experiments</p>
             </CardContent>
           </Card>
         </Link>
       </div>
 
       {/* Interactive Charts */}
-      <div className="grid gap-6 md:grid-cols-2">
-        <Card className="md:col-span-2 chart-card border-2 border-green-100 overflow-hidden">
-          <CardHeader className="bg-gradient-to-r from-green-50 to-transparent">
-            <CardTitle>Website Traffic Trend</CardTitle>
-            <CardDescription>
+      <div className="grid gap-4 md:grid-cols-2">
+        <Card className="md:col-span-2 chart-card overflow-hidden">
+          <CardHeader>
+            <CardTitle className="text-base font-semibold text-gray-700 dark:text-gray-200">Website Traffic Trend</CardTitle>
+            <CardDescription className="text-sm text-gray-500 dark:text-gray-400">
               Total and new users over the last 12 weeks
             </CardDescription>
           </CardHeader>
@@ -305,13 +304,13 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="chart-card border-2 border-blue-100 overflow-hidden">
-          <CardHeader className="bg-gradient-to-r from-blue-50 to-transparent">
-            <CardTitle className="flex items-center gap-2">
-              <Mail className="w-5 h-5 text-blue-600" />
+        <Card className="chart-card overflow-hidden">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base font-semibold text-gray-700 dark:text-gray-200">
+              <Mail className="w-4 h-4 text-green-600 dark:text-green-500" />
               Email Campaign Performance
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-sm text-gray-500 dark:text-gray-400">
               Open and click rates for recent campaigns
             </CardDescription>
           </CardHeader>
@@ -320,13 +319,13 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="chart-card border-2 border-purple-100 overflow-hidden">
-          <CardHeader className="bg-gradient-to-r from-purple-50 to-transparent">
-            <CardTitle className="flex items-center gap-2">
-              <BarChart3 className="w-5 h-5 text-purple-600" />
+        <Card className="chart-card overflow-hidden">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base font-semibold text-gray-700 dark:text-gray-200">
+              <BarChart3 className="w-4 h-4 text-green-600 dark:text-green-500" />
               Traffic Sources
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-sm text-gray-500 dark:text-gray-400">
               Where your visitors are coming from (latest week)
             </CardDescription>
           </CardHeader>
@@ -335,13 +334,13 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="md:col-span-2 chart-card border-2 border-pink-100 overflow-hidden">
-          <CardHeader className="bg-gradient-to-r from-pink-50 to-transparent">
-            <CardTitle className="flex items-center gap-2">
-              <Users className="w-5 h-5 text-pink-600" />
+        <Card className="md:col-span-2 chart-card overflow-hidden">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base font-semibold text-gray-700 dark:text-gray-200">
+              <Users className="w-4 h-4 text-green-600 dark:text-green-500" />
               Social Media Growth
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-sm text-gray-500 dark:text-gray-400">
               LinkedIn and Instagram impressions over time
             </CardDescription>
           </CardHeader>
@@ -351,26 +350,85 @@ export default async function DashboardPage() {
         </Card>
       </div>
 
+      {/* Performance Insights & Goal Tracking - Only show if we have real data */}
+      {(latestWebsite || latestEmail || latestSocial) && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <PerformanceInsights 
+            websiteData={latestWebsite ? {
+              totalUsers: latestWebsite.totalUsers || 0,
+              newUsers: latestWebsite.newUsers || 0,
+              avgSessionDuration: latestWebsite.avgSessionDuration || 0,
+              bounceRate: latestWebsite.bounceRate || 0
+            } : undefined}
+            emailData={latestEmail ? {
+              openRate: latestEmail.openRate,
+              clickRate: latestEmail.clickRate,
+              deliveryRate: latestEmail.deliveryRate
+            } : undefined}
+            socialData={latestSocial ? {
+              liEngagementRate: latestSocial.liEngagementRate,
+              igEngagementRate: latestSocial.igEngagementRate,
+              liImpressions: latestSocial.liImpressions,
+              igImpressions: latestSocial.igImpressions
+            } : undefined}
+          />
+          {(latestWebsite?.totalUsers || latestEmail?.openRate || latestSocial?.liEngagementRate || latestSocial?.igEngagementRate) && (
+            <GoalTracking 
+              websiteVisitors={latestWebsite?.totalUsers}
+              emailOpenRate={latestEmail?.openRate}
+              socialEngagement={latestSocial?.liEngagementRate || latestSocial?.igEngagementRate || undefined}
+              newLeads={latestWebsite?.newUsers ? Math.floor(latestWebsite.newUsers * 0.15) : undefined}
+            />
+          )}
+        </div>
+      )}
+
+      {/* Top Performers & Growth Trends - Only show if we have real data */}
+      {(emailChartData.length > 0 || socialChartData.length > 0 || websiteChartData.length > 1) && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {(emailChartData.length > 0 || socialChartData.length > 0) && (
+            <TopPerformers 
+              emailCampaigns={emailChartData}
+              socialPosts={socialChartData.filter(s => (s.liImpressions || s.igImpressions) && (s.liEngagementRate || s.igEngagementRate)).map(s => ({
+                id: s.id,
+                platform: s.liImpressions && s.liImpressions > (s.igImpressions || 0) ? 'LinkedIn' : 'Instagram',
+                impressions: Math.max(s.liImpressions || 0, s.igImpressions || 0),
+                engagements: Math.floor((Math.max(s.liImpressions || 0, s.igImpressions || 0)) * Math.max(s.liEngagementRate || 0, s.igEngagementRate || 0)),
+                engagementRate: Math.max(s.liEngagementRate || 0, s.igEngagementRate || 0),
+                weekStarting: s.weekStarting
+              }))}
+            />
+          )}
+          {(websiteChartData.length > 1 || emailChartData.length > 1 || socialChartData.length > 1) && (
+            <GrowthTrends 
+              websiteMetrics={websiteChartData}
+              emailCampaigns={emailChartData}
+              socialMetrics={socialChartData}
+            />
+          )}
+        </div>
+      )}
+
       {/* Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Card className="card-hover">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Clock className="w-5 h-5 text-[#2E8741]" />
+            <CardTitle className="flex items-center gap-2 text-base font-semibold text-gray-700 dark:text-gray-200">
+              <Clock className="w-4 h-4 text-green-600 dark:text-green-500" />
               Recent Activity
             </CardTitle>
-            <CardDescription>Latest updates across all channels</CardDescription>
+            <CardDescription className="text-sm text-gray-500 dark:text-gray-400">Latest updates across all channels</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
+            <div className="space-y-3">
               {latestEmail && (
-                <div className="flex items-start gap-3 p-3 rounded-lg bg-gray-50">
-                  <Mail className="w-4 h-4 text-[#2E8741] mt-1" />
+                <div className="flex items-start gap-3 p-2.5 rounded-xl bg-white/40 dark:bg-white/5 backdrop-blur-sm border border-white/40 dark:border-white/10">
+                  <Mail className="w-4 h-4 text-green-600 dark:text-green-500 mt-0.5" />
                   <div className="flex-1">
-                    <p className="text-sm font-medium text-gray-900">
+                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
                       {latestEmail.name}
                     </p>
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                       {new Date(latestEmail.deploymentDate).toLocaleDateString()} • 
                       {(latestEmail.openRate * 100).toFixed(1)}% open rate
                     </p>
@@ -378,26 +436,26 @@ export default async function DashboardPage() {
                 </div>
               )}
               {latestWebsite && (
-                <div className="flex items-start gap-3 p-3 rounded-lg bg-gray-50">
-                  <BarChart3 className="w-4 h-4 text-[#2E8741] mt-1" />
+                <div className="flex items-start gap-3 p-2.5 rounded-xl bg-white/40 dark:bg-white/5 backdrop-blur-sm border border-white/40 dark:border-white/10">
+                  <BarChart3 className="w-4 h-4 text-green-600 dark:text-green-500 mt-0.5" />
                   <div className="flex-1">
-                    <p className="text-sm font-medium text-gray-900">
+                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
                       {latestWebsite.totalUsers?.toLocaleString()} website visitors
                     </p>
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                       Week of {new Date(latestWebsite.weekStarting).toLocaleDateString()}
                     </p>
                   </div>
                 </div>
               )}
               {latestSocial && (
-                <div className="flex items-start gap-3 p-3 rounded-lg bg-gray-50">
-                  <Users className="w-4 h-4 text-[#2E8741] mt-1" />
+                <div className="flex items-start gap-3 p-2.5 rounded-xl bg-white/40 dark:bg-white/5 backdrop-blur-sm border border-white/40 dark:border-white/10">
+                  <Users className="w-4 h-4 text-green-600 dark:text-green-500 mt-0.5" />
                   <div className="flex-1">
-                    <p className="text-sm font-medium text-gray-900">
+                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
                       Social media update
                     </p>
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                       LI: {latestSocial.liFollowers?.toLocaleString()} followers • 
                       IG: {latestSocial.igFollowers?.toLocaleString()} followers
                     </p>
@@ -408,32 +466,32 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="card-hover">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <ArrowUpRight className="w-5 h-5 text-[#2E8741]" />
+            <CardTitle className="flex items-center gap-2 text-base font-semibold text-gray-700 dark:text-gray-200">
+              <ArrowUpRight className="w-4 h-4 text-green-600 dark:text-green-500" />
               Quick Actions
             </CardTitle>
-            <CardDescription>Navigate to key sections</CardDescription>
+            <CardDescription className="text-sm text-gray-500 dark:text-gray-400">Navigate to key sections</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
               <Link href="/dashboard/website">
-                <button className="w-full text-left p-3 rounded-lg border border-gray-200 hover:border-[#2E8741] hover:bg-[#2E8741]/5 transition-colors">
-                  <p className="text-sm font-medium text-gray-900">Website Analytics</p>
-                  <p className="text-xs text-gray-500 mt-1">View traffic and engagement</p>
+                <button className="w-full text-left p-2.5 rounded-xl border border-white/40 dark:border-white/20 hover:border-white/60 dark:hover:border-white/30 hover:bg-white/30 dark:hover:bg-white/5 transition-all backdrop-blur-sm">
+                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Website Analytics</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">View traffic and engagement</p>
                 </button>
               </Link>
               <Link href="/dashboard/email">
-                <button className="w-full text-left p-3 rounded-lg border border-gray-200 hover:border-[#2E8741] hover:bg-[#2E8741]/5 transition-colors">
-                  <p className="text-sm font-medium text-gray-900">Email Campaigns</p>
-                  <p className="text-xs text-gray-500 mt-1">Review campaign performance</p>
+                <button className="w-full text-left p-2.5 rounded-xl border border-white/40 dark:border-white/20 hover:border-white/60 dark:hover:border-white/30 hover:bg-white/30 dark:hover:bg-white/5 transition-all backdrop-blur-sm">
+                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Email Campaigns</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Review campaign performance</p>
                 </button>
               </Link>
               <Link href="/dashboard/social">
-                <button className="w-full text-left p-3 rounded-lg border border-gray-200 hover:border-[#2E8741] hover:bg-[#2E8741]/5 transition-colors">
-                  <p className="text-sm font-medium text-gray-900">Social Media</p>
-                  <p className="text-xs text-gray-500 mt-1">Check LinkedIn & Instagram</p>
+                <button className="w-full text-left p-2.5 rounded-xl border border-white/40 dark:border-white/20 hover:border-white/60 dark:hover:border-white/30 hover:bg-white/30 dark:hover:bg-white/5 transition-all backdrop-blur-sm">
+                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Social Media</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Check LinkedIn & Instagram</p>
                 </button>
               </Link>
             </div>

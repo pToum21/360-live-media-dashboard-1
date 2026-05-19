@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { RefreshCw, Settings, CheckCircle, XCircle } from 'lucide-react'
 import { toast } from 'sonner'
+import { ApiConfigDialog } from './api-config-dialog'
 
 interface ApiConnection {
   id: string
@@ -21,6 +22,7 @@ interface ApiConnectionCardProps {
 
 export function ApiConnectionCard({ connection }: ApiConnectionCardProps) {
   const [syncing, setSyncing] = useState(false)
+  const [configOpen, setConfigOpen] = useState(false)
 
   const handleSync = async () => {
     setSyncing(true)
@@ -44,8 +46,7 @@ export function ApiConnectionCard({ connection }: ApiConnectionCardProps) {
   }
 
   const handleConfigure = () => {
-    toast.info(`Opening ${connection.name} configuration...`)
-    // Will open configuration modal
+    setConfigOpen(true)
   }
 
   return (
@@ -102,6 +103,12 @@ export function ApiConnectionCard({ connection }: ApiConnectionCardProps) {
           </div>
         </div>
       </CardContent>
+
+      <ApiConfigDialog 
+        open={configOpen}
+        onOpenChange={setConfigOpen}
+        connection={connection}
+      />
     </Card>
   )
 }
