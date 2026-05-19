@@ -27,6 +27,7 @@ yarn-error.log*
 .env*.local
 .env.development.local
 .env.test.local
+.env.production
 .env.production.local
 
 # Vercel
@@ -54,3 +55,5 @@ excel-analysis/detailed-analysis.json
 Thumbs.db
 
 /lib/generated/prisma
+
+.vercel
