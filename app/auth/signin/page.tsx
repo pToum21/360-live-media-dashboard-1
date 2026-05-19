@@ -73,9 +73,14 @@ export default function SignInPage() {
               )}
             </Button>
           </form>
-          <p className="text-xs text-center text-gray-500 mt-6">
-            You&apos;ll receive a magic link via email to sign in securely.
-          </p>
+          <div className="mt-6 space-y-2">
+            <p className="text-xs text-center text-gray-500">
+              You&apos;ll receive a magic link via email to sign in securely.
+            </p>
+            <p className="text-xs text-center text-amber-600 font-medium">
+              Only @360livemedia.com email addresses are permitted.
+            </p>
+          </div>
         </CardContent>
       </Card>
     </div>
