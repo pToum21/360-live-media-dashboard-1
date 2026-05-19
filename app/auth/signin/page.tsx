@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Link from "next/link"
 import { signIn } from "next-auth/react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -80,6 +81,13 @@ export default function SignInPage() {
             <p className="text-xs text-center text-amber-600 font-medium">
               Only @360livemedia.com email addresses are permitted.
             </p>
+          </div>
+          
+          <div className="mt-4 text-center text-sm text-gray-600">
+            Don&apos;t have an account?{' '}
+            <Link href="/auth/register" className="text-[#2E8741] hover:underline font-medium">
+              Sign up
+            </Link>
           </div>
         </CardContent>
       </Card>

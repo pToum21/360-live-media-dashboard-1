@@ -23,6 +23,11 @@ export default function RegisterPage() {
     setLoading(true)
 
     try {
+      // Validate email domain
+      if (!formData.email.toLowerCase().endsWith('@360livemedia.com')) {
+        throw new Error('Only @360livemedia.com email addresses are allowed.')
+      }
+
       const response = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -84,12 +89,15 @@ export default function RegisterPage() {
               <Input
                 id="email"
                 type="email"
-                placeholder="you@company.com"
+                placeholder="you@360livemedia.com"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 required
                 disabled={loading}
               />
+              <p className="text-xs text-amber-600 font-medium">
+                Only @360livemedia.com email addresses are permitted.
+              </p>
             </div>
 
             <Button

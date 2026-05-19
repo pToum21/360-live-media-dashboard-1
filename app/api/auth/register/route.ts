@@ -13,6 +13,14 @@ export async function POST(request: Request) {
       )
     }
 
+    // Validate email domain
+    if (!email.toLowerCase().endsWith('@360livemedia.com')) {
+      return NextResponse.json(
+        { error: 'Only @360livemedia.com email addresses are allowed' },
+        { status: 403 }
+      )
+    }
+
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
       where: { email },
