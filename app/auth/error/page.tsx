@@ -9,7 +9,7 @@ import { AlertCircle } from "lucide-react"
 
 const errorMessages: Record<string, string> = {
   Configuration: "There is a problem with the server configuration.",
-  AccessDenied: "You do not have permission to sign in.",
+  AccessDenied: "Access denied. Only @360livemedia.com email addresses are allowed to sign in.",
   Verification: "The sign-in link is no longer valid. It may have expired.",
   Default: "An error occurred during sign-in.",
 }
