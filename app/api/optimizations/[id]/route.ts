@@ -5,7 +5,7 @@ import { prisma } from '@/lib/prisma'
 
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await getServerSession(authOptions)
   if (!session) {
@@ -13,15 +13,18 @@ export async function PUT(
   }
 
   try {
+    const { id } = await params
     const body = await request.json()
     
     const optimization = await prisma.optimization.update({
-      where: { id: params.id },
+      where: { id },
       data: {
-        month: body.month ? new Date(body.month) : undefined,
+        month: body.month,
         channel: body.channel,
-        testDescription: body.testDescription,
+        controlTest: body.controlTest,
+        testVariant: body.testVariant,
         results: body.results,
+        conclusions: body.conclusions,
       },
     })
 
@@ -34,7 +37,7 @@ export async function PUT(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await getServerSession(authOptions)
   if (!session) {
@@ -42,8 +45,9 @@ export async function DELETE(
   }
 
   try {
+    const { id } = await params
     await prisma.optimization.delete({
-      where: { id: params.id },
+      where: { id },
     })
 
     return NextResponse.json({ success: true })

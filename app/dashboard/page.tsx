@@ -73,9 +73,11 @@ export default async function DashboardPage() {
     orderBy: { deploymentDate: 'desc' },
     take: 8,
     select: {
+      id: true,
       name: true,
       openRate: true,
       clickRate: true,
+      deploymentDate: true,
     }
   })
 
@@ -89,9 +91,12 @@ export default async function DashboardPage() {
     orderBy: { weekStarting: 'asc' },
     take: 12,
     select: {
+      id: true,
       weekStarting: true,
       liImpressions: true,
       igImpressions: true,
+      liEngagementRate: true,
+      igEngagementRate: true,
     }
   })
 
@@ -131,7 +136,7 @@ export default async function DashboardPage() {
             Welcome back, {session?.user.name || session?.user.email?.split('@')[0]}!
           </h2>
           <p className="text-gray-500 dark:text-gray-400 text-sm font-normal">
-            Here's what's happening with your marketing this week
+            Here&apos;s what&apos;s happening with your marketing this week
           </p>
         </div>
       </div>
@@ -357,8 +362,8 @@ export default async function DashboardPage() {
             websiteData={latestWebsite ? {
               totalUsers: latestWebsite.totalUsers || 0,
               newUsers: latestWebsite.newUsers || 0,
-              avgSessionDuration: latestWebsite.avgSessionDuration || 0,
-              bounceRate: latestWebsite.bounceRate || 0
+              avgEngagementTimeSec: latestWebsite.avgEngagementTimeSec || 0,
+              healthScore: latestWebsite.healthScore || 0
             } : undefined}
             emailData={latestEmail ? {
               openRate: latestEmail.openRate,

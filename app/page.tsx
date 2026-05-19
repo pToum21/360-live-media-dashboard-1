@@ -1,6 +1,7 @@
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -33,9 +34,11 @@ export default async function Home() {
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-10 h-10 rounded-lg flex items-center justify-center">
-              <img 
+              <Image 
                 src="/Logos/Info=Basic, Color=Green.png" 
                 alt="360 Live Media Logo" 
+                width={40}
+                height={40}
                 className="w-full h-full object-contain"
               />
             </div>
@@ -139,7 +142,7 @@ export default async function Home() {
       {/* Features Section */}
       <section className="container mx-auto px-4 py-20">
         <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold mb-4 text-[#0C1C14]">What's Tracked</h2>
+          <h2 className="text-4xl font-bold mb-4 text-[#0C1C14]">What&apos;s Tracked</h2>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
             All your marketing metrics in one place. Updated automatically.
           </p>
@@ -285,9 +288,11 @@ export default async function Home() {
         <div className="container mx-auto px-4 text-center">
           <div className="flex items-center justify-center gap-2 mb-4">
             <div className="w-8 h-8 rounded-lg flex items-center justify-center">
-              <img 
+              <Image 
                 src="/Logos/Info=Basic, Color=Green.png" 
                 alt="360 Live Media Logo" 
+                width={32}
+                height={32}
                 className="w-full h-full object-contain"
               />
             </div>

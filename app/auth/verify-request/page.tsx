@@ -1,5 +1,9 @@
+"use client"
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { MailCheck } from "lucide-react"
+
+export const dynamic = 'force-dynamic'
 
 export default function VerifyRequestPage() {
   return (
@@ -19,7 +23,7 @@ export default function VerifyRequestPage() {
             Click the link in the email to sign in to your account. The link will expire in 24 hours.
           </p>
           <p className="text-xs text-gray-500">
-            If you don't see the email, check your spam folder.
+            If you don&apos;t see the email, check your spam folder.
           </p>
         </CardContent>
       </Card>

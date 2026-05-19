@@ -5,7 +5,7 @@ import { prisma } from '@/lib/prisma'
 
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await getServerSession(authOptions)
   if (!session) {
@@ -13,10 +13,11 @@ export async function PUT(
   }
 
   try {
+    const { id } = await params
     const body = await request.json()
     
     const metric = await prisma.socialMetric.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         weekStarting: body.weekStarting ? new Date(body.weekStarting) : undefined,
         liFollowers: body.liFollowers,
@@ -37,7 +38,7 @@ export async function PUT(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await getServerSession(authOptions)
   if (!session) {
@@ -45,8 +46,9 @@ export async function DELETE(
   }
 
   try {
+    const { id } = await params
     await prisma.socialMetric.delete({
-      where: { id: params.id },
+      where: { id },
     })
 
     return NextResponse.json({ success: true })
