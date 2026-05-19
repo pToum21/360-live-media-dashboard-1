@@ -8,6 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "postinstall": "prisma generate",
     "analyze:excel": "node excel-analysis/final-summary.js",
     "db:seed": "tsx prisma/seed.ts",
     "db:studio": "prisma studio",
