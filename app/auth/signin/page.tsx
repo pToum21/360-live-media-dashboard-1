@@ -7,6 +7,8 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Mail } from "lucide-react"
 
+export const dynamic = 'force-dynamic'
+
 export default function SignInPage() {
   const [email, setEmail] = useState("")
   const [isLoading, setIsLoading] = useState(false)
@@ -72,7 +74,7 @@ export default function SignInPage() {
             </Button>
           </form>
           <p className="text-xs text-center text-gray-500 mt-6">
-            You'll receive a magic link via email to sign in securely.
+            You&apos;ll receive a magic link via email to sign in securely.
           </p>
         </CardContent>
       </Card>

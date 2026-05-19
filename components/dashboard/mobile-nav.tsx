@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Menu, X, LayoutDashboard, Globe, Mail, Share2, Tag, Briefcase, FlaskConical } from 'lucide-react'
@@ -46,9 +47,11 @@ export function MobileNav() {
               {/* Logo */}
               <div className="flex items-center justify-center mb-8 mt-12">
                 <div className="w-32">
-                  <img 
+                  <Image 
                     src="/Logos/Info=Basic, Color=Green.png" 
                     alt="360 Live Media Logo" 
+                    width={128}
+                    height={128}
                     className="w-full h-auto object-contain"
                   />
                 </div>

@@ -29,8 +29,11 @@ export async function POST(request: Request) {
       data: {
         name: body.name,
         eventName: body.eventName || null,
+        year: body.year || new Date().getFullYear(),
+        campaignStatus: body.campaignStatus || 'Active',
+        dashboardStatus: body.dashboardStatus || 'Active',
         utmTracking: body.utmTracking || false,
-        conversionTracking: body.conversionTracking || false,
+        conversionTracking: body.conversionTracking || 'No',
       },
     })
 

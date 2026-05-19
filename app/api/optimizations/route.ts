@@ -18,19 +18,31 @@ export async function GET() {
 
 export async function POST(request: Request) {
   const session = await getServerSession(authOptions)
-  if (!session) {
+  if (!session || !session.user?.email) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
   try {
     const body = await request.json()
     
+    // Get user by email
+    const user = await prisma.user.findUnique({
+      where: { email: session.user.email }
+    })
+    
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 })
+    }
+    
     const optimization = await prisma.optimization.create({
       data: {
-        month: new Date(body.month),
+        month: body.month,
         channel: body.channel || null,
-        testDescription: body.testDescription || null,
+        controlTest: body.controlTest || null,
+        testVariant: body.testVariant || null,
         results: body.results || null,
+        conclusions: body.conclusions || null,
+        createdById: user.id,
       },
     })
 

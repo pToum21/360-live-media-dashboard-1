@@ -17,8 +17,8 @@ interface PerformanceInsightsProps {
   websiteData?: {
     totalUsers: number
     newUsers: number
-    avgSessionDuration: number
-    bounceRate: number
+    avgEngagementTimeSec: number
+    healthScore: number
   }
   emailData?: {
     openRate: number
@@ -116,16 +116,16 @@ function generateInsights(websiteData?: any, emailData?: any, socialData?: any) 
   const insights = []
 
   // Website Insights
-  if (websiteData && websiteData.bounceRate && websiteData.bounceRate > 0) {
-    if (websiteData.bounceRate > 0.6) {
+  if (websiteData && websiteData.healthScore && websiteData.healthScore > 0) {
+    if (websiteData.healthScore > 0.6) {
       insights.push({
         type: 'warning',
         priority: 'high',
         title: 'High Bounce Rate Detected',
-        description: `Your bounce rate is ${(websiteData.bounceRate * 100).toFixed(1)}%, which is above the healthy threshold. This indicates visitors are leaving without engaging.`,
+        description: `Your bounce rate is ${(websiteData.healthScore * 100).toFixed(1)}%, which is above the healthy threshold. This indicates visitors are leaving without engaging.`,
         action: 'Review landing page content and improve page load speed',
         icon: <AlertCircle className="w-5 h-5" />,
-        metric: `${(websiteData.bounceRate * 100).toFixed(1)}%`,
+        metric: `${(websiteData.healthScore * 100).toFixed(1)}%`,
         trend: 'up' as const,
         trendValue: 'Above target'
       })
@@ -134,24 +134,24 @@ function generateInsights(websiteData?: any, emailData?: any, socialData?: any) 
         type: 'success',
         priority: 'low',
         title: 'Excellent Bounce Rate',
-        description: `Your bounce rate of ${(websiteData.bounceRate * 100).toFixed(1)}% is performing well, showing strong visitor engagement.`,
+        description: `Your bounce rate of ${(websiteData.healthScore * 100).toFixed(1)}% is performing well, showing strong visitor engagement.`,
         action: 'Maintain current content quality and user experience',
         icon: <CheckCircle className="w-5 h-5" />,
-        metric: `${(websiteData.bounceRate * 100).toFixed(1)}%`,
+        metric: `${(websiteData.healthScore * 100).toFixed(1)}%`,
         trend: 'up' as const,
         trendValue: 'On target'
       })
     }
 
-    if (websiteData.avgSessionDuration && websiteData.avgSessionDuration > 0 && websiteData.avgSessionDuration < 60) {
+    if (websiteData.avgEngagementTimeSec && websiteData.avgEngagementTimeSec > 0 && websiteData.avgEngagementTimeSec < 60) {
       insights.push({
         type: 'opportunity',
         priority: 'medium',
         title: 'Session Duration Opportunity',
-        description: `Average session is ${websiteData.avgSessionDuration}s. Longer sessions typically indicate higher engagement and conversion potential.`,
+        description: `Average session is ${websiteData.avgEngagementTimeSec}s. Longer sessions typically indicate higher engagement and conversion potential.`,
         action: 'Add interactive content, videos, or internal linking to increase time on site',
         icon: <Zap className="w-5 h-5" />,
-        metric: `${websiteData.avgSessionDuration}s`
+        metric: `${websiteData.avgEngagementTimeSec}s`
       })
     }
   }
