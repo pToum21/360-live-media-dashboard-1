@@ -76,7 +76,7 @@ export default function SignInPage() {
               <Input
                 id="email"
                 type="email"
-                placeholder="you@360livemedia.com"
+                placeholder="you@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -102,12 +102,9 @@ export default function SignInPage() {
               )}
             </Button>
           </form>
-          <div className="mt-6 space-y-2">
+          <div className="mt-6">
             <p className="text-xs text-center text-gray-500">
               You&apos;ll receive a magic link via email to sign in securely.
-            </p>
-            <p className="text-xs text-center text-amber-600 font-medium">
-              Only @360livemedia.com email addresses are permitted.
             </p>
           </div>
           

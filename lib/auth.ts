@@ -36,12 +36,8 @@ export const authOptions: NextAuthOptions = {
   },
   callbacks: {
     async signIn({ user }) {
-      // Only allow @360livemedia.com email addresses
-      const email = user.email?.toLowerCase()
-      if (!email || !email.endsWith('@360livemedia.com')) {
-        return false // Reject sign-in
-      }
-      return true // Allow sign-in
+      // Allow any email for now
+      return true
     },
     async session({ session, user }) {
       if (session.user) {
