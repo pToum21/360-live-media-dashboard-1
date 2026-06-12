@@ -1,13 +1,11 @@
-import { getServerSession } from "next-auth";
-import { redirect } from "next/navigation";
-import { authOptions } from "@/lib/auth";
-import Image from "next/image";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { UserNav } from "@/components/auth/user-nav";
+"use client"
+
+import { useEffect, useState } from "react"
+import { useSession } from "next-auth/react"
+import { useRouter } from "next/navigation"
+import Image from "next/image"
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
 import { 
   BarChart3, 
   Mail, 
@@ -16,23 +14,46 @@ import {
   Zap, 
   Clock,
   ArrowRight,
-  CheckCircle2,
-  Sparkles
-} from "lucide-react";
+  Sparkles,
+  LineChart,
+  Target,
+  Moon,
+  Sun
+} from "lucide-react"
+import { useTheme } from "next-themes"
 
-export default async function Home() {
-  const session = await getServerSession(authOptions);
-  
-  // Redirect logged-in users to dashboard
+export default function Home() {
+  const { data: session } = useSession()
+  const router = useRouter()
+  const { theme, setTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  useEffect(() => {
+    if (session) {
+      router.push("/dashboard")
+    }
+  }, [session, router])
+
   if (session) {
-    redirect("/dashboard");
+    return null
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
+    <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 transition-colors duration-500">
+      {/* Animated Background Orbs */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 -right-40 w-80 h-80 bg-[#2E8741]/10 dark:bg-[#2E8741]/5 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-0 -left-40 w-96 h-96 bg-[#84BE41]/10 dark:bg-[#84BE41]/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-[#2E8741]/5 dark:bg-[#2E8741]/3 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+      </div>
+
       {/* Header */}
-      <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+      <header className="glass-card border-0 border-b dark:border-gray-800 sticky top-0 z-50">
+        <div className="container mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Image 
               src="/Logos/Info=Basic, Color=Green.png" 
@@ -42,253 +63,182 @@ export default async function Home() {
               className="object-contain"
             />
           </div>
-          <UserNav />
+          <div className="flex items-center gap-4">
+            {mounted && (
+              <button
+                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                aria-label="Toggle theme"
+              >
+                {theme === 'dark' ? (
+                  <Sun className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+                ) : (
+                  <Moon className="h-5 w-5 text-gray-600" />
+                )}
+              </button>
+            )}
+            <Link href="/auth/signin">
+              <Button variant="ghost" className="font-medium">
+                Sign In
+              </Button>
+            </Link>
+          </div>
         </div>
       </header>
 
       {/* Hero Section */}
-      <section className="container mx-auto px-4 pt-20 pb-16">
-        <div className="text-center max-w-4xl mx-auto mb-16">
-          <Badge className="mb-6 bg-[#84BE41]/10 text-[#2E8741] hover:bg-[#84BE41]/20 border-[#84BE41]/20">
-            <Sparkles className="w-3 h-3 mr-1" />
-            Internal Tool - 360 Marketing Team
-          </Badge>
+      <section className="relative container mx-auto px-6 pt-24 pb-20">
+        <div className="text-center max-w-5xl mx-auto">
+          {/* Badge */}
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#2E8741]/10 dark:bg-[#2E8741]/20 border border-[#2E8741]/20 dark:border-[#2E8741]/30 mb-8 backdrop-blur-sm">
+            <Sparkles className="w-4 h-4 text-[#2E8741]" />
+            <span className="text-sm font-medium text-[#2E8741] dark:text-[#84BE41]">The Future of Marketing Intelligence</span>
+          </div>
           
-          <h1 className="text-5xl md:text-7xl font-bold mb-6 text-[#0C1C14] tracking-tight">
-            Marketing Dashboard
+          {/* Main Headline */}
+          <h1 className="text-6xl md:text-8xl font-bold mb-6 tracking-tight">
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 dark:from-white dark:via-gray-100 dark:to-white">
+              Your Marketing
+            </span>
+            <br />
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#2E8741] via-[#3AA052] to-[#84BE41]">
+              Command Center
+            </span>
           </h1>
           
-          <p className="text-xl text-gray-600 mb-8 leading-relaxed max-w-2xl mx-auto">
-            Your marketing data from scattered Excel sheets, now in one{" "}
-            <span className="text-[#2E8741] font-semibold">unified, automated dashboard</span>.
-            Track website analytics, email campaigns, and social media—all in real-time.
+          <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-400 mb-12 leading-relaxed max-w-3xl mx-auto font-light">
+            Transform scattered data into actionable insights. Real-time analytics, automated reporting, and intelligent recommendations—all in one beautiful dashboard.
           </p>
           
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
             <Link href="/auth/signin">
               <Button 
                 size="lg" 
-                className="bg-[#2E8741] hover:bg-[#2E8741]/90 text-white shadow-lg shadow-[#2E8741]/20 group"
+                className="bg-gradient-to-r from-[#2E8741] to-[#3AA052] hover:from-[#236933] hover:to-[#2E8741] text-white shadow-2xl shadow-[#2E8741]/30 px-8 py-6 text-lg group"
               >
-                Sign In to Dashboard
-                <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                Get Started
+                <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
               </Button>
             </Link>
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-3 gap-8 max-w-2xl mx-auto pt-8 border-t">
-            <div>
-              <div className="text-3xl font-bold text-[#2E8741]">120hrs</div>
-              <div className="text-sm text-gray-600">Saved per year</div>
-            </div>
-            <div>
-              <div className="text-3xl font-bold text-[#2E8741]">5+</div>
-              <div className="text-sm text-gray-600">Data sources</div>
-            </div>
-            <div>
-              <div className="text-3xl font-bold text-[#2E8741]">Real-time</div>
-              <div className="text-sm text-gray-600">Auto-sync</div>
-            </div>
-          </div>
-        </div>
-
-        {/* Dashboard Preview Mock */}
-        <div className="max-w-6xl mx-auto mb-16">
-          <div className="bg-gradient-to-br from-[#103d27] to-[#2E8741] rounded-2xl shadow-2xl p-8 border border-[#84BE41]/20">
-            <div className="bg-white rounded-xl shadow-xl overflow-hidden">
-              <div className="bg-gray-50 border-b px-6 py-4 flex items-center gap-2">
-                <div className="flex gap-2">
-                  <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                  <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-                  <div className="w-3 h-3 rounded-full bg-green-500"></div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-3xl mx-auto">
+            {[
+              { value: "120hrs", label: "Saved per year", icon: Clock },
+              { value: "5+", label: "Data sources unified", icon: LineChart },
+              { value: "Real-time", label: "Auto-sync updates", icon: Zap }
+            ].map((stat, i) => (
+              <div key={i} className="glass-card p-6 hover-glass-shine border border-gray-200 dark:border-gray-800">
+                <stat.icon className="w-8 h-8 mx-auto mb-3 text-[#2E8741]" />
+                <div className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#2E8741] to-[#84BE41] mb-2">
+                  {stat.value}
                 </div>
-                <div className="text-sm text-gray-500 ml-4">360 Marketing Dashboard</div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">{stat.label}</div>
               </div>
-              <div className="grid grid-cols-3 gap-4 p-6 bg-gradient-to-br from-white to-gray-50">
-                <div className="bg-white p-6 rounded-lg border shadow-sm">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="w-10 h-10 bg-[#2E8741]/10 rounded-lg flex items-center justify-center">
-                      <BarChart3 className="w-5 h-5 text-[#2E8741]" />
-                    </div>
-                    <TrendingUp className="w-4 h-4 text-green-500" />
-                  </div>
-                  <div className="text-2xl font-bold text-[#0C1C14] mb-1">1,234</div>
-                  <div className="text-sm text-gray-500">Website Users</div>
-                </div>
-                <div className="bg-white p-6 rounded-lg border shadow-sm">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="w-10 h-10 bg-[#2E8741]/10 rounded-lg flex items-center justify-center">
-                      <Mail className="w-5 h-5 text-[#2E8741]" />
-                    </div>
-                    <TrendingUp className="w-4 h-4 text-green-500" />
-                  </div>
-                  <div className="text-2xl font-bold text-[#0C1C14] mb-1">15.3%</div>
-                  <div className="text-sm text-gray-500">Email Open Rate</div>
-                </div>
-                <div className="bg-white p-6 rounded-lg border shadow-sm">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="w-10 h-10 bg-[#2E8741]/10 rounded-lg flex items-center justify-center">
-                      <Users className="w-5 h-5 text-[#2E8741]" />
-                    </div>
-                    <TrendingUp className="w-4 h-4 text-green-500" />
-                  </div>
-                  <div className="text-2xl font-bold text-[#0C1C14] mb-1">4,891</div>
-                  <div className="text-sm text-gray-500">Social Reach</div>
-                </div>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="container mx-auto px-4 py-20">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold mb-4 text-[#0C1C14]">What&apos;s Tracked</h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            All your marketing metrics in one place. Updated automatically.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-          <Card className="border-2 hover:border-[#2E8741] transition-all hover:shadow-lg group">
-            <CardHeader>
-              <div className="w-12 h-12 bg-gradient-to-br from-[#2E8741] to-[#84BE41] rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                <BarChart3 className="w-6 h-6 text-white" />
-              </div>
-              <CardTitle className="text-2xl">Website Analytics</CardTitle>
-              <CardDescription>Real-time traffic and engagement metrics</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-3">
-                <li className="flex items-start gap-2">
-                  <CheckCircle2 className="w-5 h-5 text-[#2E8741] mt-0.5 flex-shrink-0" />
-                  <span className="text-sm text-gray-600">Auto-sync from Google Analytics</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle2 className="w-5 h-5 text-[#2E8741] mt-0.5 flex-shrink-0" />
-                  <span className="text-sm text-gray-600">SEMrush health scores</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle2 className="w-5 h-5 text-[#2E8741] mt-0.5 flex-shrink-0" />
-                  <span className="text-sm text-gray-600">UTM campaign tracking</span>
-                </li>
-              </ul>
-            </CardContent>
-          </Card>
-
-          <Card className="border-2 hover:border-[#2E8741] transition-all hover:shadow-lg group">
-            <CardHeader>
-              <div className="w-12 h-12 bg-gradient-to-br from-[#2E8741] to-[#84BE41] rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                <Mail className="w-6 h-6 text-white" />
-              </div>
-              <CardTitle className="text-2xl">Email Campaigns</CardTitle>
-              <CardDescription>Monitor newsletter and campaign performance</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-3">
-                <li className="flex items-start gap-2">
-                  <CheckCircle2 className="w-5 h-5 text-[#2E8741] mt-0.5 flex-shrink-0" />
-                  <span className="text-sm text-gray-600">MailChimp integration</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle2 className="w-5 h-5 text-[#2E8741] mt-0.5 flex-shrink-0" />
-                  <span className="text-sm text-gray-600">Open & click tracking</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle2 className="w-5 h-5 text-[#2E8741] mt-0.5 flex-shrink-0" />
-                  <span className="text-sm text-gray-600">Deliverability insights</span>
-                </li>
-              </ul>
-            </CardContent>
-          </Card>
-
-          <Card className="border-2 hover:border-[#2E8741] transition-all hover:shadow-lg group">
-            <CardHeader>
-              <div className="w-12 h-12 bg-gradient-to-br from-[#2E8741] to-[#84BE41] rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                <Users className="w-6 h-6 text-white" />
-              </div>
-              <CardTitle className="text-2xl">Social Media</CardTitle>
-              <CardDescription>LinkedIn & Instagram performance tracking</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-3">
-                <li className="flex items-start gap-2">
-                  <CheckCircle2 className="w-5 h-5 text-[#2E8741] mt-0.5 flex-shrink-0" />
-                  <span className="text-sm text-gray-600">Multi-platform sync</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle2 className="w-5 h-5 text-[#2E8741] mt-0.5 flex-shrink-0" />
-                  <span className="text-sm text-gray-600">Content tagging system</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle2 className="w-5 h-5 text-[#2E8741] mt-0.5 flex-shrink-0" />
-                  <span className="text-sm text-gray-600">Engagement analytics</span>
-                </li>
-              </ul>
-            </CardContent>
-          </Card>
-        </div>
-      </section>
-
-      {/* How It Works Section */}
-      <section className="bg-gradient-to-br from-[#103d27] to-[#2E8741] py-20">
-        <div className="container mx-auto px-4">
-          <div className="max-w-6xl mx-auto text-center text-white">
-            <h2 className="text-4xl font-bold mb-6">
-              Built to Save You <span className="text-[#84BE41]">Time</span>
+      {/* Features Grid */}
+      <section className="relative container mx-auto px-6 py-20">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-gray-900 dark:text-white">
+              Everything You Need
             </h2>
-            <p className="text-lg mb-12 text-white/90 max-w-2xl mx-auto">
-              No more spending 2-3 hours every week copying data from multiple platforms 
-              into Excel. Focus on strategy, content, and growth instead.
+            <p className="text-xl text-gray-600 dark:text-gray-400">
+              Powerful features designed for modern marketing teams
             </p>
-            
-            <div className="grid md:grid-cols-3 gap-8">
-              <div className="text-center">
-                <div className="w-16 h-16 bg-[#84BE41] rounded-2xl flex items-center justify-center mx-auto mb-4">
-                  <Zap className="w-8 h-8 text-[#0C1C14]" />
-                </div>
-                <h3 className="font-semibold text-xl mb-2">Automated Sync</h3>
-                <p className="text-white/80">Connect once, update forever. No manual work required.</p>
-              </div>
-              
-              <div className="text-center">
-                <div className="w-16 h-16 bg-[#84BE41] rounded-2xl flex items-center justify-center mx-auto mb-4">
-                  <Clock className="w-8 h-8 text-[#0C1C14]" />
-                </div>
-                <h3 className="font-semibold text-xl mb-2">Real-Time Data</h3>
-                <p className="text-white/80">Make decisions on current data, not week-old numbers.</p>
-              </div>
-              
-              <div className="text-center">
-                <div className="w-16 h-16 bg-[#84BE41] rounded-2xl flex items-center justify-center mx-auto mb-4">
-                  <TrendingUp className="w-8 h-8 text-[#0C1C14]" />
-                </div>
-                <h3 className="font-semibold text-xl mb-2">Clear Insights</h3>
-                <p className="text-white/80">Visual charts and trends that tell the real story.</p>
-              </div>
-            </div>
-
-            <div className="mt-12 pt-12 border-t border-white/20">
-              <p className="text-white/70 mb-2">🚀 Development Status</p>
-              <div className="flex items-center justify-center gap-6 text-sm">
-                <span className="text-[#84BE41]">✅ UI Components</span>
-                <span className="text-white/50">•</span>
-                <span className="text-white/70">🚧 Database Setup</span>
-                <span className="text-white/50">•</span>
-                <span className="text-white/70">⏳ Authentication</span>
-                <span className="text-white/50">•</span>
-                <span className="text-white/70">⏳ API Integration</span>
-              </div>
-            </div>
           </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[
+              {
+                icon: BarChart3,
+                title: "Website Analytics",
+                description: "Real-time traffic, engagement, and conversion tracking from Google Analytics and SEMrush.",
+                features: ["Live visitor data", "SEO health scores", "UTM campaign tracking"]
+              },
+              {
+                icon: Mail,
+                title: "Email Campaigns",
+                description: "Monitor newsletter performance and campaign effectiveness across all channels.",
+                features: ["MailChimp integration", "Open & click tracking", "Deliverability insights"]
+              },
+              {
+                icon: Users,
+                title: "Social Media",
+                description: "Track LinkedIn and Instagram performance with advanced engagement analytics.",
+                features: ["Multi-platform sync", "Content tagging", "Engagement analytics"]
+              },
+              {
+                icon: TrendingUp,
+                title: "Performance Insights",
+                description: "AI-powered recommendations to optimize your marketing strategy.",
+                features: ["Trend analysis", "Predictive insights", "Goal tracking"]
+              },
+              {
+                icon: Target,
+                title: "Campaign Management",
+                description: "Plan, execute, and measure all your marketing campaigns in one place.",
+                features: ["Campaign calendar", "Budget tracking", "ROI analysis"]
+              },
+              {
+                icon: Zap,
+                title: "Automated Reports",
+                description: "Schedule and share beautiful reports with stakeholders automatically.",
+                features: ["Custom templates", "Auto-scheduling", "Export options"]
+              }
+            ].map((feature, i) => (
+              <div
+                key={i}
+                className="glass-card p-8 hover-glass-shine border border-gray-200 dark:border-gray-800 group hover:border-[#2E8741] dark:hover:border-[#2E8741] transition-all duration-300"
+              >
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#2E8741] to-[#84BE41] flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                  <feature.icon className="w-7 h-7 text-white" />
+                </div>
+                <h3 className="text-xl font-bold mb-3 text-gray-900 dark:text-white">{feature.title}</h3>
+                <p className="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">{feature.description}</p>
+                <ul className="space-y-2">
+                  {feature.features.map((item, j) => (
+                    <li key={j} className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400">
+                      <div className="w-1.5 h-1.5 rounded-full bg-[#2E8741] mt-1.5 flex-shrink-0"></div>
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="relative container mx-auto px-6 py-20">
+        <div className="glass-card max-w-4xl mx-auto p-12 md:p-16 text-center border border-gray-200 dark:border-gray-800 bg-gradient-to-br from-[#2E8741]/5 to-[#84BE41]/5 dark:from-[#2E8741]/10 dark:to-[#84BE41]/10">
+          <h2 className="text-4xl md:text-5xl font-bold mb-6 text-gray-900 dark:text-white">
+            Ready to transform your marketing?
+          </h2>
+          <p className="text-xl text-gray-600 dark:text-gray-400 mb-8 max-w-2xl mx-auto">
+            Join your team in the modern era of data-driven marketing. Sign in to get started.
+          </p>
+          <Link href="/auth/signin">
+            <Button 
+              size="lg" 
+              className="bg-gradient-to-r from-[#2E8741] to-[#3AA052] hover:from-[#236933] hover:to-[#2E8741] text-white shadow-2xl shadow-[#2E8741]/30 px-8 py-6 text-lg group"
+            >
+              Sign In Now
+              <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+            </Button>
+          </Link>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="border-t bg-white py-12">
-        <div className="container mx-auto px-4 text-center">
+      <footer className="border-t dark:border-gray-800 py-12">
+        <div className="container mx-auto px-6 text-center">
           <div className="flex items-center justify-center mb-4">
             <Image 
               src="/Logos/Info=Basic, Color=Green.png" 
@@ -298,14 +248,14 @@ export default async function Home() {
               className="object-contain"
             />
           </div>
-          <p className="text-sm text-gray-600 mb-2">
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
             A Smithbucklin Company
           </p>
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-gray-500 dark:text-gray-500">
             © 2026 360 Live Media. All rights reserved.
           </p>
         </div>
       </footer>
     </div>
-  );
+  )
 }
