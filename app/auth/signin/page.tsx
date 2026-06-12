@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Image from "next/image"
 import { signIn } from "next-auth/react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -34,12 +35,18 @@ export default function SignInPage() {
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 flex items-center justify-center p-4">
       <Card className="w-full max-w-md border-2">
         <CardHeader className="text-center">
-          <div className="mx-auto w-16 h-16 bg-gradient-to-br from-[#2E8741] to-[#84BE41] rounded-2xl flex items-center justify-center mb-4">
-            <span className="text-white font-bold text-2xl">360</span>
+          <div className="mx-auto mb-6 flex justify-center">
+            <Image 
+              src="/Logos/Info=Basic, Color=Green.png" 
+              alt="360 Live Media Logo" 
+              width={140}
+              height={48}
+              className="object-contain"
+            />
           </div>
           <CardTitle className="text-2xl">Welcome Back</CardTitle>
           <CardDescription>
-            Sign in to access the 360 Live Media Marketing Dashboard
+            Sign in to access the 360° Marketing Dashboard
           </CardDescription>
         </CardHeader>
         <CardContent>

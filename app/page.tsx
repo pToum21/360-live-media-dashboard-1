@@ -32,17 +32,14 @@ export default async function Home() {
       {/* Header */}
       <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-lg flex items-center justify-center">
-              <Image 
-                src="/Logos/Info=Basic, Color=Green.png" 
-                alt="360 Live Media Logo" 
-                width={40}
-                height={40}
-                className="w-full h-full object-contain"
-              />
-            </div>
-            <span className="font-bold text-xl text-[#0C1C14]">Live Media</span>
+          <div className="flex items-center gap-3">
+            <Image 
+              src="/Logos/Info=Basic, Color=Green.png" 
+              alt="360 Live Media Logo" 
+              width={140}
+              height={48}
+              className="object-contain"
+            />
           </div>
           <UserNav />
         </div>
@@ -67,7 +64,11 @@ export default async function Home() {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-            <Button size="lg" className="bg-[#2E8741] hover:bg-[#2E8741]/90 text-white shadow-lg shadow-[#2E8741]/20 group">
+            <Button 
+              size="lg" 
+              className="bg-[#2E8741] hover:bg-[#2E8741]/90 text-white shadow-lg shadow-[#2E8741]/20 group"
+              onClick={() => window.location.href = '/auth/signin'}
+            >
               Sign In to Dashboard
               <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
             </Button>
@@ -286,17 +287,14 @@ export default async function Home() {
       {/* Footer */}
       <footer className="border-t bg-white py-12">
         <div className="container mx-auto px-4 text-center">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center">
-              <Image 
-                src="/Logos/Info=Basic, Color=Green.png" 
-                alt="360 Live Media Logo" 
-                width={32}
-                height={32}
-                className="w-full h-full object-contain"
-              />
-            </div>
-            <span className="font-bold text-lg text-[#0C1C14]">Live Media</span>
+          <div className="flex items-center justify-center mb-4">
+            <Image 
+              src="/Logos/Info=Basic, Color=Green.png" 
+              alt="360 Live Media Logo" 
+              width={120}
+              height={42}
+              className="object-contain"
+            />
           </div>
           <p className="text-sm text-gray-600 mb-2">
             A Smithbucklin Company
