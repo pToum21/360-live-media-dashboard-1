@@ -92,7 +92,9 @@ export default async function ClientProjectsPage() {
                     {client.eventName && (
                       <p className="text-sm text-muted-foreground dark:text-gray-400">{client.eventName}</p>
                     )}
-                    <p className="text-xs text-muted-foreground dark:text-gray-400 mt-1">Year: {client.year}</p>
+                    {client.year && (
+                      <p className="text-xs text-muted-foreground dark:text-gray-400 mt-1">Year: {client.year}</p>
+                    )}
                   </div>
                   <div className="flex gap-2">
                     {client.utmTracking ? (
@@ -112,15 +114,15 @@ export default async function ClientProjectsPage() {
                 <div className="grid md:grid-cols-2 gap-4 text-sm">
                   <div>
                     <span className="font-medium text-gray-700 dark:text-gray-300">Campaign Status:</span>
-                    <p className="text-gray-600 dark:text-gray-400">{client.campaignStatus}</p>
+                    <p className="text-gray-600 dark:text-gray-400">{client.campaignStatus || 'N/A'}</p>
                   </div>
                   <div>
                     <span className="font-medium text-gray-700 dark:text-gray-300">Dashboard Status:</span>
-                    <p className="text-gray-600 dark:text-gray-400">{client.dashboardStatus}</p>
+                    <p className="text-gray-600 dark:text-gray-400">{client.dashboardStatus || 'N/A'}</p>
                   </div>
                   <div>
                     <span className="font-medium text-gray-700 dark:text-gray-300">Conversion Tracking:</span>
-                    <p className="text-gray-600 dark:text-gray-400">{client.conversionTracking}</p>
+                    <p className="text-gray-600 dark:text-gray-400">{client.conversionTracking ? 'Enabled' : 'Disabled'}</p>
                   </div>
                 </div>
 
@@ -153,7 +155,8 @@ export default async function ClientProjectsPage() {
             <div className="space-y-2">
               {Object.entries(
                 clients.reduce((acc, client) => {
-                  acc[client.campaignStatus] = (acc[client.campaignStatus] || 0) + 1
+                  const status = client.campaignStatus || 'Unknown'
+                  acc[status] = (acc[status] || 0) + 1
                   return acc
                 }, {} as Record<string, number>)
               ).map(([status, count]) => (
@@ -174,7 +177,8 @@ export default async function ClientProjectsPage() {
             <div className="space-y-2">
               {Object.entries(
                 clients.reduce((acc, client) => {
-                  acc[client.conversionTracking] = (acc[client.conversionTracking] || 0) + 1
+                  const status = client.conversionTracking ? 'Enabled' : 'Disabled'
+                  acc[status] = (acc[status] || 0) + 1
                   return acc
                 }, {} as Record<string, number>)
               ).map(([status, count]) => (
