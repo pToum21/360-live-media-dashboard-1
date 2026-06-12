@@ -8,6 +8,7 @@ Currently, the marketing team spends **2-3 hours every week** manually copying d
 
 ## 📊 What This Dashboard Tracks
 
+
 ### Automated Data Collection
 - **Website Analytics** - Traffic, users, engagement (Google Analytics 4)
 - **SEO Health** - Site health scores (SEMrush)
