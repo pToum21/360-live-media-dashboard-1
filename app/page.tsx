@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
@@ -21,12 +21,22 @@ import {
   Sun
 } from "lucide-react"
 import { useTheme } from "next-themes"
+import { gsap } from "gsap"
+import { ScrollTrigger } from "gsap/dist/ScrollTrigger"
+
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger)
+}
 
 export default function Home() {
   const { data: session } = useSession()
   const router = useRouter()
   const { theme, setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
+  const heroRef = useRef(null)
+  const statsRef = useRef(null)
+  const featuresRef = useRef(null)
+  const ctaRef = useRef(null)
 
   useEffect(() => {
     setMounted(true)
@@ -37,6 +47,97 @@ export default function Home() {
       router.push("/dashboard")
     }
   }, [session, router])
+
+  // GSAP Animations
+  useEffect(() => {
+    if (!mounted) return
+
+    const ctx = gsap.context(() => {
+      // Hero section entrance
+      gsap.from(".hero-badge", {
+        opacity: 0,
+        y: -20,
+        duration: 0.8,
+        ease: "power3.out"
+      })
+
+      gsap.from(".hero-title", {
+        opacity: 0,
+        y: 30,
+        duration: 1,
+        delay: 0.2,
+        ease: "power3.out"
+      })
+
+      gsap.from(".hero-subtitle", {
+        opacity: 0,
+        y: 20,
+        duration: 0.8,
+        delay: 0.4,
+        ease: "power3.out"
+      })
+
+      gsap.from(".hero-cta", {
+        opacity: 0,
+        y: 20,
+        duration: 0.8,
+        delay: 0.6,
+        ease: "power3.out"
+      })
+
+      // Stats cards stagger
+      gsap.from(".stat-card", {
+        scrollTrigger: {
+          trigger: statsRef.current,
+          start: "top 80%",
+        },
+        opacity: 0,
+        y: 50,
+        stagger: 0.2,
+        duration: 0.8,
+        ease: "power3.out"
+      })
+
+      // Features title
+      gsap.from(".features-title", {
+        scrollTrigger: {
+          trigger: featuresRef.current,
+          start: "top 80%",
+        },
+        opacity: 0,
+        y: 30,
+        duration: 0.8,
+        ease: "power3.out"
+      })
+
+      // Feature cards stagger
+      gsap.from(".feature-card", {
+        scrollTrigger: {
+          trigger: featuresRef.current,
+          start: "top 70%",
+        },
+        opacity: 0,
+        y: 60,
+        stagger: 0.15,
+        duration: 0.8,
+        ease: "power3.out"
+      })
+
+      // CTA section
+      gsap.from(".cta-section", {
+        scrollTrigger: {
+          trigger: ctaRef.current,
+          start: "top 80%",
+        },
+        opacity: 0,
+        scale: 0.95,
+        duration: 1,
+        ease: "power3.out"
+      })
+    })
+
+    return () => ctx.revert()
+  }, [mounted])
 
   if (session) {
     return null
@@ -87,30 +188,29 @@ export default function Home() {
       </header>
 
       {/* Hero Section */}
-      <section className="relative container mx-auto px-6 pt-24 pb-20">
+      <section ref={heroRef} className="relative container mx-auto px-6 pt-24 pb-20">
         <div className="text-center max-w-5xl mx-auto">
           {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#2E8741]/10 dark:bg-[#2E8741]/20 border border-[#2E8741]/20 dark:border-[#2E8741]/30 mb-8 backdrop-blur-sm">
+          <div className="hero-badge inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#2E8741]/10 dark:bg-[#2E8741]/20 border border-[#2E8741]/20 dark:border-[#2E8741]/30 mb-8 backdrop-blur-sm">
             <Sparkles className="w-4 h-4 text-[#2E8741]" />
             <span className="text-sm font-medium text-[#2E8741] dark:text-[#84BE41]">The Future of Marketing Intelligence</span>
           </div>
           
           {/* Main Headline */}
-          <h1 className="text-6xl md:text-8xl font-bold mb-6 tracking-tight">
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 dark:from-white dark:via-gray-100 dark:to-white">
+          <h1 className="hero-title text-6xl md:text-8xl font-bold mb-6 tracking-tight">
+            <span className="block bg-clip-text text-transparent bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 dark:from-white dark:via-gray-100 dark:to-white">
               Your Marketing
             </span>
-            <br />
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#2E8741] via-[#3AA052] to-[#84BE41]">
+            <span className="block bg-clip-text text-transparent bg-gradient-to-r from-[#2E8741] via-[#3AA052] to-[#84BE41]">
               Command Center
             </span>
           </h1>
           
-          <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-400 mb-12 leading-relaxed max-w-3xl mx-auto font-light">
+          <p className="hero-subtitle text-xl md:text-2xl text-gray-600 dark:text-gray-400 mb-12 leading-relaxed max-w-3xl mx-auto font-light">
             Transform scattered data into actionable insights. Real-time analytics, automated reporting, and intelligent recommendations—all in one beautiful dashboard.
           </p>
           
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
+          <div className="hero-cta flex flex-col sm:flex-row gap-4 justify-center mb-16">
             <Link href="/auth/signin">
               <Button 
                 size="lg" 
@@ -123,13 +223,13 @@ export default function Home() {
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-3xl mx-auto">
+          <div ref={statsRef} className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-3xl mx-auto">
             {[
               { value: "120hrs", label: "Saved per year", icon: Clock },
               { value: "5+", label: "Data sources unified", icon: LineChart },
               { value: "Real-time", label: "Auto-sync updates", icon: Zap }
             ].map((stat, i) => (
-              <div key={i} className="glass-card p-6 hover-glass-shine border border-gray-200 dark:border-gray-800">
+              <div key={i} className="stat-card glass-card p-6 hover-glass-shine border border-gray-200 dark:border-gray-800">
                 <stat.icon className="w-8 h-8 mx-auto mb-3 text-[#2E8741]" />
                 <div className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#2E8741] to-[#84BE41] mb-2">
                   {stat.value}
@@ -142,9 +242,9 @@ export default function Home() {
       </section>
 
       {/* Features Grid */}
-      <section className="relative container mx-auto px-6 py-20">
+      <section ref={featuresRef} className="relative container mx-auto px-6 py-20">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
+          <div className="features-title text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold mb-4 text-gray-900 dark:text-white">
               Everything You Need
             </h2>
@@ -194,7 +294,7 @@ export default function Home() {
             ].map((feature, i) => (
               <div
                 key={i}
-                className="glass-card p-8 hover-glass-shine border border-gray-200 dark:border-gray-800 group hover:border-[#2E8741] dark:hover:border-[#2E8741] transition-all duration-300"
+                className="feature-card glass-card p-8 hover-glass-shine border border-gray-200 dark:border-gray-800 group hover:border-[#2E8741] dark:hover:border-[#2E8741] transition-all duration-300"
               >
                 <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#2E8741] to-[#84BE41] flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
                   <feature.icon className="w-7 h-7 text-white" />
@@ -216,8 +316,8 @@ export default function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="relative container mx-auto px-6 py-20">
-        <div className="glass-card max-w-4xl mx-auto p-12 md:p-16 text-center border border-gray-200 dark:border-gray-800 bg-gradient-to-br from-[#2E8741]/5 to-[#84BE41]/5 dark:from-[#2E8741]/10 dark:to-[#84BE41]/10">
+      <section ref={ctaRef} className="relative container mx-auto px-6 py-20">
+        <div className="cta-section glass-card max-w-4xl mx-auto p-12 md:p-16 text-center border border-gray-200 dark:border-gray-800 bg-gradient-to-br from-[#2E8741]/5 to-[#84BE41]/5 dark:from-[#2E8741]/10 dark:to-[#84BE41]/10">
           <h2 className="text-4xl md:text-5xl font-bold mb-6 text-gray-900 dark:text-white">
             Ready to transform your marketing?
           </h2>
