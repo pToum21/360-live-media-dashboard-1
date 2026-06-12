@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth";
 import Image from "next/image";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -64,14 +65,15 @@ export default async function Home() {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-            <Button 
-              size="lg" 
-              className="bg-[#2E8741] hover:bg-[#2E8741]/90 text-white shadow-lg shadow-[#2E8741]/20 group"
-              onClick={() => window.location.href = '/auth/signin'}
-            >
-              Sign In to Dashboard
-              <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-            </Button>
+            <Link href="/auth/signin">
+              <Button 
+                size="lg" 
+                className="bg-[#2E8741] hover:bg-[#2E8741]/90 text-white shadow-lg shadow-[#2E8741]/20 group"
+              >
+                Sign In to Dashboard
+                <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+              </Button>
+            </Link>
           </div>
 
           {/* Stats */}
