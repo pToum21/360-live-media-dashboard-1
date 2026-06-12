@@ -22,8 +22,9 @@ import {
 } from "lucide-react"
 import { useTheme } from "next-themes"
 import { gsap } from "gsap"
-import { ScrollTrigger } from "gsap/dist/ScrollTrigger"
+import { ScrollTrigger } from "gsap/ScrollTrigger"
 
+// Register GSAP plugins
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger)
 }
@@ -52,91 +53,98 @@ export default function Home() {
   useEffect(() => {
     if (!mounted) return
 
-    const ctx = gsap.context(() => {
-      // Hero section entrance
-      gsap.from(".hero-badge", {
-        opacity: 0,
-        y: -20,
-        duration: 0.8,
-        ease: "power3.out"
+    // Small delay to ensure DOM is ready
+    const timer = setTimeout(() => {
+      const ctx = gsap.context(() => {
+        // Hero section entrance animations
+        const heroTimeline = gsap.timeline({ defaults: { ease: "power3.out" } })
+        
+        heroTimeline
+          .from(".hero-badge", {
+            opacity: 0,
+            y: -30,
+            duration: 0.8,
+          })
+          .from(".hero-title", {
+            opacity: 0,
+            y: 40,
+            duration: 1,
+          }, "-=0.6")
+          .from(".hero-subtitle", {
+            opacity: 0,
+            y: 30,
+            duration: 0.8,
+          }, "-=0.7")
+          .from(".hero-cta", {
+            opacity: 0,
+            y: 20,
+            duration: 0.8,
+          }, "-=0.6")
+
+        // Stats cards with ScrollTrigger
+        gsap.from(".stat-card", {
+          scrollTrigger: {
+            trigger: ".stat-card",
+            start: "top 85%",
+            toggleActions: "play none none none"
+          },
+          opacity: 0,
+          y: 60,
+          stagger: 0.2,
+          duration: 1,
+          ease: "power3.out"
+        })
+
+        // Features title
+        gsap.from(".features-title", {
+          scrollTrigger: {
+            trigger: ".features-title",
+            start: "top 85%",
+            toggleActions: "play none none none"
+          },
+          opacity: 0,
+          y: 40,
+          duration: 1,
+          ease: "power3.out"
+        })
+
+        // Feature cards stagger
+        gsap.from(".feature-card", {
+          scrollTrigger: {
+            trigger: ".feature-card",
+            start: "top 85%",
+            toggleActions: "play none none none"
+          },
+          opacity: 0,
+          y: 70,
+          stagger: 0.15,
+          duration: 1,
+          ease: "power3.out"
+        })
+
+        // CTA section
+        gsap.from(".cta-section", {
+          scrollTrigger: {
+            trigger: ".cta-section",
+            start: "top 85%",
+            toggleActions: "play none none none"
+          },
+          opacity: 0,
+          scale: 0.9,
+          duration: 1.2,
+          ease: "power3.out"
+        })
       })
 
-      gsap.from(".hero-title", {
-        opacity: 0,
-        y: 30,
-        duration: 1,
-        delay: 0.2,
-        ease: "power3.out"
-      })
+      return () => {
+        ctx.revert()
+        ScrollTrigger.getAll().forEach(trigger => trigger.kill())
+      }
+    }, 100)
 
-      gsap.from(".hero-subtitle", {
-        opacity: 0,
-        y: 20,
-        duration: 0.8,
-        delay: 0.4,
-        ease: "power3.out"
-      })
-
-      gsap.from(".hero-cta", {
-        opacity: 0,
-        y: 20,
-        duration: 0.8,
-        delay: 0.6,
-        ease: "power3.out"
-      })
-
-      // Stats cards stagger
-      gsap.from(".stat-card", {
-        scrollTrigger: {
-          trigger: statsRef.current,
-          start: "top 80%",
-        },
-        opacity: 0,
-        y: 50,
-        stagger: 0.2,
-        duration: 0.8,
-        ease: "power3.out"
-      })
-
-      // Features title
-      gsap.from(".features-title", {
-        scrollTrigger: {
-          trigger: featuresRef.current,
-          start: "top 80%",
-        },
-        opacity: 0,
-        y: 30,
-        duration: 0.8,
-        ease: "power3.out"
-      })
-
-      // Feature cards stagger
-      gsap.from(".feature-card", {
-        scrollTrigger: {
-          trigger: featuresRef.current,
-          start: "top 70%",
-        },
-        opacity: 0,
-        y: 60,
-        stagger: 0.15,
-        duration: 0.8,
-        ease: "power3.out"
-      })
-
-      // CTA section
-      gsap.from(".cta-section", {
-        scrollTrigger: {
-          trigger: ctaRef.current,
-          start: "top 80%",
-        },
-        opacity: 0,
-        scale: 0.95,
-        duration: 1,
-        ease: "power3.out"
-      })
-    })
-
-    return () => ctx.revert()
+    return () => {
+      clearTimeout(timer)
+    }
   }, [mounted])
 
   if (session) {
