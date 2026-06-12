@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import Link from "next/link"
 import { signIn } from "next-auth/react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -104,15 +103,8 @@ export default function SignInPage() {
           </form>
           <div className="mt-6">
             <p className="text-xs text-center text-gray-500">
-              You&apos;ll receive a magic link via email to sign in securely.
+              You&apos;ll receive a magic link via email to sign in securely. New users will be automatically registered.
             </p>
-          </div>
-          
-          <div className="mt-4 text-center text-sm text-gray-600">
-            Don&apos;t have an account?{' '}
-            <Link href="/auth/register" className="text-[#2E8741] hover:underline font-medium">
-              Sign up
-            </Link>
           </div>
         </CardContent>
       </Card>
