@@ -100,12 +100,17 @@ model WebsiteMetric {
   avgEngagementTimeSec  Int?
   percentChangeEngTime  Float?
   
+  // Client Association
+  client                Client?   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  clientId              String?
+  
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt
   createdBy             User      @relation(fields: [createdById], references: [id])
   createdById           String
   
   @@index([weekStarting])
+  @@index([clientId])
 }
 
 // ============================================
@@ -123,12 +128,17 @@ model EmailCampaign {
   deliveryRate    Float
   unsubscribeRate Float
   
+  // Client Association
+  client          Client?   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  clientId        String?
+  
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
   createdBy       User      @relation(fields: [createdById], references: [id])
   createdById     String
   
   @@index([deploymentDate])
+  @@index([clientId])
 }
 
 // ============================================
@@ -152,12 +162,17 @@ model SocialMetric {
   igPostsPerWeek        Int?
   igFollowers           Int?
   
+  // Client Association
+  client                Client?   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  clientId              String?
+  
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt
   createdBy             User      @relation(fields: [createdById], references: [id])
   createdById           String
   
   @@index([weekStarting])
+  @@index([clientId])
 }
 
 model SocialPost {
@@ -172,6 +187,10 @@ model SocialPost {
   engagementRate  Float
   linkClicks      Int?
   
+  // Client Association
+  client          Client?   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  clientId        String?
+  
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
   createdBy       User      @relation(fields: [createdById], references: [id])
@@ -182,6 +201,7 @@ model SocialPost {
   
   @@index([weekStarting])
   @@index([platform])
+  @@index([clientId])
 }
 
 // ============================================
@@ -223,28 +243,37 @@ model Campaign {
   source      String
   pageViews   Int
   
+  // Client Association
+  client      Client?   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  clientId    String?
+  
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   
   @@index([month])
   @@index([source])
+  @@index([clientId])
 }
 
 // ============================================
-// CLIENT PROJECT TRACKING
+// CLIENT ORGANIZATIONS
 // ============================================
 
 model Client {
   id                    String    @id @default(cuid())
-  name                  String
+  name                  String    @unique
+  slug                  String?   @unique // URL-friendly identifier
+  logo                  String?
+  
+  // Project Details (optional)
   eventName             String?
-  year                  Int
-  campaignStatus        String
-  dashboardStatus       String
+  year                  Int?
+  campaignStatus        String?
+  dashboardStatus       String?
   
   // Tracking Status
   utmTracking           Boolean   @default(false)
-  conversionTracking    String    // "Yes", "No", "Some"
+  conversionTracking    Boolean   @default(false)
   
   // Notes
   issueDescription      String?
@@ -253,7 +282,15 @@ model Client {
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt
   
-  @@index([year])
+  // Relations - all data belongs to a client
+  websiteMetrics        WebsiteMetric[]
+  emailCampaigns        EmailCampaign[]
+  socialMetrics         SocialMetric[]
+  socialPosts           SocialPost[]
+  campaigns             Campaign[]
+  optimizations         Optimization[]
+  
+  @@index([slug])
 }
 
 // ============================================
@@ -269,10 +306,15 @@ model Optimization {
   results         String?
   conclusions     String?
   
+  // Client Association
+  client          Client?   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  clientId        String?
+  
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
   createdBy       User      @relation(fields: [createdById], references: [id])
   createdById     String
   
   @@index([month])
+  @@index([clientId])
 }

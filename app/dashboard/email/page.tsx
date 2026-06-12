@@ -3,10 +3,15 @@ import { Mail, TrendingUp, MousePointerClick, Send } from "lucide-react"
 import { prisma } from "@/lib/prisma"
 import { EmailPerformanceChart } from "@/components/charts/email-performance-chart"
 import { EmailManagement } from "@/components/dashboard/email-management"
+import { getSelectedClientId } from "@/lib/get-selected-client"
 
 export default async function EmailCampaignsPage() {
-  // Fetch email campaigns (most recent 12)
+  // Get the selected client ID
+  const clientId = await getSelectedClientId()
+  
+  // Fetch email campaigns for the selected client (most recent 12)
   const campaigns = await prisma.emailCampaign.findMany({
+    where: { clientId },
     orderBy: { deploymentDate: 'desc' },
     take: 12,
   })

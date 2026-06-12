@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation"
 import { UserNav } from "@/components/auth/user-nav"
 import { ThemeToggle } from "@/components/theme-toggle"
+import { ClientSwitcher } from "@/components/dashboard/client-switcher"
 import { 
   LayoutDashboard, 
   BarChart3, 
@@ -122,6 +123,7 @@ export function DashboardHeader() {
       </div>
 
       <div className="flex items-center gap-3 relative z-10">
+        <ClientSwitcher />
         <ThemeToggle />
         <UserNav />
       </div>
