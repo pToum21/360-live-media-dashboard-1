@@ -2,11 +2,12 @@
 
 import { useState } from "react"
 import Image from "next/image"
+import Link from "next/link"
 import { signIn } from "next-auth/react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Mail } from "lucide-react"
+import { Mail, ArrowLeft } from "lucide-react"
 
 export const dynamic = 'force-dynamic'
 
@@ -32,8 +33,16 @@ export default function SignInPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md border-2">
+    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 dark:from-gray-950 dark:to-gray-900 flex items-center justify-center p-4 relative">
+      <Link 
+        href="/"
+        className="absolute top-8 left-8 flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-[#2E8741] dark:hover:text-[#84BE41] transition-colors group"
+      >
+        <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+        <span className="font-medium">Back to Home</span>
+      </Link>
+
+      <Card className="w-full max-w-md border-2 dark:bg-gray-900 dark:border-gray-800">
         <CardHeader className="text-center">
           <div className="mx-auto mb-6 flex justify-center">
             <Image 
