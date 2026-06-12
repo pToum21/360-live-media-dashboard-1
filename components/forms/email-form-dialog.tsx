@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -19,13 +19,37 @@ export function EmailFormDialog({ open, onOpenChange, data, mode }: EmailFormDia
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
-    deploymentDate: data?.deploymentDate ? new Date(data.deploymentDate).toISOString().split('T')[0] : '',
-    name: data?.name || '',
-    openRate: data?.openRate ? (data.openRate * 100).toString() : '',
-    clickRate: data?.clickRate ? (data.clickRate * 100).toString() : '',
-    deliveryRate: data?.deliveryRate ? (data.deliveryRate * 100).toString() : '',
-    unsubscribeRate: data?.unsubscribeRate ? (data.unsubscribeRate * 100).toString() : '',
+    deploymentDate: '',
+    name: '',
+    openRate: '',
+    clickRate: '',
+    deliveryRate: '',
+    unsubscribeRate: '',
   })
+
+  // Update form data when data prop changes
+  useEffect(() => {
+    if (data) {
+      setFormData({
+        deploymentDate: data.deploymentDate ? new Date(data.deploymentDate).toISOString().split('T')[0] : '',
+        name: data.name || '',
+        openRate: data.openRate ? (data.openRate * 100).toString() : '',
+        clickRate: data.clickRate ? (data.clickRate * 100).toString() : '',
+        deliveryRate: data.deliveryRate ? (data.deliveryRate * 100).toString() : '',
+        unsubscribeRate: data.unsubscribeRate ? (data.unsubscribeRate * 100).toString() : '',
+      })
+    } else {
+      // Reset form when creating new
+      setFormData({
+        deploymentDate: '',
+        name: '',
+        openRate: '',
+        clickRate: '',
+        deliveryRate: '',
+        unsubscribeRate: '',
+      })
+    }
+  }, [data, open])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

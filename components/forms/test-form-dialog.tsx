@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -19,11 +19,30 @@ export function TestFormDialog({ open, onOpenChange, data, mode }: TestFormDialo
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
-    month: data?.month ? new Date(data.month).toISOString().split('T')[0].slice(0, 7) : '',
-    channel: data?.channel || '',
-    testDescription: data?.testDescription || '',
-    results: data?.results || '',
+    month: '',
+    channel: '',
+    testDescription: '',
+    results: '',
   })
+
+  // Update form data when data prop changes
+  useEffect(() => {
+    if (data) {
+      setFormData({
+        month: data.month ? new Date(data.month).toISOString().split('T')[0].slice(0, 7) : '',
+        channel: data.channel || '',
+        testDescription: data.testDescription || '',
+        results: data.results || '',
+      })
+    } else {
+      setFormData({
+        month: '',
+        channel: '',
+        testDescription: '',
+        results: '',
+      })
+    }
+  }, [data, open])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

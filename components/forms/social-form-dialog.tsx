@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -19,14 +19,39 @@ export function SocialFormDialog({ open, onOpenChange, data, mode }: SocialFormD
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
-    weekStarting: data?.weekStarting ? new Date(data.weekStarting).toISOString().split('T')[0] : '',
-    liFollowers: data?.liFollowers || '',
-    liImpressions: data?.liImpressions || '',
-    liEngagementRate: data?.liEngagementRate ? (data.liEngagementRate * 100).toString() : '',
-    igFollowers: data?.igFollowers || '',
-    igImpressions: data?.igImpressions || '',
-    igEngagementRate: data?.igEngagementRate ? (data.igEngagementRate * 100).toString() : '',
+    weekStarting: '',
+    liFollowers: '',
+    liImpressions: '',
+    liEngagementRate: '',
+    igFollowers: '',
+    igImpressions: '',
+    igEngagementRate: '',
   })
+
+  // Update form data when data prop changes
+  useEffect(() => {
+    if (data) {
+      setFormData({
+        weekStarting: data.weekStarting ? new Date(data.weekStarting).toISOString().split('T')[0] : '',
+        liFollowers: data.liFollowers || '',
+        liImpressions: data.liImpressions || '',
+        liEngagementRate: data.liEngagementRate ? (data.liEngagementRate * 100).toString() : '',
+        igFollowers: data.igFollowers || '',
+        igImpressions: data.igImpressions || '',
+        igEngagementRate: data.igEngagementRate ? (data.igEngagementRate * 100).toString() : '',
+      })
+    } else {
+      setFormData({
+        weekStarting: '',
+        liFollowers: '',
+        liImpressions: '',
+        liEngagementRate: '',
+        igFollowers: '',
+        igImpressions: '',
+        igEngagementRate: '',
+      })
+    }
+  }, [data, open])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

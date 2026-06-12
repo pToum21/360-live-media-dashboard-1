@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -19,17 +19,48 @@ export function WebsiteFormDialog({ open, onOpenChange, data, mode }: WebsiteFor
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
-    weekStarting: data?.weekStarting ? new Date(data.weekStarting).toISOString().split('T')[0] : '',
-    totalUsers: data?.totalUsers || '',
-    newUsers: data?.newUsers || '',
-    avgEngagementTimeSec: data?.avgEngagementTimeSec || '',
-    healthScore: data?.healthScore || '',
-    referral: data?.referral || '',
-    organicSearch: data?.organicSearch || '',
-    direct: data?.direct || '',
-    organicSocial: data?.organicSocial || '',
-    email: data?.email || '',
+    weekStarting: '',
+    totalUsers: '',
+    newUsers: '',
+    avgEngagementTimeSec: '',
+    healthScore: '',
+    referral: '',
+    organicSearch: '',
+    direct: '',
+    organicSocial: '',
+    email: '',
   })
+
+  // Update form data when data prop changes
+  useEffect(() => {
+    if (data) {
+      setFormData({
+        weekStarting: data.weekStarting ? new Date(data.weekStarting).toISOString().split('T')[0] : '',
+        totalUsers: data.totalUsers || '',
+        newUsers: data.newUsers || '',
+        avgEngagementTimeSec: data.avgEngagementTimeSec || '',
+        healthScore: data.healthScore || '',
+        referral: data.referral || '',
+        organicSearch: data.organicSearch || '',
+        direct: data.direct || '',
+        organicSocial: data.organicSocial || '',
+        email: data.email || '',
+      })
+    } else {
+      setFormData({
+        weekStarting: '',
+        totalUsers: '',
+        newUsers: '',
+        avgEngagementTimeSec: '',
+        healthScore: '',
+        referral: '',
+        organicSearch: '',
+        direct: '',
+        organicSocial: '',
+        email: '',
+      })
+    }
+  }, [data, open])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
