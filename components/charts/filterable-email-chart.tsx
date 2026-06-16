@@ -11,8 +11,8 @@ interface EmailCampaignData {
   clickRate: number
   deliveryRate: number
   unsubscribeRate: number
-  audience?: string
-  campaignType?: string
+  audience?: string | null
+  campaignType?: string | null
   deploymentDate: Date
 }
 
@@ -21,9 +21,6 @@ interface FilterableEmailChartProps {
 }
 
 export function FilterableEmailChart({ data }: FilterableEmailChartProps) {
-  const [selectedFilters, setSelectedFilters] = useState<Record<string, string[]>>({})
-  const [chartType, setChartType] = useState<'bar' | 'line'>('bar')
-
   // Extract unique audiences and campaign types from data
   const filterGroups: FilterGroup[] = useMemo(() => {
     const audiences = [...new Set(data.map(d => d.audience).filter(Boolean))]
@@ -71,6 +68,19 @@ export function FilterableEmailChart({ data }: FilterableEmailChartProps) {
 
     return groups
   }, [data])
+
+  // Initialize with all options selected by default
+  const [selectedFilters, setSelectedFilters] = useState<Record<string, string[]>>(() => {
+    const audiences = [...new Set(data.map(d => d.audience).filter(Boolean))] as string[]
+    const campaignTypes = [...new Set(data.map(d => d.campaignType).filter(Boolean))] as string[]
+    
+    return {
+      audience: audiences,
+      campaignType: campaignTypes,
+      metric: ['openRate', 'clickRate', 'deliveryRate'],
+    }
+  })
+  const [chartType, setChartType] = useState<'bar' | 'line'>('bar')
 
   // Filter data based on selected filters
   const filteredData = useMemo(() => {
@@ -133,7 +143,14 @@ export function FilterableEmailChart({ data }: FilterableEmailChartProps) {
   }
 
   const handleClearAll = () => {
-    setSelectedFilters({})
+    const audiences = [...new Set(data.map(d => d.audience).filter(Boolean))] as string[]
+    const campaignTypes = [...new Set(data.map(d => d.campaignType).filter(Boolean))] as string[]
+    
+    setSelectedFilters({
+      audience: audiences,
+      campaignType: campaignTypes,
+      metric: ['openRate', 'clickRate', 'deliveryRate'],
+    })
   }
 
   const CustomTooltip = ({ active, payload, label }: any) => {

@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge"
 import { FlaskConical, TrendingUp, Target } from "lucide-react"
 import { prisma } from "@/lib/prisma"
 import { TestManagement } from "@/components/dashboard/test-management"
+import { FilterableTestingChart } from "@/components/charts/filterable-testing-chart"
 
 export default async function ABTestingPage() {
   // Fetch A/B tests
@@ -75,6 +76,24 @@ export default async function ABTestingPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Filterable A/B Testing Chart */}
+      <Card className="chart-card border-0 overflow-hidden shadow-lg">
+        <CardHeader className="bg-gradient-to-r from-teal-50/10 dark:from-teal-900/20 to-transparent border-b border-gray-200 dark:border-gray-700">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 gradient-teal rounded-xl flex items-center justify-center shadow-md">
+              <FlaskConical className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <CardTitle className="text-lg text-gray-900 dark:text-gray-100">A/B Testing Analysis</CardTitle>
+              <CardDescription className="dark:text-gray-400">Visualize tests over time, by channel, and track cumulative progress</CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="pt-6">
+          <FilterableTestingChart data={tests} />
+        </CardContent>
+      </Card>
 
       {/* Tests by Channel */}
       <Card>

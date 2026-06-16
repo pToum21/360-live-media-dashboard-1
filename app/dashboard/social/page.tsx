@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Users, TrendingUp, Eye, Heart } from "lucide-react"
 import { prisma } from "@/lib/prisma"
-import { SocialGrowthChart } from "@/components/charts/social-growth-chart"
+import { FilterableSocialChart } from "@/components/charts/filterable-social-chart"
 import { SocialManagement } from "@/components/dashboard/social-management"
 
 export default async function SocialMediaPage() {
@@ -205,16 +205,16 @@ export default async function SocialMediaPage() {
         </div>
       </div>
 
-      {/* Social Growth Chart */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Social Media Growth Trend</CardTitle>
-          <CardDescription>
-            LinkedIn and Instagram impressions over time
-          </CardDescription>
+      {/* Filterable Social Growth Chart */}
+      <Card className="chart-card border-0 overflow-hidden shadow-lg">
+        <CardHeader className="bg-gradient-to-r from-purple-50/10 dark:from-purple-900/20 to-transparent border-b border-gray-200 dark:border-gray-700">
+          <div>
+            <CardTitle className="text-lg text-gray-900 dark:text-gray-100">Social Media Performance Analysis</CardTitle>
+            <CardDescription className="dark:text-gray-400">Filter by platform, metrics, and time range to explore social media growth</CardDescription>
+          </div>
         </CardHeader>
-        <CardContent>
-          <SocialGrowthChart data={chartData} />
+        <CardContent className="pt-6">
+          <FilterableSocialChart data={metrics} />
         </CardContent>
       </Card>
 

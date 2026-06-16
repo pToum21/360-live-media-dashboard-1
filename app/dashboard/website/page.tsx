@@ -1,8 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { BarChart3, TrendingUp, Users, Clock } from "lucide-react"
 import { prisma } from "@/lib/prisma"
-import { WebsiteTrendChart } from "@/components/charts/website-trend-chart"
-import { TrafficSourceChart } from "@/components/charts/traffic-source-chart"
+import { FilterableWebsiteChart } from "@/components/charts/filterable-website-chart"
 import { WebsiteManagement } from "@/components/dashboard/website-management"
 
 export default async function WebsiteAnalyticsPage() {
@@ -122,39 +121,21 @@ export default async function WebsiteAnalyticsPage() {
         </Card>
       </div>
 
-      {/* Traffic Trend Chart */}
+      {/* Filterable Website Analytics Chart */}
       <Card className="chart-card border-0 overflow-hidden shadow-lg">
-        <CardHeader className="bg-gradient-to-r from-green-50/10 dark:from-green-900/20 to-transparent border-b border-gray-200 dark:border-gray-700">
+        <CardHeader className="bg-gradient-to-r from-blue-50/10 dark:from-blue-900/20 to-transparent border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 gradient-green rounded-xl flex items-center justify-center shadow-md">
-              <BarChart3 className="w-5 h-5 text-white" />
+            <div className="w-10 h-10 gradient-blue rounded-xl flex items-center justify-center shadow-md">
+              <TrendingUp className="w-5 h-5 text-white" />
             </div>
             <div>
-              <CardTitle className="text-lg text-gray-900 dark:text-gray-100">Traffic Trend</CardTitle>
-              <CardDescription className="dark:text-gray-400">Website visitors over the last 12 weeks</CardDescription>
+              <CardTitle className="text-lg text-gray-900 dark:text-gray-100">Website Analytics Performance</CardTitle>
+              <CardDescription className="dark:text-gray-400">Filter by metrics, view trends over time, or analyze traffic sources</CardDescription>
             </div>
           </div>
         </CardHeader>
         <CardContent className="pt-6">
-          <WebsiteTrendChart data={chartData} />
-        </CardContent>
-      </Card>
-
-      {/* Traffic Sources Chart */}
-      <Card className="chart-card border-0 overflow-hidden shadow-lg">
-        <CardHeader className="bg-gradient-to-r from-purple-50/10 dark:from-purple-900/20 to-transparent border-b border-gray-200 dark:border-gray-700">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 gradient-purple rounded-xl flex items-center justify-center shadow-md">
-              <BarChart3 className="w-5 h-5 text-white" />
-            </div>
-            <div>
-              <CardTitle className="text-lg text-gray-900 dark:text-gray-100">Traffic Sources (Latest Week)</CardTitle>
-              <CardDescription className="dark:text-gray-400">Interactive breakdown of where your visitors are coming from</CardDescription>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <TrafficSourceChart data={trafficData} />
+          <FilterableWebsiteChart data={metrics} />
         </CardContent>
       </Card>
 

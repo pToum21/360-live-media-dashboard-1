@@ -15,10 +15,9 @@ import {
   FlaskConical,
 } from "lucide-react"
 import Link from "next/link"
-import { WebsiteTrendChart } from "@/components/charts/website-trend-chart"
-import { EmailPerformanceChart } from "@/components/charts/email-performance-chart"
-import { TrafficSourceChart } from "@/components/charts/traffic-source-chart"
-import { SocialGrowthChart } from "@/components/charts/social-growth-chart"
+import { FilterableWebsiteChart } from "@/components/charts/filterable-website-chart"
+import { FilterableEmailChart } from "@/components/charts/filterable-email-chart"
+import { FilterableSocialChart } from "@/components/charts/filterable-social-chart"
 import { PerformanceInsights } from "@/components/dashboard/performance-insights"
 import { GoalTracking } from "@/components/dashboard/goal-tracking"
 import { TopPerformers } from "@/components/dashboard/top-performers"
@@ -57,28 +56,11 @@ export default async function DashboardPage() {
     where: { totalUsers: { gt: 0 } },
     orderBy: { weekStarting: 'asc' },
     take: 12,
-    select: {
-      weekStarting: true,
-      totalUsers: true,
-      newUsers: true,
-      organicSearch: true,
-      direct: true,
-      referral: true,
-      organicSocial: true,
-      email: true,
-    }
   })
 
   const emailChartData = await prisma.emailCampaign.findMany({
     orderBy: { deploymentDate: 'desc' },
-    take: 8,
-    select: {
-      id: true,
-      name: true,
-      openRate: true,
-      clickRate: true,
-      deploymentDate: true,
-    }
+    take: 12,
   })
 
   const socialChartData = await prisma.socialMetric.findMany({
@@ -90,41 +72,18 @@ export default async function DashboardPage() {
     },
     orderBy: { weekStarting: 'asc' },
     take: 12,
-    select: {
-      id: true,
-      weekStarting: true,
-      liImpressions: true,
-      igImpressions: true,
-      liEngagementRate: true,
-      igEngagementRate: true,
-    }
   })
 
-  // Format data for charts
-  const formattedWebsiteData = websiteChartData.map(m => ({
-    week: m.weekStarting.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-    users: m.totalUsers || 0,
-    newUsers: m.newUsers || 0,
-  }))
-
-  const formattedEmailData = emailChartData.reverse().map(c => ({
-    name: c.name.replace('360 - ', '').replace(' Mission Brief', ''),
+  // Prepare email data for filterable chart
+  const emailChartDataFormatted = emailChartData.map(c => ({
+    name: c.name,
     openRate: c.openRate,
     clickRate: c.clickRate,
-  }))
-
-  const formattedTrafficData = latestWebsite ? [
-    { name: 'Organic Search', value: latestWebsite.organicSearch || 0 },
-    { name: 'Direct', value: latestWebsite.direct || 0 },
-    { name: 'Referral', value: latestWebsite.referral || 0 },
-    { name: 'Social', value: latestWebsite.organicSocial || 0 },
-    { name: 'Email', value: latestWebsite.email || 0 },
-  ].filter(item => item.value > 0) : []
-
-  const formattedSocialData = socialChartData.map(s => ({
-    week: s.weekStarting.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-    linkedIn: s.liImpressions || 0,
-    instagram: s.igImpressions || 0,
+    deliveryRate: c.deliveryRate || 0,
+    unsubscribeRate: c.unsubscribeRate || 0,
+    audience: c.audience,
+    campaignType: c.campaignType,
+    deploymentDate: c.deploymentDate,
   }))
 
   return (
@@ -295,62 +254,47 @@ export default async function DashboardPage() {
         </Link>
       </div>
 
-      {/* Interactive Charts */}
-      <div className="grid gap-4 md:grid-cols-2">
-        <Card className="md:col-span-2 chart-card overflow-hidden">
-          <CardHeader>
-            <CardTitle className="text-base font-semibold text-gray-700 dark:text-gray-200">Website Traffic Trend</CardTitle>
-            <CardDescription className="text-sm text-gray-500 dark:text-gray-400">
-              Total and new users over the last 12 weeks
+      {/* Interactive Filterable Charts */}
+      <div className="grid gap-4">
+        <Card className="chart-card border-0 overflow-hidden shadow-lg">
+          <CardHeader className="bg-gradient-to-r from-blue-50/10 dark:from-blue-900/20 to-transparent border-b border-gray-200 dark:border-gray-700">
+            <CardTitle className="text-lg font-semibold text-gray-900 dark:text-gray-100">Website Analytics</CardTitle>
+            <CardDescription className="text-sm text-gray-600 dark:text-gray-400">
+              Filter by metrics, view trends over time, or analyze traffic sources
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <WebsiteTrendChart data={formattedWebsiteData} />
+          <CardContent className="pt-6">
+            <FilterableWebsiteChart data={websiteChartData} />
           </CardContent>
         </Card>
 
-        <Card className="chart-card overflow-hidden">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base font-semibold text-gray-700 dark:text-gray-200">
-              <Mail className="w-4 h-4 text-green-600 dark:text-green-500" />
+        <Card className="chart-card border-0 overflow-hidden shadow-lg">
+          <CardHeader className="bg-gradient-to-r from-green-50/10 dark:from-green-900/20 to-transparent border-b border-gray-200 dark:border-gray-700">
+            <CardTitle className="flex items-center gap-2 text-lg font-semibold text-gray-900 dark:text-gray-100">
+              <Mail className="w-5 h-5 text-[#2E8741]" />
               Email Campaign Performance
             </CardTitle>
-            <CardDescription className="text-sm text-gray-500 dark:text-gray-400">
-              Open and click rates for recent campaigns
+            <CardDescription className="text-sm text-gray-600 dark:text-gray-400">
+              Filter campaigns by audience, type, and metrics for detailed analysis
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <EmailPerformanceChart data={formattedEmailData} />
+          <CardContent className="pt-6">
+            <FilterableEmailChart data={emailChartDataFormatted} />
           </CardContent>
         </Card>
 
-        <Card className="chart-card overflow-hidden">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base font-semibold text-gray-700 dark:text-gray-200">
-              <BarChart3 className="w-4 h-4 text-green-600 dark:text-green-500" />
-              Traffic Sources
+        <Card className="chart-card border-0 overflow-hidden shadow-lg">
+          <CardHeader className="bg-gradient-to-r from-purple-50/10 dark:from-purple-900/20 to-transparent border-b border-gray-200 dark:border-gray-700">
+            <CardTitle className="flex items-center gap-2 text-lg font-semibold text-gray-900 dark:text-gray-100">
+              <Users className="w-5 h-5 text-purple-600" />
+              Social Media Performance
             </CardTitle>
-            <CardDescription className="text-sm text-gray-500 dark:text-gray-400">
-              Where your visitors are coming from (latest week)
+            <CardDescription className="text-sm text-gray-600 dark:text-gray-400">
+              Filter by platform, metrics, and time range to explore social media growth
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <TrafficSourceChart data={formattedTrafficData} />
-          </CardContent>
-        </Card>
-
-        <Card className="md:col-span-2 chart-card overflow-hidden">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base font-semibold text-gray-700 dark:text-gray-200">
-              <Users className="w-4 h-4 text-green-600 dark:text-green-500" />
-              Social Media Growth
-            </CardTitle>
-            <CardDescription className="text-sm text-gray-500 dark:text-gray-400">
-              LinkedIn and Instagram impressions over time
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <SocialGrowthChart data={formattedSocialData} />
+          <CardContent className="pt-6">
+            <FilterableSocialChart data={socialChartData} />
           </CardContent>
         </Card>
       </div>
