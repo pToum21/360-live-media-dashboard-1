@@ -4,6 +4,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
+import { useEffect, useState } from "react"
 import {
   LayoutDashboard,
   BarChart3,
@@ -13,53 +14,129 @@ import {
   Building2,
   FlaskConical,
   Settings,
+  Ticket,
+  FileText,
+  DollarSign,
+  UserCheck,
+  Target,
 } from "lucide-react"
 
-const navItems = [
+// Define nav items with client restrictions
+const allNavItems = [
   {
     title: "360° Command",
     href: "/dashboard",
     icon: LayoutDashboard,
+    clients: ["360-live-media", "atc-2026"], // Available for all clients
   },
   {
     title: "Website Analytics",
     href: "/dashboard/website",
     icon: BarChart3,
+    clients: ["360-live-media", "atc-2026"],
   },
   {
     title: "Email Campaigns",
     href: "/dashboard/email",
     icon: Mail,
+    clients: ["360-live-media", "atc-2026"],
   },
   {
     title: "Social Media",
     href: "/dashboard/social",
     icon: Users,
-  },
-  {
-    title: "Content Tagging",
-    href: "/dashboard/tagging",
-    icon: Tag,
-  },
-  {
-    title: "Client Projects",
-    href: "/dashboard/clients",
-    icon: Building2,
+    clients: ["360-live-media", "atc-2026"],
   },
   {
     title: "A/B Testing",
     href: "/dashboard/testing",
     icon: FlaskConical,
+    clients: ["360-live-media", "atc-2026"],
+  },
+  {
+    title: "Content Tagging",
+    href: "/dashboard/tagging",
+    icon: Tag,
+    clients: ["360-live-media", "atc-2026"],
+  },
+  // ATC-specific pages
+  {
+    title: "Paid Media",
+    href: "/dashboard/paid-media",
+    icon: Target,
+    clients: ["atc-2026"], // Only for ATC
+  },
+  {
+    title: "Event Registrations",
+    href: "/dashboard/registrations",
+    icon: UserCheck,
+    clients: ["atc-2026"], // Only for ATC
+  },
+  {
+    title: "Pass Types",
+    href: "/dashboard/pass-types",
+    icon: Ticket,
+    clients: ["atc-2026"], // Only for ATC
+  },
+  {
+    title: "Abstracts",
+    href: "/dashboard/abstracts",
+    icon: FileText,
+    clients: ["atc-2026"], // Only for ATC
+  },
+  {
+    title: "Revenue",
+    href: "/dashboard/revenue",
+    icon: DollarSign,
+    clients: ["atc-2026"], // Only for ATC
+  },
+  {
+    title: "Client Projects",
+    href: "/dashboard/clients",
+    icon: Building2,
+    clients: ["360-live-media", "atc-2026"],
   },
   {
     title: "API Settings",
     href: "/dashboard/settings/api",
     icon: Settings,
+    clients: ["360-live-media", "atc-2026"],
   },
 ]
 
 export function DashboardNav() {
   const pathname = usePathname()
+  const [selectedClient, setSelectedClient] = useState<string>("360-live-media")
+
+  // Get selected client from cookies
+  useEffect(() => {
+    const getClientFromCookie = () => {
+      const cookies = document.cookie.split(';')
+      const clientCookie = cookies.find(c => c.trim().startsWith('selectedClient='))
+      if (clientCookie) {
+        const client = clientCookie.split('=')[1]
+        setSelectedClient(client)
+      }
+    }
+    
+    getClientFromCookie()
+    
+    // Listen for client changes
+    const handleClientChange = () => {
+      getClientFromCookie()
+    }
+    
+    window.addEventListener('storage', handleClientChange)
+    window.addEventListener('client-changed', handleClientChange)
+    
+    return () => {
+      window.removeEventListener('storage', handleClientChange)
+      window.removeEventListener('client-changed', handleClientChange)
+    }
+  }, [])
+
+  // Filter nav items based on selected client
+  const navItems = allNavItems.filter(item => item.clients.includes(selectedClient))
 
   return (
     <aside className="fixed left-0 top-0 h-full w-72 flex flex-col border-r border-white/20 dark:border-white/10 shadow-2xl z-30 backdrop-blur-3xl bg-white/15 dark:bg-black/30" style={{ backdropFilter: 'blur(100px) saturate(180%)' }}>

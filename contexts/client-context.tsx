@@ -38,9 +38,10 @@ export function ClientProvider({ children }: { children: ReactNode }) {
         const clientToUse = savedClient || data[0] || null
         setSelectedClientState(clientToUse)
         
-        // Set cookie for server-side access
+        // Set cookies for server-side access
         if (clientToUse) {
           document.cookie = `selectedClientId=${clientToUse.id}; path=/; max-age=31536000`
+          document.cookie = `selectedClient=${clientToUse.slug}; path=/; max-age=31536000`
         }
       } catch (error) {
         console.error('Failed to fetch clients:', error)
@@ -55,8 +56,9 @@ export function ClientProvider({ children }: { children: ReactNode }) {
   const setSelectedClient = (client: Client) => {
     setSelectedClientState(client)
     localStorage.setItem('selectedClientId', client.id)
-    // Also set a cookie for server-side access
+    // Set cookies for server-side access - use SLUG for selectedClient!
     document.cookie = `selectedClientId=${client.id}; path=/; max-age=31536000`
+    document.cookie = `selectedClient=${client.slug}; path=/; max-age=31536000`
     // Trigger a page reload to fetch new data for the selected client
     window.location.reload()
   }

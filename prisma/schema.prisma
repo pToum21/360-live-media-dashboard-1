@@ -29,11 +29,16 @@ model User {
   sessions      Session[]
   
   // App Relations
-  websiteMetrics    WebsiteMetric[]
-  emailCampaigns    EmailCampaign[]
-  socialMetrics     SocialMetric[]
-  socialPosts       SocialPost[]
-  optimizations     Optimization[]
+  websiteMetrics       WebsiteMetric[]
+  emailCampaigns       EmailCampaign[]
+  socialMetrics        SocialMetric[]
+  socialPosts          SocialPost[]
+  optimizations        Optimization[]
+  paidMedia            PaidMedia[]
+  eventRegistrations   EventRegistration[]
+  passTypes            PassType[]
+  abstractSubmissions  AbstractSubmission[]
+  revenueProjections   RevenueProjection[]
 }
 
 model Account {
@@ -95,6 +100,8 @@ model WebsiteMetric {
   organicSocial         Int?
   email                 Int?
   unassigned            Int?
+  paidSocial            Int?      // For ATC - Paid social ads
+  paidSearch            Int?      // For ATC - Paid search ads
   
   // Engagement
   avgEngagementTimeSec  Int?
@@ -132,6 +139,16 @@ model EmailCampaign {
   deliveryRate    Float
   unsubscribeRate Float
   
+  // Benchmarks (for ATC - industry standards)
+  openRateBenchmark       Float?
+  clickRateBenchmark      Float?
+  deliveryRateBenchmark   Float?
+  unsubscribeRateBenchmark Float?
+  
+  // Additional ATC fields
+  totalSent       Int?
+  subjectLine     String?
+  
   // Client Association
   client          Client?   @relation(fields: [clientId], references: [id], onDelete: Cascade)
   clientId        String?
@@ -167,6 +184,20 @@ model SocialMetric {
   igEngagementRate      Float?
   igPostsPerWeek        Int?
   igFollowers           Int?
+  
+  // Facebook (for ATC)
+  fbFollowers           Int?
+  fbFollowerGrowthRate  Float?
+  fbImpressions         Int?
+  fbEngagements         Int?
+  fbPostsPerWeek        Int?
+  
+  // Twitter/X (for ATC)
+  xFollowers            Int?
+  xFollowerGrowthRate   Float?
+  xImpressions          Int?
+  xEngagements          Int?
+  xPostsPerWeek         Int?
   
   // Client Association
   client                Client?   @relation(fields: [clientId], references: [id], onDelete: Cascade)
@@ -295,6 +326,11 @@ model Client {
   socialPosts           SocialPost[]
   campaigns             Campaign[]
   optimizations         Optimization[]
+  paidMedia             PaidMedia[]              // For ATC - Paid advertising
+  eventRegistrations    EventRegistration[]      // For ATC - Event registration tracking
+  passTypes             PassType[]               // For ATC - Ticket/pass type breakdown
+  abstractSubmissions   AbstractSubmission[]     // For ATC - Abstract submissions
+  revenueProjections    RevenueProjection[]      // For ATC - Revenue projections
   
   @@index([slug])
 }
@@ -322,5 +358,179 @@ model Optimization {
   createdById     String
   
   @@index([month])
+  @@index([clientId])
+}
+
+// ============================================
+// PAID MEDIA (for ATC)
+// ============================================
+
+model PaidMedia {
+  id                    String    @id @default(cuid())
+  weekStarting          DateTime
+  
+  // LinkedIn Ads
+  liImpressions         Int?
+  liClicks              Int?
+  liSpend               Float?
+  liCPC                 Float?
+  liCTR                 Float?
+  liConversions         Int?
+  liCVR                 Float?
+  liCPA                 Float?
+  
+  // Meta Ads (Facebook + Instagram)
+  metaImpressions       Int?
+  metaClicks            Int?
+  metaSpend             Float?
+  metaCPC               Float?
+  metaCTR               Float?
+  metaConversions       Int?
+  metaCVR               Float?
+  metaCPA               Float?
+  
+  // Google Search
+  googleSearchImpressions Int?
+  googleSearchClicks      Int?
+  googleSearchSpend       Float?
+  googleSearchCPC         Float?
+  googleSearchCTR         Float?
+  googleSearchConversions Int?
+  googleSearchCVR         Float?
+  googleSearchCPA         Float?
+  
+  // Google Display
+  googleDisplayImpressions Int?
+  googleDisplayClicks      Int?
+  googleDisplaySpend       Float?
+  googleDisplayCPC         Float?
+  googleDisplayCTR         Float?
+  googleDisplayConversions Int?
+  googleDisplayCVR         Float?
+  googleDisplayCPA         Float?
+  
+  // Client Association
+  client                Client?   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  clientId              String?
+  
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  createdBy             User      @relation(fields: [createdById], references: [id])
+  createdById           String
+  
+  @@index([weekStarting])
+  @@index([clientId])
+}
+
+// ============================================
+// EVENT REGISTRATIONS (for ATC)
+// ============================================
+
+model EventRegistration {
+  id                    String    @id @default(cuid())
+  date                  DateTime
+  
+  // Registration Counts
+  totalRegistrations    Int
+  compRegistrations     Int?      // Comp/Free registrations
+  paidRegistrations     Int?      // Paid registrations
+  
+  // Revenue (if available)
+  revenue               Float?
+  
+  // Registration Types (pass types)
+  memberCount           Int?
+  nonMemberCount        Int?
+  studentCount          Int?
+  sponsorCount          Int?
+  
+  // Goals
+  registrationGoal      Int?
+  percentOfGoal         Float?
+  
+  // Client Association
+  client                Client?   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  clientId              String?
+  
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  createdBy             User      @relation(fields: [createdById], references: [id])
+  createdById           String
+  
+  @@index([date])
+  @@index([clientId])
+}
+
+// ============================================
+// PASS TYPES / TICKET TYPES (for ATC)
+// ============================================
+
+model PassType {
+  id                    String    @id @default(cuid())
+  passTypeName          String
+  year                  Int
+  registrationCount     Int
+  percentOfTotal        Float?
+  revenue               Float?
+  
+  // Client Association
+  client                Client?   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  clientId              String?
+  
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  createdBy             User      @relation(fields: [createdById], references: [id])
+  createdById           String
+  
+  @@index([year])
+  @@index([clientId])
+}
+
+// ============================================
+// ABSTRACTS / SUBMISSIONS (for ATC)
+// ============================================
+
+model AbstractSubmission {
+  id                    String    @id @default(cuid())
+  year                  Int
+  submissionCount       Int
+  submissionType        String?   // e.g., "Late-Breaking", "Regular"
+  
+  // Client Association
+  client                Client?   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  clientId              String?
+  
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  createdBy             User      @relation(fields: [createdById], references: [id])
+  createdById           String
+  
+  @@index([year])
+  @@index([clientId])
+}
+
+// ============================================
+// REVENUE PROJECTIONS (for ATC)
+// ============================================
+
+model RevenueProjection {
+  id                    String    @id @default(cuid())
+  date                  DateTime
+  projectedRevenue      Float?
+  actualRevenue         Float?
+  projectedRegistrations Int?
+  actualRegistrations   Int?
+  category              String?   // e.g., "Members", "Sponsors", "Exhibitors"
+  
+  // Client Association
+  client                Client?   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  clientId              String?
+  
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  createdBy             User      @relation(fields: [createdById], references: [id])
+  createdById           String
+  
+  @@index([date])
   @@index([clientId])
 }
