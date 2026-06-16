@@ -21,6 +21,8 @@ export async function PUT(
       data: {
         deploymentDate: body.deploymentDate ? new Date(body.deploymentDate) : undefined,
         name: body.name,
+        audience: body.audience !== undefined ? body.audience : undefined,
+        campaignType: body.campaignType !== undefined ? body.campaignType : undefined,
         openRate: body.openRate,
         clickRate: body.clickRate,
         deliveryRate: body.deliveryRate,

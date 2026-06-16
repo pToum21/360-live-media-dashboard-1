@@ -21,6 +21,8 @@ export function EmailFormDialog({ open, onOpenChange, data, mode }: EmailFormDia
   const [formData, setFormData] = useState({
     deploymentDate: '',
     name: '',
+    audience: '',
+    campaignType: '',
     openRate: '',
     clickRate: '',
     deliveryRate: '',
@@ -33,6 +35,8 @@ export function EmailFormDialog({ open, onOpenChange, data, mode }: EmailFormDia
       setFormData({
         deploymentDate: data.deploymentDate ? new Date(data.deploymentDate).toISOString().split('T')[0] : '',
         name: data.name || '',
+        audience: data.audience || '',
+        campaignType: data.campaignType || '',
         openRate: data.openRate ? (data.openRate * 100).toString() : '',
         clickRate: data.clickRate ? (data.clickRate * 100).toString() : '',
         deliveryRate: data.deliveryRate ? (data.deliveryRate * 100).toString() : '',
@@ -43,6 +47,8 @@ export function EmailFormDialog({ open, onOpenChange, data, mode }: EmailFormDia
       setFormData({
         deploymentDate: '',
         name: '',
+        audience: '',
+        campaignType: '',
         openRate: '',
         clickRate: '',
         deliveryRate: '',
@@ -65,6 +71,8 @@ export function EmailFormDialog({ open, onOpenChange, data, mode }: EmailFormDia
         body: JSON.stringify({
           deploymentDate: formData.deploymentDate,
           name: formData.name,
+          audience: formData.audience || null,
+          campaignType: formData.campaignType || null,
           openRate: parseFloat(formData.openRate) / 100 || 0,
           clickRate: parseFloat(formData.clickRate) / 100 || 0,
           deliveryRate: parseFloat(formData.deliveryRate) / 100 || 0,
@@ -117,6 +125,40 @@ export function EmailFormDialog({ open, onOpenChange, data, mode }: EmailFormDia
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 required
               />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="audience">Audience (optional)</Label>
+                <select
+                  id="audience"
+                  value={formData.audience}
+                  onChange={(e) => setFormData({ ...formData, audience: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
+                >
+                  <option value="">Select audience...</option>
+                  <option value="Members">Members</option>
+                  <option value="Sponsors">Sponsors</option>
+                  <option value="Attendees">Attendees</option>
+                  <option value="All">All</option>
+                </select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="campaignType">Campaign Type (optional)</Label>
+                <select
+                  id="campaignType"
+                  value={formData.campaignType}
+                  onChange={(e) => setFormData({ ...formData, campaignType: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
+                >
+                  <option value="">Select type...</option>
+                  <option value="Newsletter">Newsletter</option>
+                  <option value="Promotion">Promotion</option>
+                  <option value="Announcement">Announcement</option>
+                  <option value="Event Update">Event Update</option>
+                </select>
+              </div>
             </div>
 
             <div className="border-t pt-4">

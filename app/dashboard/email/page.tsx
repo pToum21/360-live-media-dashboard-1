@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Mail, TrendingUp, MousePointerClick, Send } from "lucide-react"
 import { prisma } from "@/lib/prisma"
-import { EmailPerformanceChart } from "@/components/charts/email-performance-chart"
+import { FilterableEmailChart } from "@/components/charts/filterable-email-chart"
 import { EmailManagement } from "@/components/dashboard/email-management"
 import { getSelectedClientId } from "@/lib/get-selected-client"
 
@@ -21,11 +21,16 @@ export default async function EmailCampaignsPage() {
   const avgClickRate = campaigns.reduce((sum, c) => sum + c.clickRate, 0) / campaigns.length
   const avgDeliveryRate = campaigns.reduce((sum, c) => sum + c.deliveryRate, 0) / campaigns.length
 
-  // Format data for chart
-  const chartData = campaigns.slice().reverse().map(c => ({
-    name: c.name.replace('360 - ', '').replace(' Mission Brief', '').substring(0, 20),
+  // Format data for filterable chart
+  const chartData = campaigns.map(c => ({
+    name: c.name,
     openRate: c.openRate,
     clickRate: c.clickRate,
+    deliveryRate: c.deliveryRate,
+    unsubscribeRate: c.unsubscribeRate,
+    audience: c.audience,
+    campaignType: c.campaignType,
+    deploymentDate: c.deploymentDate,
   }))
 
   return (
@@ -97,7 +102,7 @@ export default async function EmailCampaignsPage() {
         </Card>
       </div>
 
-      {/* Performance Chart */}
+      {/* Filterable Performance Chart */}
       <Card className="chart-card border-0 overflow-hidden shadow-lg">
         <CardHeader className="bg-gradient-to-r from-blue-50/10 dark:from-blue-900/20 to-transparent border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center gap-3">
@@ -105,13 +110,13 @@ export default async function EmailCampaignsPage() {
               <Mail className="w-5 h-5 text-white" />
             </div>
             <div>
-              <CardTitle className="text-lg text-gray-900 dark:text-gray-100">Campaign Performance Comparison</CardTitle>
-              <CardDescription className="dark:text-gray-400">Interactive comparison of open and click rates across campaigns</CardDescription>
+              <CardTitle className="text-lg text-gray-900 dark:text-gray-100">Campaign Performance Analysis</CardTitle>
+              <CardDescription className="dark:text-gray-400">Filter by audience, campaign type, and metrics to explore performance data</CardDescription>
             </div>
           </div>
         </CardHeader>
         <CardContent className="pt-6">
-          <EmailPerformanceChart data={chartData} />
+          <FilterableEmailChart data={chartData} />
         </CardContent>
       </Card>
 

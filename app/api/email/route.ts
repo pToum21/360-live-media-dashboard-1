@@ -29,6 +29,8 @@ export async function POST(request: Request) {
       data: {
         deploymentDate: new Date(body.deploymentDate),
         name: body.name,
+        audience: body.audience || null,
+        campaignType: body.campaignType || null,
         openRate: body.openRate || 0,
         clickRate: body.clickRate || 0,
         deliveryRate: body.deliveryRate || 0,
