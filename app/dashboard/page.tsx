@@ -13,6 +13,9 @@ import {
   Clock,
   Building2,
   FlaskConical,
+  DollarSign,
+  Ticket,
+  UserCheck,
 } from "lucide-react"
 import Link from "next/link"
 import { FilterableWebsiteChart } from "@/components/charts/filterable-website-chart"
@@ -22,19 +25,43 @@ import { PerformanceInsights } from "@/components/dashboard/performance-insights
 import { GoalTracking } from "@/components/dashboard/goal-tracking"
 import { TopPerformers } from "@/components/dashboard/top-performers"
 import { GrowthTrends } from "@/components/dashboard/growth-trends"
+import { cookies } from "next/headers"
+import { redirect } from "next/navigation"
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions)
+  if (!session) {
+    redirect('/auth/signin')
+  }
 
-  // Fetch latest metrics (with actual data)
+  // Get selected client from cookies
+  const cookieStore = await cookies()
+  const selectedClientSlug = cookieStore.get('selectedClient')?.value || '360-live-media'
+
+  const client = await prisma.client.findUnique({
+    where: { slug: selectedClientSlug },
+  })
+
+  if (!client) {
+    return <div>Client not found</div>
+  }
+
+  // Fetch latest metrics FILTERED BY CLIENT
   const [latestWebsite, latestEmail, latestSocial, totalClients, totalTests] = await Promise.all([
     prisma.websiteMetric.findFirst({
-      where: { totalUsers: { gt: 0 } },
+      where: { 
+        clientId: client.id,
+        totalUsers: { gt: 0 } 
+      },
       orderBy: { weekStarting: 'desc' }
     }),
-    prisma.emailCampaign.findFirst({ orderBy: { deploymentDate: 'desc' } }),
+    prisma.emailCampaign.findFirst({ 
+      where: { clientId: client.id },
+      orderBy: { deploymentDate: 'desc' } 
+    }),
     prisma.socialMetric.findFirst({
       where: {
+        clientId: client.id,
         OR: [
           { liEngagementRate: { not: null } },
           { igEngagementRate: { not: null } }
@@ -43,7 +70,7 @@ export default async function DashboardPage() {
       orderBy: { weekStarting: 'desc' }
     }),
     prisma.client.count(),
-    prisma.optimization.count(),
+    prisma.optimization.count({ where: { clientId: client.id } }),
   ])
 
   // Calculate average social engagement (LinkedIn + Instagram)
@@ -51,20 +78,25 @@ export default async function DashboardPage() {
     ? ((latestSocial.liEngagementRate || 0) + (latestSocial.igEngagementRate || 0)) / 2
     : 0
 
-  // Prepare chart data
+  // Prepare chart data FILTERED BY CLIENT
   const websiteChartData = await prisma.websiteMetric.findMany({
-    where: { totalUsers: { gt: 0 } },
+    where: { 
+      clientId: client.id,
+      totalUsers: { gt: 0 } 
+    },
     orderBy: { weekStarting: 'asc' },
     take: 12,
   })
 
   const emailChartData = await prisma.emailCampaign.findMany({
+    where: { clientId: client.id },
     orderBy: { deploymentDate: 'desc' },
     take: 12,
   })
 
   const socialChartData = await prisma.socialMetric.findMany({
     where: {
+      clientId: client.id,
       OR: [
         { liImpressions: { not: null } },
         { igImpressions: { not: null } }
@@ -447,6 +479,89 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* CLIENT-SPECIFIC SECTIONS */}
+      {client.slug === 'atc-2026' && (
+        <>
+          {/* ATC-SPECIFIC: Event Registrations & Revenue */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Card className="card-hover">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <UserCheck className="w-5 h-5 text-green-600" />
+                  Event Registrations
+                </CardTitle>
+                <CardDescription>Track daily registration progress</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Link href="/dashboard/registrations">
+                  <button className="w-full text-left p-4 rounded-xl border border-green-500/30 hover:border-green-500/50 hover:bg-green-500/10 transition-all">
+                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300">View Registration Dashboard</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">See daily trends, goals & pass types</p>
+                  </button>
+                </Link>
+              </CardContent>
+            </Card>
+
+            <Card className="card-hover">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <DollarSign className="w-5 h-5 text-green-600" />
+                  Revenue Tracking
+                </CardTitle>
+                <CardDescription>Projections vs actuals</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Link href="/dashboard/revenue">
+                  <button className="w-full text-left p-4 rounded-xl border border-green-500/30 hover:border-green-500/50 hover:bg-green-500/10 transition-all">
+                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300">View Revenue Dashboard</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Track financial performance</p>
+                  </button>
+                </Link>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* ATC-SPECIFIC: Pass Types & Paid Media */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Card className="card-hover">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Ticket className="w-5 h-5 text-green-600" />
+                  Pass Types
+                </CardTitle>
+                <CardDescription>Registration breakdown by ticket</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Link href="/dashboard/pass-types">
+                  <button className="w-full text-left p-4 rounded-xl border border-green-500/30 hover:border-green-500/50 hover:bg-green-500/10 transition-all">
+                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300">View Pass Types</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Analyze ticket distribution</p>
+                  </button>
+                </Link>
+              </CardContent>
+            </Card>
+
+            <Card className="card-hover">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <BarChart3 className="w-5 h-5 text-green-600" />
+                  Paid Media
+                </CardTitle>
+                <CardDescription>LinkedIn, Meta, Google ads</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Link href="/dashboard/paid-media">
+                  <button className="w-full text-left p-4 rounded-xl border border-green-500/30 hover:border-green-500/50 hover:bg-green-500/10 transition-all">
+                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300">View Paid Media</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Multi-platform ad performance</p>
+                  </button>
+                </Link>
+              </CardContent>
+            </Card>
+          </div>
+        </>
+      )}
     </div>
   )
 }

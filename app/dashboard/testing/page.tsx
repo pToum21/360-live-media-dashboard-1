@@ -4,10 +4,32 @@ import { FlaskConical, TrendingUp, Target } from "lucide-react"
 import { prisma } from "@/lib/prisma"
 import { TestManagement } from "@/components/dashboard/test-management"
 import { FilterableTestingChart } from "@/components/charts/filterable-testing-chart"
+import { cookies } from "next/headers"
+import { redirect } from "next/navigation"
+import { getServerSession } from "next-auth"
+import { authOptions } from "@/lib/auth"
 
 export default async function ABTestingPage() {
-  // Fetch A/B tests
+  const session = await getServerSession(authOptions)
+  if (!session) {
+    redirect('/auth/signin')
+  }
+
+  // Get selected client from cookies
+  const cookieStore = await cookies()
+  const selectedClientSlug = cookieStore.get('selectedClient')?.value || '360-live-media'
+
+  const client = await prisma.client.findUnique({
+    where: { slug: selectedClientSlug },
+  })
+
+  if (!client) {
+    return <div>Client not found</div>
+  }
+
+  // Fetch A/B tests FILTERED BY CLIENT
   const tests = await prisma.optimization.findMany({
+    where: { clientId: client.id },
     orderBy: { month: 'desc' },
   })
 

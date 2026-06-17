@@ -3,14 +3,38 @@ import { Users, TrendingUp, Eye, Heart } from "lucide-react"
 import { prisma } from "@/lib/prisma"
 import { FilterableSocialChart } from "@/components/charts/filterable-social-chart"
 import { SocialManagement } from "@/components/dashboard/social-management"
+import { cookies } from "next/headers"
+import { redirect } from "next/navigation"
+import { getServerSession } from "next-auth"
+import { authOptions } from "@/lib/auth"
 
 export default async function SocialMediaPage() {
-  // Fetch social metrics (most recent 12 weeks WITH DATA)
+  const session = await getServerSession(authOptions)
+  if (!session) {
+    redirect('/auth/signin')
+  }
+
+  // Get selected client from cookies
+  const cookieStore = await cookies()
+  const selectedClientSlug = cookieStore.get('selectedClient')?.value || '360-live-media'
+
+  const client = await prisma.client.findUnique({
+    where: { slug: selectedClientSlug },
+  })
+
+  if (!client) {
+    return <div>Client not found</div>
+  }
+
+  // Fetch social metrics FILTERED BY CLIENT - include ALL platforms
   const metrics = await prisma.socialMetric.findMany({
     where: {
+      clientId: client.id,
       OR: [
         { liImpressions: { not: null } },
-        { igImpressions: { not: null } }
+        { igImpressions: { not: null } },
+        { fbImpressions: { not: null } },
+        { xImpressions: { not: null } }
       ]
     },
     orderBy: { weekStarting: 'desc' },
@@ -20,6 +44,7 @@ export default async function SocialMediaPage() {
   // For display cards, get the latest week with actual follower data (not null and not 0)
   const latestWeekWithFollowers = await prisma.socialMetric.findFirst({
     where: {
+      clientId: client.id,
       liFollowers: { gt: 0 }
     },
     orderBy: { weekStarting: 'desc' }

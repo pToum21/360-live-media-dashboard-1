@@ -3,11 +3,33 @@ import { BarChart3, TrendingUp, Users, Clock } from "lucide-react"
 import { prisma } from "@/lib/prisma"
 import { FilterableWebsiteChart } from "@/components/charts/filterable-website-chart"
 import { WebsiteManagement } from "@/components/dashboard/website-management"
+import { cookies } from "next/headers"
+import { redirect } from "next/navigation"
+import { getServerSession } from "next-auth"
+import { authOptions } from "@/lib/auth"
 
 export default async function WebsiteAnalyticsPage() {
-  // Fetch website metrics (most recent 12 weeks WITH DATA)
+  const session = await getServerSession(authOptions)
+  if (!session) {
+    redirect('/auth/signin')
+  }
+
+  // Get selected client from cookies
+  const cookieStore = await cookies()
+  const selectedClientSlug = cookieStore.get('selectedClient')?.value || '360-live-media'
+
+  const client = await prisma.client.findUnique({
+    where: { slug: selectedClientSlug },
+  })
+
+  if (!client) {
+    return <div>Client not found</div>
+  }
+
+  // Fetch website metrics FILTERED BY CLIENT
   const metrics = await prisma.websiteMetric.findMany({
     where: {
+      clientId: client.id,
       totalUsers: { gt: 0 }
     },
     orderBy: { weekStarting: 'desc' },

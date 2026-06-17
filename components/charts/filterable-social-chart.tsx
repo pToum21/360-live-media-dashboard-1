@@ -7,12 +7,24 @@ import { TrendingUp, Users as UsersIcon, Eye } from 'lucide-react'
 
 interface SocialMetricData {
   weekStarting: Date
+  // LinkedIn
   liFollowers?: number | null
   liImpressions?: number | null
   liEngagementRate?: number | null
+  // Instagram
   igFollowers?: number | null
   igImpressions?: number | null
   igEngagementRate?: number | null
+  // Facebook
+  fbFollowers?: number | null
+  fbImpressions?: number | null
+  fbEngagements?: number | null
+  fbFollowerGrowthRate?: number | null
+  // X/Twitter
+  xFollowers?: number | null
+  xImpressions?: number | null
+  xEngagements?: number | null
+  xFollowerGrowthRate?: number | null
 }
 
 interface FilterableSocialChartProps {
@@ -20,11 +32,29 @@ interface FilterableSocialChartProps {
 }
 
 export function FilterableSocialChart({ data }: FilterableSocialChartProps) {
-  const [selectedFilters, setSelectedFilters] = useState<Record<string, string[]>>({
-    platform: ['LinkedIn', 'Instagram'],
+  // Dynamically detect which platforms have data
+  const availablePlatforms = useMemo(() => {
+    const platforms: { id: string; label: string; value: string; color: string }[] = []
+    
+    const hasLinkedIn = data.some(d => d.liFollowers || d.liImpressions || d.liEngagementRate)
+    const hasInstagram = data.some(d => d.igFollowers || d.igImpressions || d.igEngagementRate)
+    const hasFacebook = data.some(d => d.fbFollowers || d.fbImpressions || d.fbEngagements)
+    const hasX = data.some(d => d.xFollowers || d.xImpressions || d.xEngagements)
+    
+    if (hasLinkedIn) platforms.push({ id: 'linkedin', label: 'LinkedIn', value: 'LinkedIn', color: '#0077b5' })
+    if (hasInstagram) platforms.push({ id: 'instagram', label: 'Instagram', value: 'Instagram', color: '#E4405F' })
+    if (hasFacebook) platforms.push({ id: 'facebook', label: 'Facebook', value: 'Facebook', color: '#1877F2' })
+    if (hasX) platforms.push({ id: 'x', label: 'X (Twitter)', value: 'X', color: '#000000' })
+    
+    return platforms
+  }, [data])
+
+  // Initialize with all available platforms
+  const [selectedFilters, setSelectedFilters] = useState<Record<string, string[]>>(() => ({
+    platform: availablePlatforms.map(p => p.value),
     metric: ['followers', 'impressions', 'engagement'],
     timeRange: ['all'],
-  })
+  }))
   const [chartType, setChartType] = useState<'bar' | 'line'>('line')
 
   const filterGroups: FilterGroup[] = [
@@ -32,10 +62,7 @@ export function FilterableSocialChart({ data }: FilterableSocialChartProps) {
       id: 'platform',
       label: 'Platform',
       multiSelect: true,
-      options: [
-        { id: 'linkedin', label: 'LinkedIn', value: 'LinkedIn', color: '#0077b5' },
-        { id: 'instagram', label: 'Instagram', value: 'Instagram', color: '#E4405F' },
-      ],
+      options: availablePlatforms,
     },
     {
       id: 'metric',
@@ -69,24 +96,35 @@ export function FilterableSocialChart({ data }: FilterableSocialChartProps) {
     return data.slice(-weeks)
   }, [data, selectedFilters.timeRange])
 
-  // Calculate current averages
+  // Calculate current averages for ALL platforms
   const currentStats = useMemo(() => {
     if (timeFilteredData.length === 0) return null
 
     const latest = timeFilteredData[timeFilteredData.length - 1]
-    const avgLiEngagement = timeFilteredData
-      .filter(d => d.liEngagementRate !== null)
-      .reduce((sum, d) => sum + (d.liEngagementRate || 0), 0) / timeFilteredData.filter(d => d.liEngagementRate !== null).length
-
-    const avgIgEngagement = timeFilteredData
-      .filter(d => d.igEngagementRate !== null)
-      .reduce((sum, d) => sum + (d.igEngagementRate || 0), 0) / timeFilteredData.filter(d => d.igEngagementRate !== null).length
+    
+    const calcAvgEngagement = (field: keyof SocialMetricData) => {
+      const validData = timeFilteredData.filter(d => d[field] !== null && d[field] !== undefined)
+      if (validData.length === 0) return 0
+      return validData.reduce((sum, d) => sum + (Number(d[field]) || 0), 0) / validData.length
+    }
 
     return {
+      // LinkedIn
       liFollowers: latest.liFollowers || 0,
+      avgLiEngagement: calcAvgEngagement('liEngagementRate'),
+      // Instagram
       igFollowers: latest.igFollowers || 0,
-      avgLiEngagement: avgLiEngagement || 0,
-      avgIgEngagement: avgIgEngagement || 0,
+      avgIgEngagement: calcAvgEngagement('igEngagementRate'),
+      // Facebook
+      fbFollowers: latest.fbFollowers || 0,
+      avgFbEngagement: latest.fbEngagements && latest.fbImpressions 
+        ? (latest.fbEngagements / latest.fbImpressions) * 100 
+        : 0,
+      // X/Twitter
+      xFollowers: latest.xFollowers || 0,
+      avgXEngagement: latest.xEngagements && latest.xImpressions 
+        ? (latest.xEngagements / latest.xImpressions) * 100 
+        : 0,
     }
   }, [timeFilteredData])
 
@@ -100,16 +138,36 @@ export function FilterableSocialChart({ data }: FilterableSocialChartProps) {
         name: new Date(d.weekStarting).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
       }
 
+      // LinkedIn
       if (selectedPlatforms.includes('LinkedIn')) {
         if (selectedMetrics.includes('followers') && d.liFollowers) point.liFollowers = d.liFollowers
         if (selectedMetrics.includes('impressions') && d.liImpressions) point.liImpressions = d.liImpressions
         if (selectedMetrics.includes('engagement') && d.liEngagementRate) point.liEngagement = d.liEngagementRate * 100
       }
 
+      // Instagram
       if (selectedPlatforms.includes('Instagram')) {
         if (selectedMetrics.includes('followers') && d.igFollowers) point.igFollowers = d.igFollowers
         if (selectedMetrics.includes('impressions') && d.igImpressions) point.igImpressions = d.igImpressions
         if (selectedMetrics.includes('engagement') && d.igEngagementRate) point.igEngagement = d.igEngagementRate * 100
+      }
+
+      // Facebook
+      if (selectedPlatforms.includes('Facebook')) {
+        if (selectedMetrics.includes('followers') && d.fbFollowers) point.fbFollowers = d.fbFollowers
+        if (selectedMetrics.includes('impressions') && d.fbImpressions) point.fbImpressions = d.fbImpressions
+        if (selectedMetrics.includes('engagement') && d.fbEngagements && d.fbImpressions) {
+          point.fbEngagement = (d.fbEngagements / d.fbImpressions) * 100
+        }
+      }
+
+      // X/Twitter
+      if (selectedPlatforms.includes('X')) {
+        if (selectedMetrics.includes('followers') && d.xFollowers) point.xFollowers = d.xFollowers
+        if (selectedMetrics.includes('impressions') && d.xImpressions) point.xImpressions = d.xImpressions
+        if (selectedMetrics.includes('engagement') && d.xEngagements && d.xImpressions) {
+          point.xEngagement = (d.xEngagements / d.xImpressions) * 100
+        }
       }
 
       return point
@@ -125,7 +183,7 @@ export function FilterableSocialChart({ data }: FilterableSocialChartProps) {
 
   const handleClearAll = () => {
     setSelectedFilters({
-      platform: ['LinkedIn', 'Instagram'],
+      platform: availablePlatforms.map(p => p.value),
       metric: ['followers', 'impressions', 'engagement'],
       timeRange: ['all'],
     })
@@ -161,6 +219,7 @@ export function FilterableSocialChart({ data }: FilterableSocialChartProps) {
     const selectedPlatforms = selectedFilters.platform || []
     const selectedMetrics = selectedFilters.metric || []
 
+    // LinkedIn
     if (selectedPlatforms.includes('LinkedIn')) {
       if (selectedMetrics.includes('followers')) {
         lines.push({ dataKey: 'liFollowers', name: 'LinkedIn Followers', stroke: '#0077b5', strokeWidth: 3 })
@@ -173,6 +232,7 @@ export function FilterableSocialChart({ data }: FilterableSocialChartProps) {
       }
     }
 
+    // Instagram
     if (selectedPlatforms.includes('Instagram')) {
       if (selectedMetrics.includes('followers')) {
         lines.push({ dataKey: 'igFollowers', name: 'Instagram Followers', stroke: '#E4405F', strokeWidth: 3 })
@@ -182,6 +242,32 @@ export function FilterableSocialChart({ data }: FilterableSocialChartProps) {
       }
       if (selectedMetrics.includes('engagement')) {
         lines.push({ dataKey: 'igEngagement', name: 'Instagram Engagement (%)', stroke: '#F77737', strokeWidth: 3 })
+      }
+    }
+
+    // Facebook
+    if (selectedPlatforms.includes('Facebook')) {
+      if (selectedMetrics.includes('followers')) {
+        lines.push({ dataKey: 'fbFollowers', name: 'Facebook Followers', stroke: '#1877F2', strokeWidth: 3 })
+      }
+      if (selectedMetrics.includes('impressions')) {
+        lines.push({ dataKey: 'fbImpressions', name: 'Facebook Impressions', stroke: '#4267B2', strokeWidth: 3 })
+      }
+      if (selectedMetrics.includes('engagement')) {
+        lines.push({ dataKey: 'fbEngagement', name: 'Facebook Engagement (%)', stroke: '#3b5998', strokeWidth: 3 })
+      }
+    }
+
+    // X/Twitter
+    if (selectedPlatforms.includes('X')) {
+      if (selectedMetrics.includes('followers')) {
+        lines.push({ dataKey: 'xFollowers', name: 'X Followers', stroke: '#000000', strokeWidth: 3 })
+      }
+      if (selectedMetrics.includes('impressions')) {
+        lines.push({ dataKey: 'xImpressions', name: 'X Impressions', stroke: '#333333', strokeWidth: 3 })
+      }
+      if (selectedMetrics.includes('engagement')) {
+        lines.push({ dataKey: 'xEngagement', name: 'X Engagement (%)', stroke: '#666666', strokeWidth: 3 })
       }
     }
 
@@ -223,10 +309,11 @@ export function FilterableSocialChart({ data }: FilterableSocialChartProps) {
         </div>
       </div>
 
-      {/* Summary Stats */}
+      {/* Summary Stats - Dynamic for all platforms */}
       {currentStats && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {selectedFilters.platform?.includes('LinkedIn') && (
+          {/* LinkedIn */}
+          {selectedFilters.platform?.includes('LinkedIn') && currentStats.liFollowers > 0 && (
             <>
               <div className="glass-card p-4 rounded-xl border border-gray-200 dark:border-gray-700">
                 <div className="flex items-center justify-between mb-2">
@@ -248,7 +335,9 @@ export function FilterableSocialChart({ data }: FilterableSocialChartProps) {
               </div>
             </>
           )}
-          {selectedFilters.platform?.includes('Instagram') && (
+          
+          {/* Instagram */}
+          {selectedFilters.platform?.includes('Instagram') && currentStats.igFollowers > 0 && (
             <>
               <div className="glass-card p-4 rounded-xl border border-gray-200 dark:border-gray-700">
                 <div className="flex items-center justify-between mb-2">
@@ -266,6 +355,54 @@ export function FilterableSocialChart({ data }: FilterableSocialChartProps) {
                 </div>
                 <div className="text-2xl font-bold text-[#E4405F]">
                   {(currentStats.avgIgEngagement * 100).toFixed(1)}%
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* Facebook */}
+          {selectedFilters.platform?.includes('Facebook') && currentStats.fbFollowers > 0 && (
+            <>
+              <div className="glass-card p-4 rounded-xl border border-gray-200 dark:border-gray-700">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Facebook Followers</span>
+                  <UsersIcon className="w-4 h-4 text-[#1877F2]" />
+                </div>
+                <div className="text-2xl font-bold text-[#1877F2]">
+                  {currentStats.fbFollowers.toLocaleString()}
+                </div>
+              </div>
+              <div className="glass-card p-4 rounded-xl border border-gray-200 dark:border-gray-700">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Facebook Engagement</span>
+                  <TrendingUp className="w-4 h-4 text-[#1877F2]" />
+                </div>
+                <div className="text-2xl font-bold text-[#1877F2]">
+                  {currentStats.avgFbEngagement.toFixed(1)}%
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* X/Twitter */}
+          {selectedFilters.platform?.includes('X') && currentStats.xFollowers > 0 && (
+            <>
+              <div className="glass-card p-4 rounded-xl border border-gray-200 dark:border-gray-700">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-medium text-gray-600 dark:text-gray-400">X Followers</span>
+                  <UsersIcon className="w-4 h-4 text-black dark:text-white" />
+                </div>
+                <div className="text-2xl font-bold text-black dark:text-white">
+                  {currentStats.xFollowers.toLocaleString()}
+                </div>
+              </div>
+              <div className="glass-card p-4 rounded-xl border border-gray-200 dark:border-gray-700">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-medium text-gray-600 dark:text-gray-400">X Engagement</span>
+                  <TrendingUp className="w-4 h-4 text-black dark:text-white" />
+                </div>
+                <div className="text-2xl font-bold text-black dark:text-white">
+                  {currentStats.avgXEngagement.toFixed(1)}%
                 </div>
               </div>
             </>
