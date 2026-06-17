@@ -16,6 +16,9 @@ interface WebsiteMetricData {
   direct?: number | null
   organicSocial?: number | null
   email?: number | null
+  unassigned?: number | null
+  paidSocial?: number | null
+  paidSearch?: number | null
 }
 
 interface FilterableWebsiteChartProps {
@@ -28,6 +31,9 @@ const TRAFFIC_SOURCE_COLORS: Record<string, string> = {
   referral: '#f59e0b',
   organicSocial: '#8b5cf6',
   email: '#ec4899',
+  paidSocial: '#f97316',
+  paidSearch: '#06b6d4',
+  unassigned: '#6b7280',
 }
 
 export function FilterableWebsiteChart({ data }: FilterableWebsiteChartProps) {
@@ -124,18 +130,31 @@ export function FilterableWebsiteChart({ data }: FilterableWebsiteChartProps) {
     })
   }, [timeFilteredData, selectedFilters])
 
-  // Format traffic source data
+  // Format traffic source data - DYNAMICALLY detect which sources have data
   const trafficSourceData = useMemo(() => {
     const latest = timeFilteredData[timeFilteredData.length - 1]
     if (!latest) return []
 
-    return [
-      { name: 'Organic Search', value: latest.organicSearch || 0, color: TRAFFIC_SOURCE_COLORS.organicSearch },
-      { name: 'Direct', value: latest.direct || 0, color: TRAFFIC_SOURCE_COLORS.direct },
-      { name: 'Referral', value: latest.referral || 0, color: TRAFFIC_SOURCE_COLORS.referral },
-      { name: 'Organic Social', value: latest.organicSocial || 0, color: TRAFFIC_SOURCE_COLORS.organicSocial },
-      { name: 'Email', value: latest.email || 0, color: TRAFFIC_SOURCE_COLORS.email },
-    ].filter(item => item.value > 0)
+    // Define all possible traffic sources
+    const allSources = [
+      { key: 'organicSearch', name: 'Organic Search', color: TRAFFIC_SOURCE_COLORS.organicSearch },
+      { key: 'direct', name: 'Direct', color: TRAFFIC_SOURCE_COLORS.direct },
+      { key: 'referral', name: 'Referral', color: TRAFFIC_SOURCE_COLORS.referral },
+      { key: 'organicSocial', name: 'Organic Social', color: TRAFFIC_SOURCE_COLORS.organicSocial },
+      { key: 'email', name: 'Email', color: TRAFFIC_SOURCE_COLORS.email },
+      { key: 'paidSocial', name: 'Paid Social', color: TRAFFIC_SOURCE_COLORS.paidSocial },
+      { key: 'paidSearch', name: 'Paid Search', color: TRAFFIC_SOURCE_COLORS.paidSearch },
+      { key: 'unassigned', name: 'Unassigned', color: TRAFFIC_SOURCE_COLORS.unassigned },
+    ]
+
+    // Only include sources that have data
+    return allSources
+      .map(source => ({
+        name: source.name,
+        value: (latest as any)[source.key] || 0,
+        color: source.color
+      }))
+      .filter(item => item.value > 0)
   }, [timeFilteredData])
 
   const handleFilterChange = (groupId: string, selectedValues: string[]) => {
