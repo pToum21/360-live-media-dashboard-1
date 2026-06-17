@@ -25,6 +25,10 @@ import { PerformanceInsights } from "@/components/dashboard/performance-insights
 import { GoalTracking } from "@/components/dashboard/goal-tracking"
 import { TopPerformers } from "@/components/dashboard/top-performers"
 import { GrowthTrends } from "@/components/dashboard/growth-trends"
+import { SixRsFramework } from "@/components/dashboard/six-rs-framework"
+import { MultiYearRegistrationChart } from "@/components/charts/multi-year-registration-chart"
+import { RegistrationActualsVsGoalChart } from "@/components/charts/registration-actuals-vs-goal-chart"
+import { RevenueGaugeChart } from "@/components/charts/revenue-gauge-chart"
 import { cookies } from "next/headers"
 import { redirect } from "next/navigation"
 
@@ -109,6 +113,100 @@ export default async function DashboardPage() {
     prisma.paidMedia.count({ where: { clientId: client.id } }).then(count => count > 0),
     prisma.gA4Registration.count({ where: { clientId: client.id } }).then(count => count > 0),
   ])
+
+  // ATC-SPECIFIC: Fetch additional data for 6 Rs and charts
+  let atcData = null
+  if (client.slug === 'atc-2026') {
+    const [allRegistrations, allRevenue, allPassTypes] = await Promise.all([
+      prisma.eventRegistration.findMany({
+        where: { clientId: client.id },
+        orderBy: { date: 'asc' }
+      }),
+      prisma.revenueProjection.findMany({
+        where: { clientId: client.id },
+        orderBy: { createdAt: 'desc' }
+      }),
+      prisma.passType.findMany({
+        where: { clientId: client.id }
+      })
+    ])
+
+    // Calculate paid/comp percentages per year from PassType data
+    const passTypesByYear: Record<number, { paidPercent: number, compPercent: number }> = {}
+    
+    for (const year of [2023, 2024, 2026]) {
+      const yearPassTypes = allPassTypes.filter(pt => pt.year === year)
+      if (yearPassTypes.length > 0) {
+        const totalPaid = yearPassTypes.filter(pt => pt.isPaid).reduce((sum, pt) => sum + pt.registrationCount, 0)
+        const totalComp = yearPassTypes.filter(pt => !pt.isPaid).reduce((sum, pt) => sum + pt.registrationCount, 0)
+        const total = totalPaid + totalComp
+        
+        passTypesByYear[year] = {
+          paidPercent: total > 0 ? totalPaid / total : 0,
+          compPercent: total > 0 ? totalComp / total : 0
+        }
+      }
+    }
+    
+    // Use 2024 percentages for 2026 if not available
+    if (!passTypesByYear[2026] && passTypesByYear[2024]) {
+      passTypesByYear[2026] = passTypesByYear[2024]
+    }
+
+    // Group registrations by year
+    const registrationsByYear: Record<number, any[]> = {}
+    allRegistrations.forEach(reg => {
+      const year = reg.date.getFullYear()
+      if (!registrationsByYear[year]) registrationsByYear[year] = []
+      registrationsByYear[year].push(reg)
+    })
+
+    // Calculate totals from real data
+    const totalRegistrations = latestEventRegistration?.totalRegistrations || 0
+    
+    // Use actual percentages from PassType data for 2026
+    const percentages2026 = passTypesByYear[2026] || { paidPercent: 0.83, compPercent: 0.17 }
+    const compRegistrations = Math.round(totalRegistrations * percentages2026.compPercent)
+    const paidRegistrations = Math.round(totalRegistrations * percentages2026.paidPercent)
+    
+    // Calculate actual revenue from database (sum all records with actualRevenue)
+    const totalRevenue = allRevenue
+      .filter(r => r.actualRevenue && r.actualRevenue > 0)
+      .reduce((sum, r) => sum + (r.actualRevenue || 0), 0)
+    
+    // Get the most recent projected revenue record (first in descending order)
+    const mostRecentProjected = allRevenue.find(r => r.projectedRevenue && r.projectedRevenue > 0)
+    const targetRevenue = mostRecentProjected?.projectedRevenue || 0
+
+    // Format multi-year chart data
+    const maxWeeks = Math.max(
+      registrationsByYear[2023]?.length || 0,
+      registrationsByYear[2024]?.length || 0,
+      registrationsByYear[2026]?.length || 0
+    )
+
+    const multiYearChartData = []
+    for (let i = 0; i < maxWeeks; i++) {
+      multiYearChartData.push({
+        week: `Week ${i + 1}`,
+        year2023: registrationsByYear[2023]?.[i]?.totalRegistrations,
+        year2024: registrationsByYear[2024]?.[i]?.totalRegistrations,
+        year2026: registrationsByYear[2026]?.[i]?.totalRegistrations
+      })
+    }
+
+    atcData = {
+      registrations: allRegistrations,
+      totalRegistrations,
+      compRegistrations,
+      paidRegistrations,
+      totalRevenue: totalRevenue || 0,
+      targetRevenue: targetRevenue || 0,
+      revenue: allRevenue,
+      multiYearChartData,
+      passTypePercentages: passTypesByYear // Pass percentages to components
+    }
+  }
 
   // Calculate average social engagement across all platforms
   // Only use stored engagement rates, don't try to calculate from other fields
@@ -224,6 +322,208 @@ export default async function DashboardPage() {
           </div>
         </div>
       </div>
+
+      {/* ATC-SPECIFIC: Performance Summary Section - TOP OF PAGE */}
+      {client.slug === 'atc-2026' && atcData && (
+        <>
+          {/* The 6 Rs Framework with Real Data */}
+          <SixRsFramework 
+            showImage={true}
+            relevanceActual={latestWebsite?.totalUsers || 0}
+            relevanceGoal={10000}
+            retentionActual={atcData.compRegistrations}
+            retentionGoal={1725}
+            revenueActual={atcData.totalRevenue}
+            revenueGoal={atcData.targetRevenue}
+            reachActual={atcData.totalRegistrations}
+            reachGoal={8000}
+            reputationActual={undefined}
+            reputationGoal={undefined}
+            roiActual={undefined}
+            roiGoal={undefined}
+          />
+
+          {/* Multi-Year Registration Chart & Revenue Gauge */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2">
+              <MultiYearRegistrationChart 
+                data={atcData.multiYearChartData}
+                passTypePercentages={atcData.passTypePercentages}
+              />
+            </div>
+            <div className="lg:col-span-1">
+              <RevenueGaugeChart
+                actual={atcData.totalRevenue}
+                target={atcData.targetRevenue}
+                title="Revenue Progress"
+                subtitle="Year to Date"
+              />
+            </div>
+          </div>
+
+          {/* Actuals vs Goal & Key Performance Metrics */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <RegistrationActualsVsGoalChart
+              compActual={atcData.compRegistrations}
+              compGoal={1725}
+              paidActual={atcData.paidRegistrations}
+              paidGoal={675}
+              year="2026"
+            />
+            
+            {/* Key Performance Metrics Summary */}
+            <div className="grid grid-cols-2 gap-4">
+              <Card className="glass-card border-0 shadow-lg">
+                <CardContent className="pt-6">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-green-600 to-emerald-600 flex items-center justify-center">
+                      <UserCheck className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Total Registrations</p>
+                      <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                        {atcData.totalRegistrations.toLocaleString()}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs">
+                    <TrendingUp className="w-3 h-3 text-green-600" />
+                    <span className="text-green-600 font-medium">On track</span>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="glass-card border-0 shadow-lg">
+                <CardContent className="pt-6">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-cyan-600 flex items-center justify-center">
+                      <Users className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Comp Registrations</p>
+                      <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                        {atcData.compRegistrations.toLocaleString()}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs">
+                    <span className="text-gray-500 dark:text-gray-400">60% of total</span>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="glass-card border-0 shadow-lg">
+                <CardContent className="pt-6">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center">
+                      <Ticket className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Paid Registrations</p>
+                      <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                        {atcData.paidRegistrations.toLocaleString()}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs">
+                    <span className="text-gray-500 dark:text-gray-400">40% of total</span>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="glass-card border-0 shadow-lg">
+                <CardContent className="pt-6">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-600 to-red-600 flex items-center justify-center">
+                      <BarChart3 className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Website Visitors</p>
+                      <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                        {(latestWebsite?.totalUsers || 0).toLocaleString()}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs">
+                    <span className="text-gray-500 dark:text-gray-400">Latest week</span>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+
+          {/* Quick Action Links - Bottom of ATC Section */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <Card className="card-hover">
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <UserCheck className="w-5 h-5 text-green-600" />
+                  Registrations
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Link href="/dashboard/registrations">
+                  <button className="w-full text-left p-3 rounded-xl border border-green-500/30 hover:border-green-500/50 hover:bg-green-500/10 transition-all">
+                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300">View Dashboard</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Daily trends & goals</p>
+                  </button>
+                </Link>
+              </CardContent>
+            </Card>
+
+            <Card className="card-hover">
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <DollarSign className="w-5 h-5 text-green-600" />
+                  Revenue
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Link href="/dashboard/revenue">
+                  <button className="w-full text-left p-3 rounded-xl border border-green-500/30 hover:border-green-500/50 hover:bg-green-500/10 transition-all">
+                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300">View Dashboard</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Financial tracking</p>
+                  </button>
+                </Link>
+              </CardContent>
+            </Card>
+
+            <Card className="card-hover">
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <Ticket className="w-5 h-5 text-green-600" />
+                  Pass Types
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Link href="/dashboard/pass-types">
+                  <button className="w-full text-left p-3 rounded-xl border border-green-500/30 hover:border-green-500/50 hover:bg-green-500/10 transition-all">
+                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300">View Dashboard</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Ticket breakdown</p>
+                  </button>
+                </Link>
+              </CardContent>
+            </Card>
+
+            <Card className="card-hover">
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <BarChart3 className="w-5 h-5 text-green-600" />
+                  Paid Media
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Link href="/dashboard/paid-media">
+                  <button className="w-full text-left p-3 rounded-xl border border-green-500/30 hover:border-green-500/50 hover:bg-green-500/10 transition-all">
+                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300">View Dashboard</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Ad performance</p>
+                  </button>
+                </Link>
+              </CardContent>
+            </Card>
+          </div>
+        </>
+      )}
 
       {/* Stats Grid - Liquid Glass */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -658,88 +958,6 @@ export default async function DashboardPage() {
         </Card>
       </div>
 
-      {/* CLIENT-SPECIFIC SECTIONS */}
-      {client.slug === 'atc-2026' && (
-        <>
-          {/* ATC-SPECIFIC: Event Registrations & Revenue */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card className="card-hover">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <UserCheck className="w-5 h-5 text-green-600" />
-                  Event Registrations
-                </CardTitle>
-                <CardDescription>Track daily registration progress</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Link href="/dashboard/registrations">
-                  <button className="w-full text-left p-4 rounded-xl border border-green-500/30 hover:border-green-500/50 hover:bg-green-500/10 transition-all">
-                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300">View Registration Dashboard</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">See daily trends, goals & pass types</p>
-                  </button>
-                </Link>
-              </CardContent>
-            </Card>
-
-            <Card className="card-hover">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <DollarSign className="w-5 h-5 text-green-600" />
-                  Revenue Tracking
-                </CardTitle>
-                <CardDescription>Projections vs actuals</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Link href="/dashboard/revenue">
-                  <button className="w-full text-left p-4 rounded-xl border border-green-500/30 hover:border-green-500/50 hover:bg-green-500/10 transition-all">
-                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300">View Revenue Dashboard</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Track financial performance</p>
-                  </button>
-                </Link>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* ATC-SPECIFIC: Pass Types & Paid Media */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card className="card-hover">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Ticket className="w-5 h-5 text-green-600" />
-                  Pass Types
-                </CardTitle>
-                <CardDescription>Registration breakdown by ticket</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Link href="/dashboard/pass-types">
-                  <button className="w-full text-left p-4 rounded-xl border border-green-500/30 hover:border-green-500/50 hover:bg-green-500/10 transition-all">
-                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300">View Pass Types</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Analyze ticket distribution</p>
-                  </button>
-                </Link>
-              </CardContent>
-            </Card>
-
-            <Card className="card-hover">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <BarChart3 className="w-5 h-5 text-green-600" />
-                  Paid Media
-                </CardTitle>
-                <CardDescription>LinkedIn, Meta, Google ads</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Link href="/dashboard/paid-media">
-                  <button className="w-full text-left p-4 rounded-xl border border-green-500/30 hover:border-green-500/50 hover:bg-green-500/10 transition-all">
-                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300">View Paid Media</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Multi-platform ad performance</p>
-                  </button>
-                </Link>
-              </CardContent>
-            </Card>
-          </div>
-        </>
-      )}
     </div>
   )
 }

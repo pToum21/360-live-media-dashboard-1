@@ -1,11 +1,13 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { prisma } from "@/lib/prisma"
 import { GA4RegistrationChart } from "@/components/charts/ga4-registration-chart"
+import { GA4RegistrationManagement } from "@/components/dashboard/ga4-registration-management"
 import { cookies } from "next/headers"
 import { redirect } from "next/navigation"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { LineChart as LineChartIcon, TrendingUp, Users, Target } from "lucide-react"
+import { Suspense } from "react"
 
 export default async function GA4RegistrationsPage() {
   const session = await getServerSession(authOptions)
@@ -204,6 +206,21 @@ export default async function GA4RegistrationsPage() {
             organicSocial: d.organicSocial || 0,
             totalRegistrations: d.totalRegistrations || 0,
           }))} />
+        </CardContent>
+      </Card>
+
+      {/* Data Management Section */}
+      <Card className="glass-card">
+        <CardHeader>
+          <CardTitle>Manage GA4 Registration Data</CardTitle>
+          <CardDescription>
+            Add, edit, or delete GA4 registration attribution records for {client.name}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Suspense fallback={<div>Loading...</div>}>
+            <GA4RegistrationManagement registrations={ga4Data} clientId={client.id} />
+          </Suspense>
         </CardContent>
       </Card>
     </div>

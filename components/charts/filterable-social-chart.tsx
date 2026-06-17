@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts'
 import { ChartFilters, FilterGroup } from './chart-filters'
 import { TrendingUp, Users as UsersIcon, Eye } from 'lucide-react'
@@ -32,6 +32,12 @@ interface FilterableSocialChartProps {
 }
 
 export function FilterableSocialChart({ data }: FilterableSocialChartProps) {
+  const [isClient, setIsClient] = useState(false)
+
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
+
   // Dynamically detect which platforms have data
   const availablePlatforms = useMemo(() => {
     const platforms: { id: string; label: string; value: string; color: string }[] = []
@@ -272,6 +278,10 @@ export function FilterableSocialChart({ data }: FilterableSocialChartProps) {
     }
 
     return lines
+  }
+
+  if (!isClient) {
+    return <div className="h-[400px] flex items-center justify-center text-muted-foreground">Loading chart...</div>
   }
 
   return (

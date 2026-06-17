@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, PieChart, Pie, Cell } from 'recharts'
 import { ChartFilters, FilterGroup } from './chart-filters'
 import { Users, MousePointerClick, Clock, TrendingUp } from 'lucide-react'
@@ -37,11 +37,16 @@ const TRAFFIC_SOURCE_COLORS: Record<string, string> = {
 }
 
 export function FilterableWebsiteChart({ data }: FilterableWebsiteChartProps) {
+  const [isClient, setIsClient] = useState(false)
   const [selectedFilters, setSelectedFilters] = useState<Record<string, string[]>>({
     metric: ['totalUsers', 'newUsers', 'engagement', 'healthScore'],
     view: ['trend'],
     timeRange: ['all'],
   })
+
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
   const [chartType, setChartType] = useState<'line' | 'area'>('line')
 
   const filterGroups: FilterGroup[] = [
@@ -198,6 +203,10 @@ export function FilterableWebsiteChart({ data }: FilterableWebsiteChartProps) {
   }
 
   const selectedView = selectedFilters.view?.[0] || 'trend'
+
+  if (!isClient) {
+    return <div className="h-[400px] flex items-center justify-center text-muted-foreground">Loading chart...</div>
+  }
 
   return (
     <div className="space-y-6">

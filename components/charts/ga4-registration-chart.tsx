@@ -1,7 +1,7 @@
 'use client'
 
 import { AreaChart, Area, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 interface GA4RegistrationData {
   weekLabel: string
@@ -32,9 +32,19 @@ const TRAFFIC_SOURCE_COLORS = {
 
 export function GA4RegistrationChart({ data }: GA4RegistrationChartProps) {
   const [chartType, setChartType] = useState<'area' | 'line'>('area')
+  const [isClient, setIsClient] = useState(false)
+
+  // Ensure chart only renders on client to avoid SSR/hydration issues
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
 
   if (!data || data.length === 0) {
     return <div className="text-center text-muted-foreground py-8">No GA4 registration data available</div>
+  }
+
+  if (!isClient) {
+    return <div className="h-[450px] flex items-center justify-center text-muted-foreground">Loading chart...</div>
   }
 
   // Sort by weeksOut descending (oldest to newest)

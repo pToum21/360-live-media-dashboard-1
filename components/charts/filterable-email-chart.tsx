@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, Legend, LineChart, Line } from 'recharts'
 import { ChartFilters, FilterGroup } from './chart-filters'
 import { TrendingUp, TrendingDown } from 'lucide-react'
@@ -21,6 +21,12 @@ interface FilterableEmailChartProps {
 }
 
 export function FilterableEmailChart({ data }: FilterableEmailChartProps) {
+  const [isClient, setIsClient] = useState(false)
+
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
+
   // Extract unique audiences and campaign types from data
   const filterGroups: FilterGroup[] = useMemo(() => {
     const audiences = [...new Set(data.map(d => d.audience).filter(Boolean))]
@@ -193,6 +199,10 @@ export function FilterableEmailChart({ data }: FilterableEmailChartProps) {
   const selectedMetrics = selectedFilters.metric && selectedFilters.metric.length > 0 
     ? selectedFilters.metric 
     : ['openRate', 'clickRate']
+
+  if (!isClient) {
+    return <div className="h-[400px] flex items-center justify-center text-muted-foreground">Loading chart...</div>
+  }
 
   return (
     <div className="space-y-6">

@@ -530,6 +530,7 @@ model PassType {
   registrationCount     Int
   percentOfTotal        Float?
   revenue               Float?
+  isPaid                Boolean   @default(true)
   
   // Client Association
   client                Client?   @relation(fields: [clientId], references: [id], onDelete: Cascade)

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, PieChart, Pie, Cell } from 'recharts'
 import { ChartFilters, FilterGroup } from './chart-filters'
 import { FlaskConical, Target, TrendingUp } from 'lucide-react'
@@ -29,6 +29,12 @@ const CHANNEL_COLORS: Record<string, string> = {
 }
 
 export function FilterableTestingChart({ data }: FilterableTestingChartProps) {
+  const [isClient, setIsClient] = useState(false)
+
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
+
   // Get all unique channels
   const allChannels = useMemo(() => {
     const channels = new Set(data.map(t => t.channel || 'Unknown').filter(Boolean))
@@ -205,6 +211,10 @@ export function FilterableTestingChart({ data }: FilterableTestingChartProps) {
   }
 
   const selectedView = selectedFilters.view?.[0] || 'timeline'
+
+  if (!isClient) {
+    return <div className="h-[400px] flex items-center justify-center text-muted-foreground">Loading chart...</div>
+  }
 
   return (
     <div className="space-y-6">
