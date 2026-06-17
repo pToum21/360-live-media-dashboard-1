@@ -39,6 +39,7 @@ model User {
   passTypes            PassType[]
   abstractSubmissions  AbstractSubmission[]
   revenueProjections   RevenueProjection[]
+  ga4Registrations     GA4Registration[]
 }
 
 model Account {
@@ -128,40 +129,96 @@ model EmailCampaign {
   id              String    @id @default(cuid())
   name            String
   deploymentDate  DateTime
-  
+
   // Segmentation
   audience        String?   // e.g., "Members", "Sponsors", "Attendees", "All"
   campaignType    String?   // e.g., "Newsletter", "Promotion", "Announcement"
-  
+
+  // Timing Analysis (for send time optimization)
+  deploymentDayOfWeek String?  // e.g., "Monday", "Friday"
+  deploymentTimeOfDay String?  // e.g., "Morning", "Afternoon", "Evening"
+  deploymentHour      Int?     // Hour of day (0-23) for precise time analysis
+
   // Metrics
   openRate        Float
   clickRate       Float
   deliveryRate    Float
   unsubscribeRate Float
-  
+
   // Benchmarks (for ATC - industry standards)
   openRateBenchmark       Float?
   clickRateBenchmark      Float?
   deliveryRateBenchmark   Float?
   unsubscribeRateBenchmark Float?
-  
+
   // Additional ATC fields
   totalSent       Int?
   subjectLine     String?
   
+  // Email Click Heatmap Data (where recipients click)
+  totalClicks          Int?
+  topButtonClicks      Int?
+  topButtonClickPct    Float?   // % of total clicks
+  topLogoClicks        Int?
+  topLogoClickPct      Float?
+  headerImageClicks    Int?
+  headerImageClickPct  Float?
+  bodyContentClicks    Int?
+  bodyContentClickPct  Float?
+  footerClicks         Int?
+  footerClickPct       Float?
+
   // Client Association
   client          Client?   @relation(fields: [clientId], references: [id], onDelete: Cascade)
   clientId        String?
-  
+
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
   createdBy       User      @relation(fields: [createdById], references: [id])
   createdById     String
-  
+
   @@index([deploymentDate])
   @@index([clientId])
   @@index([audience])
   @@index([campaignType])
+  @@index([deploymentDayOfWeek])
+}
+
+// ============================================
+// GA4 REGISTRATION TRACKING BY TRAFFIC SOURCE
+// ============================================
+
+model GA4Registration {
+  id                String    @id @default(cuid())
+  weekStarting      DateTime
+  weekLabel         String?   // e.g., "1/5 - 1/11" or "Week 24"
+  weeksOut          Int?      // Weeks until event (e.g., 24, 23, 22...)
+  
+  // Registration counts by traffic source (GA4 acquisition)
+  organicSearch     Int?
+  email             Int?
+  direct            Int?
+  paidSocial        Int?
+  paidSearch        Int?
+  referral          Int?
+  organicSocial     Int?
+  unassigned        Int?
+  
+  // Total registrations for this week
+  totalRegistrations Int?
+  
+  // Client Association
+  client            Client?   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  clientId          String?
+  
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  createdBy         User      @relation(fields: [createdById], references: [id])
+  createdById       String
+  
+  @@index([weekStarting])
+  @@index([clientId])
+  @@index([weeksOut])
 }
 
 // ============================================
@@ -331,6 +388,7 @@ model Client {
   passTypes             PassType[]               // For ATC - Ticket/pass type breakdown
   abstractSubmissions   AbstractSubmission[]     // For ATC - Abstract submissions
   revenueProjections    RevenueProjection[]      // For ATC - Revenue projections
+  ga4Registrations      GA4Registration[]        // For ATC - GA4 registration tracking by traffic source
   
   @@index([slug])
 }

@@ -10,7 +10,9 @@ import {
   BarChart3,
   TrendingUp,
   CheckCircle2,
-  Clock
+  Clock,
+  UserCheck,
+  DollarSign
 } from "lucide-react"
 
 interface GoalTrackingProps {
@@ -18,6 +20,11 @@ interface GoalTrackingProps {
   emailOpenRate?: number
   socialEngagement?: number
   newLeads?: number
+  // Client-specific goals
+  eventRegistrations?: number
+  eventRegistrationsTarget?: number
+  revenueActual?: number
+  revenueTarget?: number
 }
 
 // Helper to check if we have any real data
@@ -25,57 +32,90 @@ function hasRealData(props: GoalTrackingProps) {
   return (props.websiteVisitors && props.websiteVisitors > 0) || 
          (props.emailOpenRate && props.emailOpenRate > 0) || 
          (props.socialEngagement && props.socialEngagement > 0) ||
-         (props.newLeads && props.newLeads > 0)
+         (props.newLeads && props.newLeads > 0) ||
+         (props.eventRegistrations && props.eventRegistrations > 0) ||
+         (props.revenueActual && props.revenueActual > 0)
 }
 
-export function GoalTracking({ websiteVisitors, emailOpenRate, socialEngagement, newLeads }: GoalTrackingProps) {
+export function GoalTracking({ 
+  websiteVisitors, 
+  emailOpenRate, 
+  socialEngagement, 
+  newLeads,
+  eventRegistrations,
+  eventRegistrationsTarget,
+  revenueActual,
+  revenueTarget
+}: GoalTrackingProps) {
   // Don't render if no real data
-  if (!hasRealData({ websiteVisitors, emailOpenRate, socialEngagement, newLeads })) {
+  if (!hasRealData({ websiteVisitors, emailOpenRate, socialEngagement, newLeads, eventRegistrations, revenueActual })) {
     return null
   }
 
   const goals = [
-    {
+    // Client-specific goals (priority display)
+    eventRegistrations && eventRegistrations > 0 ? {
+      id: 'registrations',
+      title: 'Event Registrations',
+      icon: Users,
+      current: eventRegistrations,
+      target: eventRegistrationsTarget || 1000,
+      unit: '',
+      color: 'green',
+      deadline: 'Event Date'
+    } : null,
+    revenueActual && revenueActual > 0 ? {
+      id: 'revenue',
+      title: 'Revenue Target',
+      icon: TrendingUp,
+      current: revenueActual,
+      target: revenueTarget || revenueActual * 1.2,
+      unit: '$',
+      color: 'blue',
+      deadline: 'End of Year'
+    } : null,
+    // Generic goals
+    websiteVisitors && websiteVisitors > 0 ? {
       id: 'website',
       title: 'Monthly Website Visitors',
       icon: BarChart3,
-      current: websiteVisitors || 0,
-      target: 1000,
+      current: websiteVisitors,
+      target: Math.max(10000, Math.ceil(websiteVisitors * 1.1)), // Target is 10% growth or 10k minimum
       unit: '',
       color: 'blue',
       deadline: 'End of Month'
-    },
-    {
+    } : null,
+    emailOpenRate && emailOpenRate > 0 ? {
       id: 'email',
       title: 'Email Open Rate',
       icon: Mail,
-      current: (emailOpenRate || 0) * 100,
+      current: emailOpenRate * 100,
       target: 20,
       unit: '%',
       color: 'purple',
       deadline: 'Next Campaign'
-    },
-    {
+    } : null,
+    socialEngagement && socialEngagement > 0 ? {
       id: 'social',
       title: 'Social Engagement Rate',
       icon: Users,
-      current: (socialEngagement || 0) * 100,
+      current: socialEngagement * 100,
       target: 15,
       unit: '%',
       color: 'pink',
       deadline: 'This Week'
-    },
-    {
+    } : null,
+    newLeads && newLeads > 0 ? {
       id: 'leads',
       title: 'New Leads Generated',
       icon: TrendingUp,
-      current: newLeads || 0,
-      target: 50,
+      current: newLeads,
+      target: Math.max(50, Math.ceil(newLeads * 1.1)), // Target is 10% growth or 50 minimum
       unit: '',
       color: 'green',
       deadline: 'This Quarter'
-    }
-  ].filter(goal => goal.current > 0) // Only show goals with real data
+    } : null
+  ].filter((goal): goal is NonNullable<typeof goal> => goal !== null) // Only show goals with real data
 
   return (
     <Card className="glass-card border-0 shadow-lg overflow-hidden">
@@ -129,9 +169,9 @@ export function GoalTracking({ websiteVisitors, emailOpenRate, socialEngagement,
                   
                   <div className="text-right">
                     <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                      {goal.current.toFixed(0)}{goal.unit}
+                      {goal.unit === '$' ? '$' : ''}{goal.current.toLocaleString()}{goal.unit !== '$' ? goal.unit : ''}
                       <span className="text-sm font-normal text-gray-500 dark:text-gray-400">
-                        /{goal.target}{goal.unit}
+                        /{goal.unit === '$' ? '$' : ''}{goal.target.toLocaleString()}{goal.unit !== '$' ? goal.unit : ''}
                       </span>
                     </div>
                     {isComplete ? (
@@ -157,9 +197,15 @@ export function GoalTracking({ websiteVisitors, emailOpenRate, socialEngagement,
                     <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
                       {progress.toFixed(1)}% Complete
                     </span>
-                    <span className="text-xs font-semibold text-gray-700 dark:text-gray-300">
-                      {(goal.target - goal.current).toFixed(0)}{goal.unit} to go
-                    </span>
+                    {isComplete ? (
+                      <span className="text-xs font-semibold text-green-600 dark:text-green-400">
+                        Exceeded by {goal.unit === '$' ? '$' : ''}{(goal.current - goal.target).toLocaleString()}{goal.unit !== '$' ? goal.unit : ''}
+                      </span>
+                    ) : (
+                      <span className="text-xs font-semibold text-gray-700 dark:text-gray-300">
+                        {goal.unit === '$' ? '$' : ''}{(goal.target - goal.current).toLocaleString()}{goal.unit !== '$' ? goal.unit : ''} to go
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>

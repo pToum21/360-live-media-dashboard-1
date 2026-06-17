@@ -1,6 +1,7 @@
 'use client'
 
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts'
+import { UniversalTooltip, currencyFormatter } from './universal-tooltip'
 
 interface RevenueChartProps {
   data: {
@@ -57,17 +58,16 @@ export function RevenueChart({ data }: RevenueChartProps) {
           <YAxis
             tickFormatter={(value) => `$${(value / 1000)}K`}
           />
-          <Tooltip
-            formatter={(value) => value ? `$${Number(value).toLocaleString()}` : '$0'}
-            contentStyle={{
-              backgroundColor: 'rgba(0, 0, 0, 0.8)',
-              border: 'none',
-              borderRadius: '8px',
+          <Tooltip content={<UniversalTooltip valueFormatter={currencyFormatter} />} />
+          <Legend 
+            wrapperStyle={{
+              fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
+              fontSize: '13px',
+              fontWeight: 500,
             }}
           />
-          <Legend />
-          <Bar dataKey="Projected" fill="#3b82f6" radius={[8, 8, 0, 0]} />
-          <Bar dataKey="Actual" fill="#10b981" radius={[8, 8, 0, 0]} />
+          <Bar dataKey="Actual" name="Actual Revenue" fill="#10b981" radius={[8, 8, 0, 0]} animationDuration={800} />
+          <Bar dataKey="Projected" name="Projected Revenue" fill="#3b82f6" radius={[8, 8, 0, 0]} animationDuration={800} opacity={0.7} />
         </BarChart>
       </ResponsiveContainer>
     </div>

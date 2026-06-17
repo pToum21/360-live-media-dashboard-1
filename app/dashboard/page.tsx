@@ -47,7 +47,23 @@ export default async function DashboardPage() {
   }
 
   // Fetch latest metrics FILTERED BY CLIENT
-  const [latestWebsite, latestEmail, latestSocial, totalClients, totalTests] = await Promise.all([
+  const [
+    latestWebsite, 
+    latestEmail, 
+    latestSocial, 
+    totalClients, 
+    totalTests,
+    // Client-specific data availability checks
+    hasEventRegistrations,
+    latestEventRegistration,
+    hasPassTypes,
+    hasRevenueData,
+    latestRevenue,
+    hasAbstracts,
+    latestAbstract,
+    hasPaidMedia,
+    hasGA4Registrations,
+  ] = await Promise.all([
     prisma.websiteMetric.findFirst({
       where: { 
         clientId: client.id,
@@ -63,20 +79,58 @@ export default async function DashboardPage() {
       where: {
         clientId: client.id,
         OR: [
-          { liEngagementRate: { not: null } },
-          { igEngagementRate: { not: null } }
+          { liImpressions: { not: null } },
+          { igImpressions: { not: null } },
+          { fbImpressions: { not: null } },
+          { xImpressions: { not: null } }
         ]
       },
       orderBy: { weekStarting: 'desc' }
     }),
     prisma.client.count(),
     prisma.optimization.count({ where: { clientId: client.id } }),
+    // Check what data types this client has
+    prisma.eventRegistration.count({ where: { clientId: client.id } }).then(count => count > 0),
+    prisma.eventRegistration.findFirst({ 
+      where: { clientId: client.id },
+      orderBy: { date: 'desc' }
+    }),
+    prisma.passType.count({ where: { clientId: client.id } }).then(count => count > 0),
+    prisma.revenueProjection.count({ where: { clientId: client.id } }).then(count => count > 0),
+    prisma.revenueProjection.findFirst({
+      where: { clientId: client.id },
+      orderBy: { createdAt: 'desc' }
+    }),
+    prisma.abstractSubmission.count({ where: { clientId: client.id } }).then(count => count > 0),
+    prisma.abstractSubmission.findFirst({
+      where: { clientId: client.id },
+      orderBy: { createdAt: 'desc' }
+    }),
+    prisma.paidMedia.count({ where: { clientId: client.id } }).then(count => count > 0),
+    prisma.gA4Registration.count({ where: { clientId: client.id } }).then(count => count > 0),
   ])
 
-  // Calculate average social engagement (LinkedIn + Instagram)
-  const avgSocialEngagement = latestSocial
-    ? ((latestSocial.liEngagementRate || 0) + (latestSocial.igEngagementRate || 0)) / 2
-    : 0
+  // Calculate average social engagement across all platforms
+  // Only use stored engagement rates, don't try to calculate from other fields
+  let avgSocialEngagement = 0
+  if (latestSocial) {
+    const rates = []
+    
+    // Only use pre-calculated engagement rates from the database
+    if (latestSocial.liEngagementRate && latestSocial.liEngagementRate > 0) {
+      rates.push(latestSocial.liEngagementRate)
+    }
+    if (latestSocial.igEngagementRate && latestSocial.igEngagementRate > 0) {
+      rates.push(latestSocial.igEngagementRate)
+    }
+    // Note: FB and X don't have engagement rate fields in the schema
+    // If they did, we'd check them here too
+    
+    // Average all available rates
+    if (rates.length > 0) {
+      avgSocialEngagement = rates.reduce((sum, rate) => sum + rate, 0) / rates.length
+    }
+  }
 
   // Prepare chart data FILTERED BY CLIENT
   const websiteChartData = await prisma.websiteMetric.findMany({
@@ -121,14 +175,53 @@ export default async function DashboardPage() {
   return (
     <div className="space-y-6 animate-in">
       {/* Welcome Section - Minimal */}
-      <div className="relative">
-        <div className="relative">
-          <h2 className="text-2xl font-semibold text-gray-700 dark:text-gray-200 mb-1 tracking-tight">
-            Welcome back, {session?.user.name || session?.user.email?.split('@')[0]}!
-          </h2>
-          <p className="text-gray-500 dark:text-gray-400 text-sm font-normal">
-            Here&apos;s what&apos;s happening with your marketing this week
-          </p>
+      {/* Client-Branded Header */}
+      <div className="mb-6">
+        <div className="glass-card p-6 rounded-2xl border-0 shadow-lg overflow-hidden relative">
+          {/* Background gradient - client-specific */}
+          <div className={`absolute inset-0 opacity-10 ${
+            client.slug === 'atc-2026' 
+              ? 'bg-gradient-to-br from-green-600 via-emerald-500 to-teal-600' 
+              : 'bg-gradient-to-br from-blue-600 via-purple-500 to-pink-600'
+          }`} />
+          
+          <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div className="flex items-center gap-4">
+              {client.logo && (
+                <div className="w-16 h-16 rounded-xl overflow-hidden shadow-lg bg-white dark:bg-gray-800 flex items-center justify-center">
+                  <img src={client.logo} alt={client.name} className="w-full h-full object-contain" />
+                </div>
+              )}
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-1 tracking-tight">
+                  {client.eventName || client.name} {client.year ? client.year : ''}
+                </h1>
+                <p className="text-gray-600 dark:text-gray-400 text-sm font-medium">
+                  360° Marketing Command Center
+                </p>
+              </div>
+            </div>
+            
+            <div className="flex flex-col items-end gap-2">
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Welcome back, <span className="font-semibold text-gray-900 dark:text-gray-100">
+                  {session?.user.name || session?.user.email?.split('@')[0]}
+                </span>
+              </p>
+              <div className="flex gap-2">
+                {client.utmTracking && (
+                  <Badge className="bg-green-100 dark:bg-green-950/50 text-green-600 dark:text-green-400 border-green-300 dark:border-green-800">
+                    UTM Tracking
+                  </Badge>
+                )}
+                {client.conversionTracking && (
+                  <Badge className="bg-blue-100 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 border-blue-300 dark:border-blue-800">
+                    Conversion Tracking
+                  </Badge>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -232,17 +325,19 @@ export default async function DashboardPage() {
               <div className="flex items-baseline justify-between">
                 <div>
                   <div className="text-3xl font-semibold text-gray-700 dark:text-gray-200">
-                    {(avgSocialEngagement * 100).toFixed(1)}%
+                    {avgSocialEngagement > 0 ? `${(avgSocialEngagement * 100).toFixed(1)}%` : 'N/A'}
                   </div>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1.5 flex items-center gap-1">
                     <Clock className="w-3 h-3" />
-                    Average rate
+                    {avgSocialEngagement > 0 ? 'Average rate' : 'No data'}
                   </p>
                 </div>
-                <Badge className="bg-gray-500/10 dark:bg-gray-500/20 text-gray-600 dark:text-gray-400 border-gray-500/20 dark:border-gray-500/30 border px-2 py-0.5 font-medium text-xs">
-                  <Users className="w-3 h-3 mr-0.5" />
-                  LI + IG
-                </Badge>
+                {avgSocialEngagement > 0 && (
+                  <Badge className="bg-gray-500/10 dark:bg-gray-500/20 text-gray-600 dark:text-gray-400 border-gray-500/20 dark:border-gray-500/30 border px-2 py-0.5 font-medium text-xs">
+                    <Users className="w-3 h-3 mr-0.5" />
+                    All Platforms
+                  </Badge>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -359,6 +454,10 @@ export default async function DashboardPage() {
               emailOpenRate={latestEmail?.openRate}
               socialEngagement={latestSocial?.liEngagementRate || latestSocial?.igEngagementRate || undefined}
               newLeads={latestWebsite?.newUsers ? Math.floor(latestWebsite.newUsers * 0.15) : undefined}
+              eventRegistrations={latestEventRegistration?.totalRegistrations ?? undefined}
+              eventRegistrationsTarget={client.eventName ? 8000 : undefined}
+              revenueActual={latestRevenue?.actualRevenue ?? undefined}
+              revenueTarget={latestRevenue?.projectedRevenue ?? undefined}
             />
           )}
         </div>
@@ -398,10 +497,15 @@ export default async function DashboardPage() {
               <Clock className="w-4 h-4 text-green-600 dark:text-green-500" />
               Recent Activity
             </CardTitle>
-            <CardDescription className="text-sm text-gray-500 dark:text-gray-400">Latest updates across all channels</CardDescription>
+            <CardDescription className="text-sm text-gray-500 dark:text-gray-400">
+              {client.eventName 
+                ? `Latest updates for ${client.eventName} ${client.year || ''}`
+                : 'Latest updates across all channels'}
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
+              {/* Core Activities - Email, Website, Social */}
               {latestEmail && (
                 <div className="flex items-start gap-3 p-2.5 rounded-xl bg-white/40 dark:bg-white/5 backdrop-blur-sm border border-white/40 dark:border-white/10">
                   <Mail className="w-4 h-4 text-green-600 dark:text-green-500 mt-0.5" />
@@ -416,6 +520,51 @@ export default async function DashboardPage() {
                   </div>
                 </div>
               )}
+              
+              {/* Client-Specific Activities */}
+              {latestEventRegistration && (
+                <div className="flex items-start gap-3 p-2.5 rounded-xl bg-green-50/60 dark:bg-green-900/10 backdrop-blur-sm border border-green-200/40 dark:border-green-700/20">
+                  <UserCheck className="w-4 h-4 text-green-600 dark:text-green-500 mt-0.5" />
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      {latestEventRegistration.totalRegistrations?.toLocaleString()} event registrations
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                      {new Date(latestEventRegistration.date).toLocaleDateString()}
+                    </p>
+                  </div>
+                </div>
+              )}
+              
+              {latestAbstract && (
+                <div className="flex items-start gap-3 p-2.5 rounded-xl bg-purple-50/60 dark:bg-purple-900/10 backdrop-blur-sm border border-purple-200/40 dark:border-purple-700/20">
+                  <FlaskConical className="w-4 h-4 text-purple-600 dark:text-purple-500 mt-0.5" />
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      {latestAbstract.submissionCount?.toLocaleString()} abstract submissions
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                      Year: {latestAbstract.year}
+                    </p>
+                  </div>
+                </div>
+              )}
+              
+              {latestRevenue && (
+                <div className="flex items-start gap-3 p-2.5 rounded-xl bg-blue-50/60 dark:bg-blue-900/10 backdrop-blur-sm border border-blue-200/40 dark:border-blue-700/20">
+                  <DollarSign className="w-4 h-4 text-blue-600 dark:text-blue-500 mt-0.5" />
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Revenue update: ${latestRevenue.actualRevenue?.toLocaleString() || 0}
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                      vs ${latestRevenue.projectedRevenue?.toLocaleString() || 0} projected
+                    </p>
+                  </div>
+                </div>
+              )}
+              
+              {/* Generic Activities */}
               {latestWebsite && (
                 <div className="flex items-start gap-3 p-2.5 rounded-xl bg-white/40 dark:bg-white/5 backdrop-blur-sm border border-white/40 dark:border-white/10">
                   <BarChart3 className="w-4 h-4 text-green-600 dark:text-green-500 mt-0.5" />
@@ -457,6 +606,7 @@ export default async function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
+              {/* Core Analytics - Always shown */}
               <Link href="/dashboard/website">
                 <button className="w-full text-left p-2.5 rounded-xl border border-white/40 dark:border-white/20 hover:border-white/60 dark:hover:border-white/30 hover:bg-white/30 dark:hover:bg-white/5 transition-all backdrop-blur-sm">
                   <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Website Analytics</p>
@@ -475,6 +625,34 @@ export default async function DashboardPage() {
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Check LinkedIn & Instagram</p>
                 </button>
               </Link>
+              
+              {/* Client-specific actions */}
+              {hasEventRegistrations && (
+                <Link href="/dashboard/registrations">
+                  <button className="w-full text-left p-2.5 rounded-xl border border-green-500/40 dark:border-green-500/20 hover:border-green-500/60 dark:hover:border-green-500/30 hover:bg-green-500/10 dark:hover:bg-green-500/5 transition-all backdrop-blur-sm">
+                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Event Registrations</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Track attendee sign-ups</p>
+                  </button>
+                </Link>
+              )}
+              
+              {hasRevenueData && (
+                <Link href="/dashboard/revenue">
+                  <button className="w-full text-left p-2.5 rounded-xl border border-green-500/40 dark:border-green-500/20 hover:border-green-500/60 dark:hover:border-green-500/30 hover:bg-green-500/10 dark:hover:bg-green-500/5 transition-all backdrop-blur-sm">
+                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Revenue Tracking</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Monitor financial performance</p>
+                  </button>
+                </Link>
+              )}
+              
+              {hasPaidMedia && (
+                <Link href="/dashboard/paid-media">
+                  <button className="w-full text-left p-2.5 rounded-xl border border-blue-500/40 dark:border-blue-500/20 hover:border-blue-500/60 dark:hover:border-blue-500/30 hover:bg-blue-500/10 dark:hover:bg-blue-500/5 transition-all backdrop-blur-sm">
+                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Paid Media</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Ad performance & spend</p>
+                  </button>
+                </Link>
+              )}
             </div>
           </CardContent>
         </Card>

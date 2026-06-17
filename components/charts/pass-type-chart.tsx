@@ -1,6 +1,7 @@
 'use client'
 
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts'
+import { UniversalTooltip, numberFormatter } from './universal-tooltip'
 
 interface PassTypeChartProps {
   data: {
@@ -37,14 +38,8 @@ export function PassTypeChart({ data }: PassTypeChartProps) {
               tick={{ fontSize: 12 }}
             />
             <YAxis />
-            <Tooltip
-              contentStyle={{
-                backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                border: 'none',
-                borderRadius: '8px',
-              }}
-            />
-            <Bar dataKey="value" fill="#10b981" radius={[8, 8, 0, 0]} />
+            <Tooltip content={<UniversalTooltip valueFormatter={numberFormatter} />} />
+            <Bar dataKey="value" name="Registrations" fill="#10b981" radius={[8, 8, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </div>
@@ -56,24 +51,37 @@ export function PassTypeChart({ data }: PassTypeChartProps) {
               data={chartData.slice(0, 8)}
               cx="50%"
               cy="50%"
-              labelLine={false}
-              label={({ name, percent }) => `${name}: ${percent}%`}
-              outerRadius={120}
+              labelLine={true}
+              label={({ name, percent }) => {
+                if (!name || percent === undefined) return ''
+                return `${name}: ${(percent * 100).toFixed(0)}%`
+              }}
+              outerRadius={130}
               fill="#8884d8"
               dataKey="value"
+              animationBegin={0}
+              animationDuration={800}
+              style={{
+                fontFamily: 'var(--font-geist-sans), system-ui, -apple-system, sans-serif',
+                fontSize: '13px',
+                fontWeight: 600,
+              }}
             >
               {chartData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                <Cell 
+                  key={`cell-${index}`} 
+                  fill={COLORS[index % COLORS.length]}
+                />
               ))}
             </Pie>
-            <Tooltip
-              contentStyle={{
-                backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                border: 'none',
-                borderRadius: '8px',
+            <Tooltip content={<UniversalTooltip valueFormatter={numberFormatter} showTotal />} />
+            <Legend 
+              wrapperStyle={{
+                fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
+                fontSize: '13px',
+                fontWeight: 500,
               }}
             />
-            <Legend />
           </PieChart>
         </ResponsiveContainer>
       </div>

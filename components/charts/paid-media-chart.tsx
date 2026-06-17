@@ -2,6 +2,7 @@
 
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts'
 import { format } from 'date-fns'
+import { UniversalTooltip, currencyFormatter, numberFormatter } from './universal-tooltip'
 
 interface PaidMediaChartProps {
   data: {
@@ -67,15 +68,14 @@ export function PaidMediaChart({ data }: PaidMediaChartProps) {
               <YAxis 
                 tickFormatter={(value) => `$${value}`}
               />
-              <Tooltip
-                formatter={(value) => value ? `$${Number(value).toLocaleString()}` : '$0'}
-                contentStyle={{
-                  backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                  border: 'none',
-                  borderRadius: '8px',
+              <Tooltip content={<UniversalTooltip valueFormatter={currencyFormatter} showTotal />} />
+              <Legend 
+                wrapperStyle={{
+                  fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
+                  fontSize: '13px',
+                  fontWeight: 500,
                 }}
               />
-              <Legend />
               {hasLinkedIn && <Bar dataKey="LinkedIn" stackId="a" fill="#0077B5" radius={[0, 0, 0, 0]} />}
               {hasMeta && <Bar dataKey="Meta" stackId="a" fill="#1877F2" radius={[0, 0, 0, 0]} />}
               {hasGoogleSearch && <Bar dataKey="Google Search" stackId="a" fill="#4285F4" radius={[0, 0, 0, 0]} />}
@@ -99,14 +99,14 @@ export function PaidMediaChart({ data }: PaidMediaChartProps) {
                 height={80}
               />
               <YAxis />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                  border: 'none',
-                  borderRadius: '8px',
+              <Tooltip content={<UniversalTooltip valueFormatter={numberFormatter} />} />
+              <Legend 
+                wrapperStyle={{
+                  fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
+                  fontSize: '13px',
+                  fontWeight: 500,
                 }}
               />
-              <Legend />
               {hasLinkedIn && (
                 <Line 
                   type="monotone" 

@@ -72,10 +72,7 @@ export function TestManagement({ tests }: TestManagementProps) {
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-2">
                   <h4 className="font-semibold text-gray-900">
-                    {new Date(test.month).toLocaleDateString('en-US', {
-                      month: 'long',
-                      year: 'numeric'
-                    })}
+                    {test.month || 'Unknown Date'}
                   </h4>
                   {test.channel && (
                     <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full font-medium">

@@ -79,6 +79,18 @@ const allNavItems = [
     clients: ["atc-2026"], // Only for ATC
   },
   {
+    title: "Email Analytics",
+    href: "/dashboard/email-analytics",
+    icon: Mail,
+    clients: ["atc-2026"], // Only for ATC (heatmap, timing, benchmarks)
+  },
+  {
+    title: "GA4 Attribution",
+    href: "/dashboard/ga4-registrations",
+    icon: BarChart3,
+    clients: ["atc-2026"], // Only for ATC (registration by traffic source)
+  },
+  {
     title: "Abstracts",
     href: "/dashboard/abstracts",
     icon: FileText,

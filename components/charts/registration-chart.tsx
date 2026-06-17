@@ -2,6 +2,7 @@
 
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, AreaChart, Area } from 'recharts'
 import { format } from 'date-fns'
+import { UniversalTooltip, numberFormatter } from './universal-tooltip'
 
 interface RegistrationChartProps {
   data: {
@@ -46,26 +47,29 @@ export function RegistrationChart({ data }: RegistrationChartProps) {
               height={80}
             />
             <YAxis />
-            <Tooltip
-              contentStyle={{
-                backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                border: 'none',
-                borderRadius: '8px',
+            <Tooltip content={<UniversalTooltip valueFormatter={numberFormatter} />} />
+            <Legend 
+              wrapperStyle={{
+                fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
+                fontSize: '13px',
+                fontWeight: 500,
               }}
             />
-            <Legend />
             <Area
               type="monotone"
               dataKey="registrations"
+              name="Total Registrations"
               stroke="#10b981"
               fillOpacity={1}
               fill="url(#colorRegistrations)"
-              strokeWidth={2}
+              strokeWidth={3}
+              animationDuration={1000}
             />
             {chartData.some(d => d.goal > 0) && (
               <Line
                 type="monotone"
                 dataKey="goal"
+                name="Registration Goal"
                 stroke="#f59e0b"
                 strokeDasharray="5 5"
                 strokeWidth={2}

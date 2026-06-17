@@ -1,6 +1,7 @@
 'use client'
 
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, Legend } from 'recharts'
+import { UniversalTooltip, numberFormatter } from './universal-tooltip'
 
 interface AbstractChartProps {
   data: {
@@ -36,21 +37,23 @@ export function AbstractChart({ data }: AbstractChartProps) {
             <CartesianGrid strokeDasharray="3 3" opacity={0.1} />
             <XAxis dataKey="year" />
             <YAxis />
-            <Tooltip
-              contentStyle={{
-                backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                border: 'none',
-                borderRadius: '8px',
+            <Tooltip content={<UniversalTooltip valueFormatter={numberFormatter} />} />
+            <Legend 
+              wrapperStyle={{
+                fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
+                fontSize: '13px',
+                fontWeight: 500,
               }}
             />
-            <Legend />
             <Line 
               type="monotone" 
-              dataKey="submissions" 
+              dataKey="submissions"
+              name="Submissions" 
               stroke="#10b981" 
               strokeWidth={3}
               dot={{ fill: '#10b981', r: 6 }}
               activeDot={{ r: 8 }}
+              animationDuration={1000}
             />
           </LineChart>
         </ResponsiveContainer>
@@ -62,14 +65,8 @@ export function AbstractChart({ data }: AbstractChartProps) {
             <CartesianGrid strokeDasharray="3 3" opacity={0.1} />
             <XAxis dataKey="year" />
             <YAxis />
-            <Tooltip
-              contentStyle={{
-                backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                border: 'none',
-                borderRadius: '8px',
-              }}
-            />
-            <Bar dataKey="submissions" fill="#10b981" radius={[8, 8, 0, 0]} />
+            <Tooltip content={<UniversalTooltip valueFormatter={numberFormatter} />} />
+            <Bar dataKey="submissions" name="Submissions" fill="#10b981" radius={[8, 8, 0, 0]} animationDuration={800} />
           </BarChart>
         </ResponsiveContainer>
       </div>
