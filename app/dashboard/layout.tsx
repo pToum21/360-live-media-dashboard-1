@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth"
 import { DashboardNav } from "@/components/dashboard/nav"
 import { DashboardHeader } from "@/components/dashboard/header"
 import { MobileNav } from "@/components/dashboard/mobile-nav"
+import { MainContentWrapper } from "@/components/dashboard/main-content-wrapper"
 import { Toaster } from "@/components/ui/sonner"
 import { ClientProvider } from "@/contexts/client-context"
 
@@ -38,14 +39,14 @@ export default async function DashboardLayout({
         <MobileNav />
         
         {/* Main Content */}
-        <div className="flex-1 flex flex-col lg:ml-72">
+        <MainContentWrapper>
           <DashboardHeader />
           <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 mt-16 lg:mt-0">
             <div className="max-w-[1600px] mx-auto">
               {children}
             </div>
           </main>
-        </div>
+        </MainContentWrapper>
         <Toaster position="top-right" richColors />
       </div>
     </ClientProvider>

@@ -92,17 +92,18 @@ export function CampaignPerformanceTable({ campaigns }: CampaignPerformanceTable
 
       {/* Pagination Controls */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+        <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-200 dark:border-gray-700 relative z-10">
           <div className="text-sm text-gray-600 dark:text-gray-400">
             Showing {startIndex + 1}-{Math.min(endIndex, campaigns.length)} of {campaigns.length} campaigns | Page {currentPage} of {totalPages}
           </div>
           <div className="flex items-center gap-2">
             <Button
+              type="button"
               variant="outline"
               size="sm"
               onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
               disabled={currentPage === 1}
-              className="dark:hover:bg-gray-700"
+              className="dark:hover:bg-gray-700 cursor-pointer"
             >
               <ChevronLeft className="h-4 w-4 mr-1" />
               Previous
@@ -125,10 +126,11 @@ export function CampaignPerformanceTable({ campaigns }: CampaignPerformanceTable
                 return (
                   <Button
                     key={pageNum}
+                    type="button"
                     variant={currentPage === pageNum ? "default" : "outline"}
                     size="sm"
                     onClick={() => setCurrentPage(pageNum)}
-                    className={currentPage === pageNum ? "bg-[#2E8741] hover:bg-[#236933]" : "dark:hover:bg-gray-700"}
+                    className={currentPage === pageNum ? "bg-[#2E8741] hover:bg-[#236933] cursor-pointer" : "dark:hover:bg-gray-700 cursor-pointer"}
                   >
                     {pageNum}
                   </Button>
@@ -137,11 +139,12 @@ export function CampaignPerformanceTable({ campaigns }: CampaignPerformanceTable
             </div>
             
             <Button
+              type="button"
               variant="outline"
               size="sm"
               onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
               disabled={currentPage === totalPages}
-              className="dark:hover:bg-gray-700"
+              className="dark:hover:bg-gray-700 cursor-pointer"
             >
               Next
               <ChevronRight className="h-4 w-4 ml-1" />
