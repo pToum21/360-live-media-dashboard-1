@@ -3,11 +3,13 @@ import { prisma } from "@/lib/prisma"
 import { EmailHeatmapChart } from "@/components/charts/email-heatmap-chart"
 import { SendTimeHeatmap } from "@/components/charts/send-time-heatmap"
 import { BenchmarkComparisonChart } from "@/components/charts/benchmark-comparison-chart"
+import { EmailManagement } from "@/components/dashboard/email-management"
 import { cookies } from "next/headers"
 import { redirect } from "next/navigation"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { Mail, MousePointerClick, Clock, Target } from "lucide-react"
+import { Suspense } from 'react'
 
 export default async function EmailAnalyticsPage() {
   const session = await getServerSession(authOptions)
@@ -248,6 +250,24 @@ export default async function EmailAnalyticsPage() {
           </CardContent>
         </Card>
       )}
+
+      {/* Email Data Management */}
+      <Card className="chart-card">
+        <CardHeader>
+          <CardTitle>Manage Email Campaign Data</CardTitle>
+          <CardDescription>Add, edit, or remove email campaign data for {client.name}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Suspense fallback={<div>Loading...</div>}>
+            <EmailManagement 
+              campaigns={emails.map(e => ({
+                ...e,
+                deploymentDate: e.deploymentDate
+              }))} 
+            />
+          </Suspense>
+        </CardContent>
+      </Card>
     </div>
   )
 }

@@ -54,7 +54,7 @@ export function PassTypeChart({ data }: PassTypeChartProps) {
               labelLine={true}
               label={({ name, percent }) => {
                 if (!name || percent === undefined) return ''
-                return `${name}: ${(percent * 100).toFixed(0)}%`
+                return `${name}: ${Number(percent).toFixed(0)}%`
               }}
               outerRadius={130}
               fill="#8884d8"

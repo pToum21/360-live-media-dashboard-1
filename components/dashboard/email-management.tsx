@@ -1,8 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
-import { Plus, Pencil, Trash2 } from 'lucide-react'
+import { Plus, Pencil, Trash2, ChevronLeft, ChevronRight } from 'lucide-react'
 import { EmailFormDialog } from '@/components/forms/email-form-dialog'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
@@ -11,11 +11,25 @@ interface EmailManagementProps {
   campaigns: any[]
 }
 
+const ITEMS_PER_PAGE = 15
+
 export function EmailManagement({ campaigns }: EmailManagementProps) {
   const router = useRouter()
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editData, setEditData] = useState<any>(null)
   const [mode, setMode] = useState<'create' | 'edit'>('create')
+  const [currentPage, setCurrentPage] = useState(1)
+  
+  // Calculate pagination
+  const totalPages = Math.ceil(campaigns.length / ITEMS_PER_PAGE)
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE
+  const endIndex = startIndex + ITEMS_PER_PAGE
+  const paginatedCampaigns = campaigns.slice(startIndex, endIndex)
+  
+  // Reset to page 1 when campaigns list changes (e.g., after filtering)
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [campaigns.length])
 
   const handleAdd = () => {
     setMode('create')
@@ -52,7 +66,12 @@ export function EmailManagement({ campaigns }: EmailManagementProps) {
   return (
     <>
       <div className="flex justify-between items-center mb-6">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Recent Campaigns</h3>
+        <div>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Campaign Management</h3>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            Showing {startIndex + 1}-{Math.min(endIndex, campaigns.length)} of {campaigns.length} campaigns
+          </p>
+        </div>
         <Button 
           onClick={handleAdd}
           className="bg-[#2E8741] hover:bg-[#236933]"
@@ -62,8 +81,20 @@ export function EmailManagement({ campaigns }: EmailManagementProps) {
         </Button>
       </div>
 
-      <div className="space-y-3">
-        {campaigns.slice(0, 10).map((campaign) => (
+      {campaigns.length === 0 ? (
+        <div className="text-center py-12 border border-dashed border-gray-300 dark:border-gray-700 rounded-lg">
+          <p className="text-gray-500 dark:text-gray-400 mb-4">No campaigns found</p>
+          <Button 
+            onClick={handleAdd}
+            className="bg-[#2E8741] hover:bg-[#236933]"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Add Your First Campaign
+          </Button>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {paginatedCampaigns.map((campaign) => (
           <div
             key={campaign.id}
             className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 hover-glass-shine transition-colors"
@@ -119,7 +150,68 @@ export function EmailManagement({ campaigns }: EmailManagementProps) {
             </div>
           </div>
         ))}
-      </div>
+        </div>
+      )}
+
+      {/* Pagination Controls */}
+      {campaigns.length > 0 && totalPages > 1 && (
+        <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+          <div className="text-sm text-gray-600 dark:text-gray-400">
+            Page {currentPage} of {totalPages}
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+              className="dark:hover:bg-gray-700"
+            >
+              <ChevronLeft className="h-4 w-4 mr-1" />
+              Previous
+            </Button>
+            
+            <div className="flex gap-1">
+              {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                // Show first page, last page, current page, and pages around current
+                let pageNum: number
+                if (totalPages <= 5) {
+                  pageNum = i + 1
+                } else if (currentPage <= 3) {
+                  pageNum = i + 1
+                } else if (currentPage >= totalPages - 2) {
+                  pageNum = totalPages - 4 + i
+                } else {
+                  pageNum = currentPage - 2 + i
+                }
+                
+                return (
+                  <Button
+                    key={pageNum}
+                    variant={currentPage === pageNum ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setCurrentPage(pageNum)}
+                    className={currentPage === pageNum ? "bg-[#2E8741] hover:bg-[#236933]" : "dark:hover:bg-gray-700"}
+                  >
+                    {pageNum}
+                  </Button>
+                )
+              })}
+            </div>
+            
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+              className="dark:hover:bg-gray-700"
+            >
+              Next
+              <ChevronRight className="h-4 w-4 ml-1" />
+            </Button>
+          </div>
+        </div>
+      )}
 
       <EmailFormDialog
         open={dialogOpen}

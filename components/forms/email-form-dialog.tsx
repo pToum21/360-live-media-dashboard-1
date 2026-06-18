@@ -72,7 +72,7 @@ export function EmailFormDialog({ open, onOpenChange, data, mode }: EmailFormDia
           deploymentDate: formData.deploymentDate,
           name: formData.name,
           audience: formData.audience || null,
-          campaignType: formData.campaignType || null,
+          campaignType: formData.campaignType,
           openRate: parseFloat(formData.openRate) / 100 || 0,
           clickRate: parseFloat(formData.clickRate) / 100 || 0,
           deliveryRate: parseFloat(formData.deliveryRate) / 100 || 0,
@@ -145,18 +145,19 @@ export function EmailFormDialog({ open, onOpenChange, data, mode }: EmailFormDia
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="campaignType">Campaign Type (optional)</Label>
+                <Label htmlFor="campaignType">Campaign Type <span className="text-gray-500">(updates filters)</span></Label>
                 <select
                   id="campaignType"
                   value={formData.campaignType}
                   onChange={(e) => setFormData({ ...formData, campaignType: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
+                  required
                 >
                   <option value="">Select type...</option>
-                  <option value="Newsletter">Newsletter</option>
-                  <option value="Promotion">Promotion</option>
-                  <option value="Announcement">Announcement</option>
-                  <option value="Event Update">Event Update</option>
+                  <option value="Registration Email">Registration Email</option>
+                  <option value="Nurture Email">Nurture Email</option>
+                  <option value="Call for Content Email">Call for Content Email</option>
+                  <option value="Awareness Email">Awareness Email</option>
                 </select>
               </div>
             </div>

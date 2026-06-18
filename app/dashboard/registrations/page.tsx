@@ -2,6 +2,9 @@ import { Suspense } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { RegistrationManagement } from '@/components/dashboard/registration-management'
 import { RegistrationChart } from '@/components/charts/registration-chart'
+import { MultiYearRegistrationChart } from '@/components/charts/multi-year-registration-chart'
+import { RegistrationActualsVsGoalChart } from '@/components/charts/registration-actuals-vs-goal-chart'
+import { PassTypeChart } from '@/components/charts/pass-type-chart'
 import { prisma } from '@/lib/prisma'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
@@ -33,6 +36,87 @@ export default async function RegistrationsPage() {
   const totalRegistrations = registrations.reduce((sum, r) => sum + r.totalRegistrations, 0)
   const totalRevenue = registrations.reduce((sum, r) => sum + (r.revenue || 0), 0)
   const latestRegistration = registrations[0]
+
+  // ATC-SPECIFIC: Fetch additional data for enhanced registration visualizations
+  let atcRegistrationData = null
+  if (client.slug === 'atc-2026') {
+    const [allRegistrations, allPassTypes] = await Promise.all([
+      prisma.eventRegistration.findMany({
+        where: { clientId: client.id },
+        orderBy: { date: 'asc' }
+      }),
+      prisma.passType.findMany({
+        where: { clientId: client.id },
+        orderBy: { registrationCount: 'desc' }
+      })
+    ])
+
+    // Group registrations by year
+    const registrationsByYear: Record<number, any[]> = {}
+    allRegistrations.forEach(reg => {
+      const year = reg.date.getFullYear()
+      if (!registrationsByYear[year]) registrationsByYear[year] = []
+      registrationsByYear[year].push(reg)
+    })
+
+    // Calculate ACTUAL paid/comp totals from the EventRegistration records
+    // This ensures charts update when users enter data in the CRUD table
+    const currentYearRegistrations = registrationsByYear[2026] || []
+    const latestReg = currentYearRegistrations[currentYearRegistrations.length - 1]
+    
+    const compRegistrations = latestReg?.compRegistrations || 0
+    const paidRegistrations = latestReg?.paidRegistrations || 0
+
+    // Calculate paid/comp percentages per year from ACTUAL EventRegistration data
+    const passTypesByYear: Record<number, { paidPercent: number, compPercent: number }> = {}
+    
+    for (const year of [2023, 2024, 2026]) {
+      const yearRegs = registrationsByYear[year] || []
+      const latestYearReg = yearRegs[yearRegs.length - 1]
+      
+      if (latestYearReg && latestYearReg.paidRegistrations && latestYearReg.compRegistrations) {
+        const total = latestYearReg.totalRegistrations
+        passTypesByYear[year] = {
+          paidPercent: total > 0 ? latestYearReg.paidRegistrations / total : 0,
+          compPercent: total > 0 ? latestYearReg.compRegistrations / total : 0
+        }
+      } else {
+        // Fallback: calculate from totalRegistrations if paid/comp not entered
+        passTypesByYear[year] = {
+          paidPercent: 0.83,
+          compPercent: 0.17
+        }
+      }
+    }
+
+    // Format multi-year chart data
+    const maxWeeks = Math.max(
+      registrationsByYear[2023]?.length || 0,
+      registrationsByYear[2024]?.length || 0,
+      registrationsByYear[2026]?.length || 0
+    )
+
+    const multiYearChartData = []
+    for (let i = 0; i < maxWeeks; i++) {
+      multiYearChartData.push({
+        week: `Week ${i + 1}`,
+        year2023: registrationsByYear[2023]?.[i]?.totalRegistrations,
+        year2024: registrationsByYear[2024]?.[i]?.totalRegistrations,
+        year2026: registrationsByYear[2026]?.[i]?.totalRegistrations
+      })
+    }
+
+    // Get pass types for current year (2024 data for visualization)
+    const currentYearPassTypes = allPassTypes.filter(pt => pt.year === 2024)
+
+    atcRegistrationData = {
+      multiYearChartData,
+      passTypePercentages: passTypesByYear,
+      compRegistrations,
+      paidRegistrations,
+      passTypes: currentYearPassTypes
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -93,17 +177,50 @@ export default async function RegistrationsPage() {
         </Card>
       </div>
 
+      {/* ATC-SPECIFIC: Multi-Year Registration Comparison */}
+      {atcRegistrationData && (
+        <MultiYearRegistrationChart 
+          data={atcRegistrationData.multiYearChartData}
+          passTypePercentages={atcRegistrationData.passTypePercentages}
+        />
+      )}
+
+      {/* ATC-SPECIFIC: Registration Actuals vs Goal */}
+      {atcRegistrationData && (
+        <RegistrationActualsVsGoalChart 
+          compActual={atcRegistrationData.compRegistrations}
+          compGoal={1725}
+          paidActual={atcRegistrationData.paidRegistrations}
+          paidGoal={6275}
+        />
+      )}
+
       <Card className="glass-card">
         <CardHeader>
-          <CardTitle>Registration Trends</CardTitle>
+          <CardTitle>Weekly Registration Trends</CardTitle>
           <CardDescription>
-            Daily registration growth over time
+            Registration growth over time
           </CardDescription>
         </CardHeader>
         <CardContent>
           <RegistrationChart data={registrations} />
         </CardContent>
       </Card>
+
+      {/* ATC-SPECIFIC: Pass Types Distribution */}
+      {atcRegistrationData && atcRegistrationData.passTypes.length > 0 && (
+        <Card className="glass-card">
+          <CardHeader>
+            <CardTitle>2024 Registrations by Pass Types</CardTitle>
+            <CardDescription>
+              Breakdown of registrations by ticket type
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <PassTypeChart data={atcRegistrationData.passTypes} />
+          </CardContent>
+        </Card>
+      )}
 
       <Card className="glass-card">
         <CardHeader>

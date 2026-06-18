@@ -166,7 +166,9 @@ export function RegistrationFormDialog({
               </div>
 
               <div className="grid gap-2">
-                <Label htmlFor="paidRegistrations">Paid</Label>
+                <Label htmlFor="paidRegistrations">
+                  Paid <span className="text-xs text-muted-foreground">(updates charts)</span>
+                </Label>
                 <Input
                   id="paidRegistrations"
                   type="number"
@@ -174,11 +176,14 @@ export function RegistrationFormDialog({
                   onChange={(e) =>
                     setFormData({ ...formData, paidRegistrations: parseInt(e.target.value) })
                   }
+                  placeholder="0"
                 />
               </div>
 
               <div className="grid gap-2">
-                <Label htmlFor="compRegistrations">Comp</Label>
+                <Label htmlFor="compRegistrations">
+                  Comp <span className="text-xs text-muted-foreground">(updates charts)</span>
+                </Label>
                 <Input
                   id="compRegistrations"
                   type="number"
@@ -186,13 +191,16 @@ export function RegistrationFormDialog({
                   onChange={(e) =>
                     setFormData({ ...formData, compRegistrations: parseInt(e.target.value) })
                   }
+                  placeholder="0"
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
-                <Label htmlFor="revenue">Revenue ($)</Label>
+                <Label htmlFor="revenue">
+                  Revenue ($) <span className="text-xs text-muted-foreground">(updates charts)</span>
+                </Label>
                 <Input
                   id="revenue"
                   type="number"
@@ -201,11 +209,14 @@ export function RegistrationFormDialog({
                   onChange={(e) =>
                     setFormData({ ...formData, revenue: parseFloat(e.target.value) })
                   }
+                  placeholder="0"
                 />
               </div>
 
               <div className="grid gap-2">
-                <Label htmlFor="registrationGoal">Goal</Label>
+                <Label htmlFor="registrationGoal">
+                  Goal <span className="text-xs text-muted-foreground">(updates charts)</span>
+                </Label>
                 <Input
                   id="registrationGoal"
                   type="number"
@@ -213,6 +224,7 @@ export function RegistrationFormDialog({
                   onChange={(e) =>
                     setFormData({ ...formData, registrationGoal: parseInt(e.target.value) })
                   }
+                  placeholder="0"
                 />
               </div>
             </div>

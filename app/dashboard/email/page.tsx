@@ -1,28 +1,69 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Mail, TrendingUp, MousePointerClick, Send } from "lucide-react"
+import { Mail, TrendingUp, MousePointerClick, Send, Clock, Star, Calendar } from "lucide-react"
 import { prisma } from "@/lib/prisma"
 import { FilterableEmailChart } from "@/components/charts/filterable-email-chart"
 import { EmailManagement } from "@/components/dashboard/email-management"
+import { OpenRateByTimeChart } from "@/components/charts/open-rate-by-time-chart"
+import { OpenRateByDayChart } from "@/components/charts/open-rate-by-day-chart"
+import { EmailTypeFilter } from "@/components/dashboard/email-type-filter"
+import { CampaignPerformanceTable } from "@/components/tables/campaign-performance-table"
 import { getSelectedClientId } from "@/lib/get-selected-client"
 
-export default async function EmailCampaignsPage() {
+export default async function EmailCampaignsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ type?: string }>
+}) {
   // Get the selected client ID
   const clientId = await getSelectedClientId()
   
-  // Fetch email campaigns for the selected client (most recent 12)
+  // Get filter type from URL params (await searchParams in Next.js 15)
+  const params = await searchParams
+  const filterType = params.type || 'all'
+  
+  // Build the where clause based on filter
+  const whereClause: any = { clientId }
+  if (filterType !== 'all') {
+    whereClause.campaignType = filterType
+  }
+  
+  // Fetch email campaigns for the selected client with filtering at DB level
   const campaigns = await prisma.emailCampaign.findMany({
-    where: { clientId },
+    where: whereClause,
     orderBy: { deploymentDate: 'desc' },
-    take: 12,
+    // No limit - fetch all matching campaigns so edits don't cause campaigns to "disappear"
   })
 
-  // Calculate averages
-  const avgOpenRate = campaigns.reduce((sum, c) => sum + c.openRate, 0) / campaigns.length
-  const avgClickRate = campaigns.reduce((sum, c) => sum + c.clickRate, 0) / campaigns.length
-  const avgDeliveryRate = campaigns.reduce((sum, c) => sum + c.deliveryRate, 0) / campaigns.length
+  // Use recent campaigns for calculations (top 50 or all if less)
+  const recentCampaigns = campaigns.slice(0, 50)
+  
+  // Calculate averages based on recent campaigns
+  const avgOpenRate = recentCampaigns.length > 0 
+    ? recentCampaigns.reduce((sum, c) => sum + c.openRate, 0) / recentCampaigns.length 
+    : 0
+  const avgClickRate = recentCampaigns.length > 0
+    ? recentCampaigns.reduce((sum, c) => sum + c.clickRate, 0) / recentCampaigns.length
+    : 0
+  const avgDeliveryRate = recentCampaigns.length > 0
+    ? recentCampaigns.reduce((sum, c) => sum + c.deliveryRate, 0) / recentCampaigns.length
+    : 0
+  const avgUnsubscribeRate = recentCampaigns.length > 0
+    ? recentCampaigns.reduce((sum, c) => sum + c.unsubscribeRate, 0) / recentCampaigns.length
+    : 0
+  const avgClickToOpenRate = avgOpenRate > 0 ? avgClickRate / avgOpenRate : 0
+  
+  // Get top 5 subject lines by open rate from recent campaigns
+  const topSubjectLines = recentCampaigns
+    .filter(c => c.subjectLine)
+    .sort((a, b) => b.openRate - a.openRate)
+    .slice(0, 5)
+    .map(c => ({
+      subject: c.subjectLine!,
+      openRate: c.openRate
+    }))
 
-  // Format data for filterable chart
-  const chartData = campaigns.map(c => ({
+  // Format data for filterable chart (use recent campaigns)
+  const chartData = recentCampaigns.map(c => ({
     name: c.name,
     openRate: c.openRate,
     clickRate: c.clickRate,
@@ -35,24 +76,22 @@ export default async function EmailCampaignsPage() {
 
   return (
     <div className="space-y-8 animate-in">
-      {/* Key Metrics */}
-      <div className="grid gap-6 md:grid-cols-4">
-        <Card className="stat-card border-0 overflow-hidden relative group">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-blue-400/10 to-transparent rounded-bl-full"></div>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
-            <CardTitle className="text-sm font-semibold text-gray-700 dark:text-gray-300">Campaigns Sent</CardTitle>
-            <div className="w-10 h-10 gradient-blue rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/30 group-hover:scale-110 transition-transform">
-              <Mail className="h-5 w-5 text-white" />
-            </div>
-          </CardHeader>
-          <CardContent className="relative z-10">
-            <div className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 dark:from-blue-400 dark:to-blue-600 bg-clip-text text-transparent">
-              {campaigns.length}
-            </div>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">Total campaigns tracked</p>
-          </CardContent>
-        </Card>
+      {/* Filter Bar */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Email Campaigns</h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-1">
+            {filterType === 'all' 
+              ? 'Overall performance metrics across all campaigns'
+              : `Performance metrics for ${filterType}`
+            }
+          </p>
+        </div>
+        <EmailTypeFilter currentType={filterType} />
+      </div>
 
+      {/* Key Metrics - Overall Averages */}
+      <div className="grid gap-6 md:grid-cols-4">
         <Card className="stat-card border-0 overflow-hidden relative group">
           <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-green-400/10 to-transparent rounded-bl-full"></div>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
@@ -72,7 +111,7 @@ export default async function EmailCampaignsPage() {
         <Card className="stat-card border-0 overflow-hidden relative group">
           <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-purple-400/10 to-transparent rounded-bl-full"></div>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
-            <CardTitle className="text-sm font-semibold text-gray-700 dark:text-gray-300">Avg. Click Rate</CardTitle>
+            <CardTitle className="text-sm font-semibold text-gray-700 dark:text-gray-300">Avg. Click-Through Rate</CardTitle>
             <div className="w-10 h-10 gradient-purple rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/30 group-hover:scale-110 transition-transform">
               <MousePointerClick className="h-5 w-5 text-white" />
             </div>
@@ -81,23 +120,127 @@ export default async function EmailCampaignsPage() {
             <div className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-purple-800 dark:from-purple-400 dark:to-purple-600 bg-clip-text text-transparent">
               {(avgClickRate * 100).toFixed(1)}%
             </div>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">Across all campaigns</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">Overall average</p>
           </CardContent>
         </Card>
 
         <Card className="stat-card border-0 overflow-hidden relative group">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-teal-400/10 to-transparent rounded-bl-full"></div>
+          <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-orange-400/10 to-transparent rounded-bl-full"></div>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
-            <CardTitle className="text-sm font-semibold text-gray-700 dark:text-gray-300">Avg. Delivery Rate</CardTitle>
-            <div className="w-10 h-10 gradient-teal rounded-xl flex items-center justify-center shadow-lg shadow-teal-500/30 group-hover:scale-110 transition-transform">
+            <CardTitle className="text-sm font-semibold text-gray-700 dark:text-gray-300">Avg. Click-to-Open Rate</CardTitle>
+            <div className="w-10 h-10 gradient-orange rounded-xl flex items-center justify-center shadow-lg shadow-orange-500/30 group-hover:scale-110 transition-transform">
+              <MousePointerClick className="h-5 w-5 text-white" />
+            </div>
+          </CardHeader>
+          <CardContent className="relative z-10">
+            <div className="text-3xl font-bold bg-gradient-to-r from-orange-600 to-orange-800 dark:from-orange-400 dark:to-orange-600 bg-clip-text text-transparent">
+              {(avgClickToOpenRate * 100).toFixed(1)}%
+            </div>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">Overall average</p>
+          </CardContent>
+        </Card>
+
+        <Card className="stat-card border-0 overflow-hidden relative group">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-red-400/10 to-transparent rounded-bl-full"></div>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
+            <CardTitle className="text-sm font-semibold text-gray-700 dark:text-gray-300">Avg. Unsubscribe Rate</CardTitle>
+            <div className="w-10 h-10 gradient-red rounded-xl flex items-center justify-center shadow-lg shadow-red-500/30 group-hover:scale-110 transition-transform">
               <Send className="h-5 w-5 text-white" />
             </div>
           </CardHeader>
           <CardContent className="relative z-10">
-            <div className="text-3xl font-bold bg-gradient-to-r from-teal-600 to-teal-800 dark:from-teal-400 dark:to-teal-600 bg-clip-text text-transparent">
-              {(avgDeliveryRate * 100).toFixed(1)}%
+            <div className="text-3xl font-bold bg-gradient-to-r from-red-600 to-red-800 dark:from-red-400 dark:to-red-600 bg-clip-text text-transparent">
+              {(avgUnsubscribeRate * 100).toFixed(2)}%
             </div>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">Successfully delivered</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">Overall unsubscribe</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Send Time Optimization */}
+      <div className="grid gap-6 md:grid-cols-3">
+        <Card className="chart-card border-0 overflow-hidden shadow-lg">
+          <CardHeader className="bg-gradient-to-r from-purple-50/10 dark:from-purple-900/20 to-transparent border-b border-gray-200 dark:border-gray-700">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 gradient-purple rounded-xl flex items-center justify-center shadow-md">
+                <Clock className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <CardTitle className="text-lg text-gray-900 dark:text-gray-100">Open Rate by Time of Day</CardTitle>
+                <CardDescription className="dark:text-gray-400">Performance by hour</CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="pt-6">
+            <OpenRateByTimeChart 
+              data={campaigns.map(c => ({
+                hour: c.deploymentHour,
+                openRate: c.openRate,
+                timeOfDay: c.deploymentTimeOfDay
+              }))}
+            />
+          </CardContent>
+        </Card>
+
+        <Card className="chart-card border-0 overflow-hidden shadow-lg">
+          <CardHeader className="bg-gradient-to-r from-purple-50/10 dark:from-purple-900/20 to-transparent border-b border-gray-200 dark:border-gray-700">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 gradient-purple rounded-xl flex items-center justify-center shadow-md">
+                <Calendar className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <CardTitle className="text-lg text-gray-900 dark:text-gray-100">Open Rate by Day of Week</CardTitle>
+                <CardDescription className="dark:text-gray-400">Best days to send</CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="pt-6">
+            <OpenRateByDayChart 
+              data={campaigns.map(c => ({
+                deploymentDayOfWeek: c.deploymentDayOfWeek,
+                openRate: c.openRate
+              }))}
+            />
+          </CardContent>
+        </Card>
+
+        <Card className="chart-card border-0 overflow-hidden shadow-lg">
+          <CardHeader className="bg-gradient-to-r from-green-50/10 dark:from-green-900/20 to-transparent border-b border-gray-200 dark:border-gray-700">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 gradient-green rounded-xl flex items-center justify-center shadow-md">
+                <Star className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <CardTitle className="text-lg text-gray-900 dark:text-gray-100">TOP 5 SUBJECT LINES</CardTitle>
+                <CardDescription className="dark:text-gray-400">Based on highest open rate</CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="pt-6">
+            {topSubjectLines.length > 0 ? (
+              <div className="space-y-4">
+                {topSubjectLines.map((item, index) => (
+                  <div key={index} className="flex items-start gap-4 p-4 rounded-xl bg-gradient-to-r from-green-50 to-transparent dark:from-green-900/20 border border-green-100 dark:border-green-900/30 hover:shadow-md transition-shadow">
+                    <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center shadow-lg">
+                      <span className="text-white font-bold text-sm">{index + 1}</span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-gray-900 dark:text-gray-100 line-clamp-2 mb-1">
+                        {item.subject}
+                      </p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        Open Rate: <span className="font-bold text-green-600">{(item.openRate * 100).toFixed(1)}%</span>
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                <p>No subject lines available</p>
+                <p className="text-xs mt-2">Subject lines will appear here once campaigns are added</p>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
@@ -129,55 +272,12 @@ export default async function EmailCampaignsPage() {
             </div>
             <div>
               <CardTitle className="text-lg text-gray-900 dark:text-gray-100">Campaign Performance</CardTitle>
-              <CardDescription className="dark:text-gray-400">Recent email campaign metrics and engagement</CardDescription>
+              <CardDescription className="dark:text-gray-400">Email campaign metrics and engagement data</CardDescription>
             </div>
           </div>
         </CardHeader>
         <CardContent>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-gray-200 dark:border-gray-700">
-                  <th className="text-left py-3 px-4 text-gray-700 dark:text-gray-300 font-semibold">Campaign Name</th>
-                  <th className="text-right py-3 px-4 text-gray-700 dark:text-gray-300 font-semibold">Deployment Date</th>
-                  <th className="text-right py-3 px-4 text-gray-700 dark:text-gray-300 font-semibold">Open Rate</th>
-                  <th className="text-right py-3 px-4 text-gray-700 dark:text-gray-300 font-semibold">Click Rate</th>
-                  <th className="text-right py-3 px-4 text-gray-700 dark:text-gray-300 font-semibold">Delivery Rate</th>
-                  <th className="text-right py-3 px-4 text-gray-700 dark:text-gray-300 font-semibold">Unsub. Rate</th>
-                </tr>
-              </thead>
-              <tbody>
-                {campaigns.map((campaign) => (
-                  <tr key={campaign.id} className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
-                    <td className="py-3 px-4 font-medium text-gray-900 dark:text-gray-100">{campaign.name}</td>
-                    <td className="text-right py-3 px-4 text-gray-900 dark:text-gray-100">
-                      {new Date(campaign.deploymentDate).toLocaleDateString()}
-                    </td>
-                    <td className="text-right py-3 px-4">
-                      <span className={campaign.openRate >= 0.15 ? 'text-green-600 dark:text-green-400' : 'text-gray-900 dark:text-gray-100'}>
-                        {(campaign.openRate * 100).toFixed(1)}%
-                      </span>
-                    </td>
-                    <td className="text-right py-3 px-4">
-                      <span className={campaign.clickRate >= 0.025 ? 'text-green-600 dark:text-green-400' : 'text-gray-900 dark:text-gray-100'}>
-                        {(campaign.clickRate * 100).toFixed(1)}%
-                      </span>
-                    </td>
-                    <td className="text-right py-3 px-4">
-                      <span className={campaign.deliveryRate >= 0.99 ? 'text-green-600 dark:text-green-400' : 'text-orange-600 dark:text-orange-400'}>
-                        {(campaign.deliveryRate * 100).toFixed(1)}%
-                      </span>
-                    </td>
-                    <td className="text-right py-3 px-4">
-                      <span className={campaign.unsubscribeRate <= 0.005 ? 'text-gray-900 dark:text-gray-100' : 'text-red-600 dark:text-red-400'}>
-                        {(campaign.unsubscribeRate * 100).toFixed(2)}%
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <CampaignPerformanceTable campaigns={campaigns} />
         </CardContent>
       </Card>
 

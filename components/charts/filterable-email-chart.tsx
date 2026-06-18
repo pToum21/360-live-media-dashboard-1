@@ -29,8 +29,10 @@ export function FilterableEmailChart({ data }: FilterableEmailChartProps) {
 
   // Extract unique audiences and campaign types from data
   const filterGroups: FilterGroup[] = useMemo(() => {
-    const audiences = [...new Set(data.map(d => d.audience).filter(Boolean))]
-    const campaignTypes = [...new Set(data.map(d => d.campaignType).filter(Boolean))]
+    const audiencesRaw = data.map(d => d.audience ?? '(No Audience)')
+    const audiences = [...new Set(audiencesRaw)]
+    const campaignTypesRaw = data.map(d => d.campaignType ?? '(No Type)')
+    const campaignTypes = [...new Set(campaignTypesRaw)]
 
     const groups: FilterGroup[] = []
 
@@ -40,10 +42,10 @@ export function FilterableEmailChart({ data }: FilterableEmailChartProps) {
         label: 'Audience',
         multiSelect: true,
         options: audiences.map(a => ({
-          id: a!,
-          label: a!,
-          value: a!,
-          color: getAudienceColor(a!),
+          id: a,
+          label: a,
+          value: a,
+          color: getAudienceColor(a),
         })),
       })
     }
@@ -54,9 +56,9 @@ export function FilterableEmailChart({ data }: FilterableEmailChartProps) {
         label: 'Campaign Type',
         multiSelect: true,
         options: campaignTypes.map(c => ({
-          id: c!,
-          label: c!,
-          value: c!,
+          id: c,
+          label: c,
+          value: c,
         })),
       })
     }
@@ -77,8 +79,10 @@ export function FilterableEmailChart({ data }: FilterableEmailChartProps) {
 
   // Initialize with all options selected by default
   const [selectedFilters, setSelectedFilters] = useState<Record<string, string[]>>(() => {
-    const audiences = [...new Set(data.map(d => d.audience).filter(Boolean))] as string[]
-    const campaignTypes = [...new Set(data.map(d => d.campaignType).filter(Boolean))] as string[]
+    const audiencesRaw = data.map(d => d.audience ?? '(No Audience)')
+    const audiences = [...new Set(audiencesRaw)]
+    const campaignTypesRaw = data.map(d => d.campaignType ?? '(No Type)')
+    const campaignTypes = [...new Set(campaignTypesRaw)]
     
     return {
       audience: audiences,
@@ -87,17 +91,51 @@ export function FilterableEmailChart({ data }: FilterableEmailChartProps) {
     }
   })
   const [chartType, setChartType] = useState<'bar' | 'line'>('bar')
+  
+  // Reset filters when data changes (e.g., when switching campaign type filter at page level)
+  useEffect(() => {
+    const audiencesRaw = data.map(d => d.audience ?? '(No Audience)')
+    const audiences = [...new Set(audiencesRaw)]
+    const campaignTypesRaw = data.map(d => d.campaignType ?? '(No Type)')
+    const campaignTypes = [...new Set(campaignTypesRaw)]
+    
+    setSelectedFilters(prev => ({
+      audience: audiences.length > 0 ? audiences : prev.audience || [],
+      campaignType: campaignTypes.length > 0 ? campaignTypes : prev.campaignType || [],
+      metric: ['openRate', 'clickRate', 'deliveryRate'],
+    }))
+  }, [data])
 
   // Filter data based on selected filters
   const filteredData = useMemo(() => {
     let filtered = [...data]
 
-    if (selectedFilters.audience && selectedFilters.audience.length > 0) {
-      filtered = filtered.filter(d => d.audience && selectedFilters.audience.includes(d.audience))
+    // Get all available options from the actual data
+    const allAudiencesRaw = data.map(d => d.audience ?? '(No Audience)')
+    const allAudiences = [...new Set(allAudiencesRaw)]
+    const allCampaignTypesRaw = data.map(d => d.campaignType ?? '(No Type)')
+    const allCampaignTypes = [...new Set(allCampaignTypesRaw)]
+
+    // Only apply audience filter if:
+    // 1. There are filter selections
+    // 2. Not all options are selected (partial filter)
+    if (selectedFilters.audience && selectedFilters.audience.length > 0 && 
+        selectedFilters.audience.length < allAudiences.length && allAudiences.length > 0) {
+      filtered = filtered.filter(d => {
+        const normalizedAudience = d.audience ?? '(No Audience)'
+        return selectedFilters.audience.includes(normalizedAudience)
+      })
     }
 
-    if (selectedFilters.campaignType && selectedFilters.campaignType.length > 0) {
-      filtered = filtered.filter(d => d.campaignType && selectedFilters.campaignType.includes(d.campaignType))
+    // Only apply campaign type filter if:
+    // 1. There are filter selections
+    // 2. Not all options are selected (partial filter)
+    if (selectedFilters.campaignType && selectedFilters.campaignType.length > 0 && 
+        selectedFilters.campaignType.length < allCampaignTypes.length && allCampaignTypes.length > 0) {
+      filtered = filtered.filter(d => {
+        const normalizedType = d.campaignType ?? '(No Type)'
+        return selectedFilters.campaignType.includes(normalizedType)
+      })
     }
 
     return filtered
@@ -115,31 +153,44 @@ export function FilterableEmailChart({ data }: FilterableEmailChartProps) {
     }
   }, [filteredData])
 
-  // Group by audience if audience filter is active
+  // Group by audience only if specific audiences are selected (not all)
   const chartData = useMemo(() => {
     const selectedMetrics = selectedFilters.metric || ['openRate', 'clickRate']
     
-    if (selectedFilters.audience && selectedFilters.audience.length > 0) {
-      // Show data grouped by audience
+    // Get all available audiences
+    const allAudiencesRaw = data.map(d => d.audience ?? '(No Audience)')
+    const allAudiences = [...new Set(allAudiencesRaw)]
+    
+    // Only group by audience if a subset is selected (not all audiences)
+    const shouldGroupByAudience = selectedFilters.audience && 
+                                   selectedFilters.audience.length > 0 && 
+                                   selectedFilters.audience.length < allAudiences.length &&
+                                   allAudiences.length > 1
+    
+    if (shouldGroupByAudience) {
+      // Show data grouped by selected audiences
       return selectedFilters.audience.map(audience => {
-        const audienceData = filteredData.filter(d => d.audience === audience)
+        const audienceData = filteredData.filter(d => {
+          const normalizedAudience = d.audience ?? '(No Audience)'
+          return normalizedAudience === audience
+        })
         return {
           name: audience,
-          openRate: audienceData.reduce((sum, d) => sum + d.openRate, 0) / audienceData.length,
-          clickRate: audienceData.reduce((sum, d) => sum + d.clickRate, 0) / audienceData.length,
-          deliveryRate: audienceData.reduce((sum, d) => sum + d.deliveryRate, 0) / audienceData.length,
+          openRate: audienceData.length > 0 ? audienceData.reduce((sum, d) => sum + d.openRate, 0) / audienceData.length : 0,
+          clickRate: audienceData.length > 0 ? audienceData.reduce((sum, d) => sum + d.clickRate, 0) / audienceData.length : 0,
+          deliveryRate: audienceData.length > 0 ? audienceData.reduce((sum, d) => sum + d.deliveryRate, 0) / audienceData.length : 0,
         }
       })
     } else {
-      // Show individual campaigns
-      return filteredData.slice().reverse().map(d => ({
+      // Show individual campaigns (take most recent 50 for performance)
+      return filteredData.slice(0, 50).map(d => ({
         name: d.name.replace('360 - ', '').replace(' Mission Brief', '').substring(0, 20),
         openRate: d.openRate,
         clickRate: d.clickRate,
         deliveryRate: d.deliveryRate,
       }))
     }
-  }, [filteredData, selectedFilters])
+  }, [filteredData, selectedFilters, data])
 
   const handleFilterChange = (groupId: string, selectedValues: string[]) => {
     setSelectedFilters(prev => ({
@@ -149,8 +200,10 @@ export function FilterableEmailChart({ data }: FilterableEmailChartProps) {
   }
 
   const handleClearAll = () => {
-    const audiences = [...new Set(data.map(d => d.audience).filter(Boolean))] as string[]
-    const campaignTypes = [...new Set(data.map(d => d.campaignType).filter(Boolean))] as string[]
+    const audiencesRaw = data.map(d => d.audience ?? '(No Audience)')
+    const audiences = [...new Set(audiencesRaw)]
+    const campaignTypesRaw = data.map(d => d.campaignType ?? '(No Type)')
+    const campaignTypes = [...new Set(campaignTypesRaw)]
     
     setSelectedFilters({
       audience: audiences,

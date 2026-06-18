@@ -1,6 +1,6 @@
 'use client'
 
-import { AreaChart, Area, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts'
+import { AreaChart, Area, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts'
 import { useState, useEffect } from 'react'
 
 interface GA4RegistrationData {
@@ -110,8 +110,86 @@ export function GA4RegistrationChart({ data }: GA4RegistrationChartProps) {
     return null
   }
 
+  // Prepare pie chart data
+  const pieData = Object.entries(sourceTotals)
+    .filter(([, value]) => value > 0)
+    .map(([source, value]) => ({
+      name: source.replace(/([A-Z])/g, ' $1').trim(),
+      value,
+      percentage: ((value / totalRegs) * 100).toFixed(1)
+    }))
+    .sort((a, b) => b.value - a.value)
+
+  const PIE_COLORS = [
+    '#10b981',  // Green
+    '#3b82f6',  // Blue
+    '#f59e0b',  // Amber
+    '#8b5cf6',  // Purple
+    '#06b6d4',  // Cyan
+    '#ec4899',  // Pink
+    '#14b8a6',  // Teal
+  ]
+
   return (
     <div className="space-y-8">
+      {/* Pie Chart: Total Registrations to Date by Traffic Source */}
+      <div className="glass-card p-6 rounded-xl border border-gray-200 dark:border-gray-700">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-6">
+          Total Registrations to Date by Traffic Source
+        </h3>
+        <div className="h-[450px]">
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Pie
+                data={pieData}
+                cx="50%"
+                cy="50%"
+                labelLine={true}
+                label={(entry: any) => {
+                  const percentage = ((entry.value / totalRegs) * 100).toFixed(1)
+                  return `${entry.name}: ${entry.value.toLocaleString()} (${percentage}%)`
+                }}
+                outerRadius={140}
+                fill="#8884d8"
+                dataKey="value"
+                animationBegin={0}
+                animationDuration={800}
+                style={{
+                  fontFamily: 'var(--font-geist-sans), system-ui, -apple-system, sans-serif',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                }}
+              >
+                {pieData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip
+                formatter={(value) => typeof value === 'number' ? value.toLocaleString() : '0'}
+                contentStyle={{
+                  backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '12px',
+                  padding: '12px',
+                  fontSize: '13px',
+                  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                }}
+              />
+              <Legend 
+                verticalAlign="bottom"
+                height={60}
+                wrapperStyle={{
+                  fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
+                  fontSize: '13px',
+                  fontWeight: 500,
+                  paddingTop: '20px'
+                }}
+              />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
       {/* Summary Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[

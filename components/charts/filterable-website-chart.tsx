@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useMemo, useEffect } from 'react'
-import { LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, PieChart, Pie, Cell } from 'recharts'
+import { LineChart, Line, AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, PieChart, Pie, Cell } from 'recharts'
 import { ChartFilters, FilterGroup } from './chart-filters'
 import { Users, MousePointerClick, Clock, TrendingUp } from 'lucide-react'
 
@@ -47,7 +47,7 @@ export function FilterableWebsiteChart({ data }: FilterableWebsiteChartProps) {
   useEffect(() => {
     setIsClient(true)
   }, [])
-  const [chartType, setChartType] = useState<'line' | 'area'>('line')
+  const [chartType, setChartType] = useState<'line' | 'area' | 'bar'>('line')
 
   const filterGroups: FilterGroup[] = [
     {
@@ -68,6 +68,7 @@ export function FilterableWebsiteChart({ data }: FilterableWebsiteChartProps) {
       options: [
         { id: 'trend', label: 'Trend Over Time', value: 'trend' },
         { id: 'traffic', label: 'Traffic Sources', value: 'traffic' },
+        { id: 'trafficOverTime', label: 'Traffic Sources Over Time', value: 'trafficOverTime' },
       ],
     },
     {
@@ -125,7 +126,7 @@ export function FilterableWebsiteChart({ data }: FilterableWebsiteChartProps) {
       if (selectedMetrics.includes('totalUsers')) point.totalUsers = d.totalUsers
       if (selectedMetrics.includes('newUsers')) point.newUsers = d.newUsers
       if (selectedMetrics.includes('engagement') && d.avgEngagementTimeSec) {
-        point.engagement = Math.round(d.avgEngagementTimeSec / 60) // Convert to minutes
+        point.engagement = Math.round(d.avgEngagementTimeSec) // Show in seconds
       }
       if (selectedMetrics.includes('healthScore') && d.healthScore) {
         point.healthScore = d.healthScore * 100 // Convert to percentage
@@ -160,6 +161,21 @@ export function FilterableWebsiteChart({ data }: FilterableWebsiteChartProps) {
         color: source.color
       }))
       .filter(item => item.value > 0)
+  }, [timeFilteredData])
+
+  // Format traffic source over time data for stacked bar chart
+  const trafficOverTimeData = useMemo(() => {
+    return timeFilteredData.map(d => ({
+      name: new Date(d.weekStarting).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+      'Organic Search': d.organicSearch || 0,
+      'Direct': d.direct || 0,
+      'Referral': d.referral || 0,
+      'Organic Social': d.organicSocial || 0,
+      'Email': d.email || 0,
+      'Paid Social': d.paidSocial || 0,
+      'Paid Search': d.paidSearch || 0,
+      'Unassigned': d.unassigned || 0,
+    }))
   }, [timeFilteredData])
 
   const handleFilterChange = (groupId: string, selectedValues: string[]) => {
@@ -232,6 +248,16 @@ export function FilterableWebsiteChart({ data }: FilterableWebsiteChartProps) {
               Line Chart
             </button>
             <button
+              onClick={() => setChartType('bar')}
+              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                chartType === 'bar'
+                  ? 'bg-[#2E8741] text-white'
+                  : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
+              }`}
+            >
+              Bar Chart
+            </button>
+            <button
               onClick={() => setChartType('area')}
               className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                 chartType === 'area'
@@ -272,7 +298,7 @@ export function FilterableWebsiteChart({ data }: FilterableWebsiteChartProps) {
               <Clock className="w-4 h-4 text-purple-600" />
             </div>
             <div className="text-2xl font-bold text-purple-600">
-              {Math.round(currentStats.avgEngagement / 60)}m
+              {Math.round(currentStats.avgEngagement)}s
             </div>
           </div>
           <div className="glass-card p-4 rounded-xl border border-gray-200 dark:border-gray-700">
@@ -289,8 +315,80 @@ export function FilterableWebsiteChart({ data }: FilterableWebsiteChartProps) {
 
       {/* Chart */}
       <ResponsiveContainer width="100%" height={400}>
-        {selectedView === 'trend' ? (
-          chartType === 'line' ? (
+        {selectedView === 'trafficOverTime' ? (
+          <BarChart data={trafficOverTimeData} margin={{ top: 20, right: 30, left: 0, bottom: 20 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" vertical={false} opacity={0.5} />
+            <XAxis 
+              dataKey="name" 
+              stroke="#9ca3af"
+              fontSize={11}
+              tickLine={false}
+              axisLine={false}
+            />
+            <YAxis 
+              stroke="#9ca3af"
+              fontSize={11}
+              tickLine={false}
+              axisLine={false}
+              dx={-10}
+            />
+            <Tooltip content={<CustomTooltip />} />
+            <Legend 
+              verticalAlign="top" 
+              height={50}
+              iconType="rect"
+              iconSize={14}
+              wrapperStyle={{ paddingBottom: '15px', fontSize: '13px' }}
+            />
+            <Bar dataKey="Organic Search" stackId="traffic" fill={TRAFFIC_SOURCE_COLORS.organicSearch} radius={[0, 0, 0, 0]} />
+            <Bar dataKey="Direct" stackId="traffic" fill={TRAFFIC_SOURCE_COLORS.direct} radius={[0, 0, 0, 0]} />
+            <Bar dataKey="Referral" stackId="traffic" fill={TRAFFIC_SOURCE_COLORS.referral} radius={[0, 0, 0, 0]} />
+            <Bar dataKey="Organic Social" stackId="traffic" fill={TRAFFIC_SOURCE_COLORS.organicSocial} radius={[0, 0, 0, 0]} />
+            <Bar dataKey="Email" stackId="traffic" fill={TRAFFIC_SOURCE_COLORS.email} radius={[0, 0, 0, 0]} />
+            <Bar dataKey="Paid Social" stackId="traffic" fill={TRAFFIC_SOURCE_COLORS.paidSocial} radius={[0, 0, 0, 0]} />
+            <Bar dataKey="Paid Search" stackId="traffic" fill={TRAFFIC_SOURCE_COLORS.paidSearch} radius={[0, 0, 0, 0]} />
+            <Bar dataKey="Unassigned" stackId="traffic" fill={TRAFFIC_SOURCE_COLORS.unassigned} radius={[8, 8, 0, 0]} />
+          </BarChart>
+        ) : selectedView === 'trend' ? (
+          chartType === 'bar' ? (
+            <BarChart data={trendChartData} margin={{ top: 20, right: 30, left: 0, bottom: 20 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" vertical={false} opacity={0.5} />
+              <XAxis 
+                dataKey="name" 
+                stroke="#9ca3af"
+                fontSize={11}
+                tickLine={false}
+                axisLine={false}
+              />
+              <YAxis 
+                stroke="#9ca3af"
+                fontSize={11}
+                tickLine={false}
+                axisLine={false}
+                dx={-10}
+              />
+              <Tooltip content={<CustomTooltip />} />
+              <Legend 
+                verticalAlign="top" 
+                height={50}
+                iconType="rect"
+                iconSize={14}
+                wrapperStyle={{ paddingBottom: '15px', fontSize: '13px' }}
+              />
+              {selectedFilters.metric?.includes('totalUsers') && (
+                <Bar dataKey="totalUsers" name="Total Users" fill="#3b82f6" radius={[8, 8, 0, 0]} />
+              )}
+              {selectedFilters.metric?.includes('newUsers') && (
+                <Bar dataKey="newUsers" name="New Users" fill="#10b981" radius={[8, 8, 0, 0]} />
+              )}
+              {selectedFilters.metric?.includes('engagement') && (
+                <Bar dataKey="engagement" name="Engagement (sec)" fill="#8b5cf6" radius={[8, 8, 0, 0]} />
+              )}
+              {selectedFilters.metric?.includes('healthScore') && (
+                <Bar dataKey="healthScore" name="Health Score (%)" fill="#f59e0b" radius={[8, 8, 0, 0]} />
+              )}
+            </BarChart>
+          ) : chartType === 'line' ? (
             <LineChart data={trendChartData} margin={{ top: 20, right: 30, left: 0, bottom: 20 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" vertical={false} opacity={0.5} />
               <XAxis 
@@ -322,7 +420,7 @@ export function FilterableWebsiteChart({ data }: FilterableWebsiteChartProps) {
                 <Line type="monotone" dataKey="newUsers" name="New Users" stroke="#10b981" strokeWidth={3} dot={{ r: 4 }} />
               )}
               {selectedFilters.metric?.includes('engagement') && (
-                <Line type="monotone" dataKey="engagement" name="Engagement (min)" stroke="#8b5cf6" strokeWidth={3} dot={{ r: 4 }} />
+                <Line type="monotone" dataKey="engagement" name="Engagement (sec)" stroke="#8b5cf6" strokeWidth={3} dot={{ r: 4 }} />
               )}
               {selectedFilters.metric?.includes('healthScore') && (
                 <Line type="monotone" dataKey="healthScore" name="Health Score (%)" stroke="#f59e0b" strokeWidth={3} dot={{ r: 4 }} />
