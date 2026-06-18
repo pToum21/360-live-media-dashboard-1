@@ -54,11 +54,10 @@ export default async function EmailCampaignsPage({
   
   // Get top 5 subject lines by open rate from recent campaigns
   const topSubjectLines = recentCampaigns
-    .filter(c => c.subjectLine)
     .sort((a, b) => b.openRate - a.openRate)
     .slice(0, 5)
     .map(c => ({
-      subject: c.subjectLine!,
+      subject: c.subjectLine || c.name, // Use campaign name if no subject line
       openRate: c.openRate
     }))
 

@@ -21,6 +21,7 @@ export function EmailFormDialog({ open, onOpenChange, data, mode }: EmailFormDia
   const [formData, setFormData] = useState({
     deploymentDate: '',
     name: '',
+    subjectLine: '',
     audience: '',
     campaignType: '',
     openRate: '',
@@ -35,6 +36,7 @@ export function EmailFormDialog({ open, onOpenChange, data, mode }: EmailFormDia
       setFormData({
         deploymentDate: data.deploymentDate ? new Date(data.deploymentDate).toISOString().split('T')[0] : '',
         name: data.name || '',
+        subjectLine: data.subjectLine || '',
         audience: data.audience || '',
         campaignType: data.campaignType || '',
         openRate: data.openRate ? (data.openRate * 100).toString() : '',
@@ -71,6 +73,7 @@ export function EmailFormDialog({ open, onOpenChange, data, mode }: EmailFormDia
         body: JSON.stringify({
           deploymentDate: formData.deploymentDate,
           name: formData.name,
+          subjectLine: formData.subjectLine || null,
           audience: formData.audience || null,
           campaignType: formData.campaignType,
           openRate: parseFloat(formData.openRate) / 100 || 0,
@@ -124,6 +127,17 @@ export function EmailFormDialog({ open, onOpenChange, data, mode }: EmailFormDia
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="subjectLine">Subject Line (optional)</Label>
+              <Input
+                id="subjectLine"
+                type="text"
+                placeholder="Enter email subject line..."
+                value={formData.subjectLine}
+                onChange={(e) => setFormData({ ...formData, subjectLine: e.target.value })}
               />
             </div>
 

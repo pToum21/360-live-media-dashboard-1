@@ -46,6 +46,7 @@ export async function POST(request: Request) {
       data: {
         deploymentDate: deploymentDate,
         name: body.name,
+        subjectLine: body.subjectLine || null,
         audience: body.audience || null,
         campaignType: body.campaignType,
         openRate: body.openRate || 0,

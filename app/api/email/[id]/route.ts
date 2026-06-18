@@ -43,6 +43,7 @@ export async function PUT(
     // Build update data object, including ALL fields that should be updated
     const updateData: any = {
       name: body.name,
+      subjectLine: body.subjectLine !== undefined ? body.subjectLine : existingCampaign.subjectLine,
       deploymentDate: deploymentDate,
       audience: body.audience !== undefined && body.audience !== null ? body.audience : existingCampaign.audience,
       campaignType: body.campaignType !== undefined && body.campaignType !== null ? body.campaignType : existingCampaign.campaignType,
