@@ -31,6 +31,7 @@ model User {
   // App Relations
   websiteMetrics       WebsiteMetric[]
   emailCampaigns       EmailCampaign[]
+  salesMarketing       SalesMarketing[]
   socialMetrics        SocialMetric[]
   socialPosts          SocialPost[]
   optimizations        Optimization[]
@@ -182,6 +183,43 @@ model EmailCampaign {
   @@index([audience])
   @@index([campaignType])
   @@index([deploymentDayOfWeek])
+}
+
+// ============================================
+// SALES MARKETING / PROMO CAMPAIGNS
+// ============================================
+
+model SalesMarketing {
+  id              String    @id @default(cuid())
+  weekOf          DateTime
+  targetSendDate  DateTime?
+  audience        String?
+  subjectMessage  String?
+  opportunities   String?
+  notes           String?
+  status          String?
+  finalLink       String?
+  sent            String?
+  reportSent      String?
+  
+  // Metrics
+  micrositeVisits Int?
+  openRate        Float?
+  clickRate       Float?
+  bounces         Int?
+  unsubs          Int?
+  
+  // Client Association
+  client          Client?   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  clientId        String?
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  createdBy       User      @relation(fields: [createdById], references: [id])
+  createdById     String
+  
+  @@index([weekOf])
+  @@index([clientId])
 }
 
 // ============================================
@@ -379,6 +417,7 @@ model Client {
   // Relations - all data belongs to a client
   websiteMetrics        WebsiteMetric[]
   emailCampaigns        EmailCampaign[]
+  salesMarketing        SalesMarketing[]         // For ATC - Sales marketing / promo campaigns
   socialMetrics         SocialMetric[]
   socialPosts           SocialPost[]
   campaigns             Campaign[]

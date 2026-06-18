@@ -26,6 +26,7 @@ import {
   Cog,
   PanelLeftClose,
   PanelLeftOpen,
+  Megaphone,
 } from "lucide-react"
 
 // Define nav items with client restrictions
@@ -74,6 +75,12 @@ const allNavItems = [
         clients: ["atc-2026"],
       },
     ],
+  },
+  {
+    title: "Sales Marketing",
+    href: "/dashboard/sales-marketing",
+    icon: Megaphone,
+    clients: ["atc-2026"],
   },
   {
     title: "Event Management",
