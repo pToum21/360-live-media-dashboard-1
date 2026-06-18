@@ -34,15 +34,36 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 })
     }
     
+    // Get clientId from cookies (same as other routes)
+    const { cookies } = await import('next/headers')
+    const cookieStore = await cookies()
+    const selectedClientSlug = cookieStore.get('selectedClient')?.value || '360-live-media'
+    const client = await prisma.client.findUnique({
+      where: { slug: selectedClientSlug }
+    })
+    
+    const clientId = client?.id || null
+    
     const metric = await prisma.socialMetric.create({
       data: {
         weekStarting: new Date(body.weekStarting),
         liFollowers: body.liFollowers || 0,
         liImpressions: body.liImpressions || 0,
         liEngagementRate: body.liEngagementRate || null,
+        liPostsPerWeek: body.liPostsPerWeek || 0,
         igFollowers: body.igFollowers || 0,
         igImpressions: body.igImpressions || 0,
         igEngagementRate: body.igEngagementRate || null,
+        igPostsPerWeek: body.igPostsPerWeek || 0,
+        fbFollowers: body.fbFollowers || 0,
+        fbImpressions: body.fbImpressions || 0,
+        fbEngagements: body.fbEngagements || 0,
+        fbPostsPerWeek: body.fbPostsPerWeek || 0,
+        xFollowers: body.xFollowers || 0,
+        xImpressions: body.xImpressions || 0,
+        xEngagements: body.xEngagements || 0,
+        xPostsPerWeek: body.xPostsPerWeek || 0,
+        clientId: clientId,
         createdById: user.id,
       },
     })

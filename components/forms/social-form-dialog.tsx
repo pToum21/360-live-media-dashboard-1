@@ -23,9 +23,19 @@ export function SocialFormDialog({ open, onOpenChange, data, mode }: SocialFormD
     liFollowers: '',
     liImpressions: '',
     liEngagementRate: '',
+    liPostsPerWeek: '',
     igFollowers: '',
     igImpressions: '',
     igEngagementRate: '',
+    igPostsPerWeek: '',
+    fbFollowers: '',
+    fbImpressions: '',
+    fbEngagements: '',
+    fbPostsPerWeek: '',
+    xFollowers: '',
+    xImpressions: '',
+    xEngagements: '',
+    xPostsPerWeek: '',
   })
 
   // Update form data when data prop changes
@@ -36,9 +46,19 @@ export function SocialFormDialog({ open, onOpenChange, data, mode }: SocialFormD
         liFollowers: data.liFollowers || '',
         liImpressions: data.liImpressions || '',
         liEngagementRate: data.liEngagementRate ? (data.liEngagementRate * 100).toString() : '',
+        liPostsPerWeek: data.liPostsPerWeek || '',
         igFollowers: data.igFollowers || '',
         igImpressions: data.igImpressions || '',
         igEngagementRate: data.igEngagementRate ? (data.igEngagementRate * 100).toString() : '',
+        igPostsPerWeek: data.igPostsPerWeek || '',
+        fbFollowers: data.fbFollowers || '',
+        fbImpressions: data.fbImpressions || '',
+        fbEngagements: data.fbEngagements || '',
+        fbPostsPerWeek: data.fbPostsPerWeek || '',
+        xFollowers: data.xFollowers || '',
+        xImpressions: data.xImpressions || '',
+        xEngagements: data.xEngagements || '',
+        xPostsPerWeek: data.xPostsPerWeek || '',
       })
     } else {
       setFormData({
@@ -46,9 +66,19 @@ export function SocialFormDialog({ open, onOpenChange, data, mode }: SocialFormD
         liFollowers: '',
         liImpressions: '',
         liEngagementRate: '',
+        liPostsPerWeek: '',
         igFollowers: '',
         igImpressions: '',
         igEngagementRate: '',
+        igPostsPerWeek: '',
+        fbFollowers: '',
+        fbImpressions: '',
+        fbEngagements: '',
+        fbPostsPerWeek: '',
+        xFollowers: '',
+        xImpressions: '',
+        xEngagements: '',
+        xPostsPerWeek: '',
       })
     }
   }, [data, open])
@@ -69,9 +99,19 @@ export function SocialFormDialog({ open, onOpenChange, data, mode }: SocialFormD
           liFollowers: parseInt(formData.liFollowers) || 0,
           liImpressions: parseInt(formData.liImpressions) || 0,
           liEngagementRate: formData.liEngagementRate ? parseFloat(formData.liEngagementRate) / 100 : null,
+          liPostsPerWeek: parseInt(formData.liPostsPerWeek) || 0,
           igFollowers: parseInt(formData.igFollowers) || 0,
           igImpressions: parseInt(formData.igImpressions) || 0,
           igEngagementRate: formData.igEngagementRate ? parseFloat(formData.igEngagementRate) / 100 : null,
+          igPostsPerWeek: parseInt(formData.igPostsPerWeek) || 0,
+          fbFollowers: parseInt(formData.fbFollowers) || 0,
+          fbImpressions: parseInt(formData.fbImpressions) || 0,
+          fbEngagements: parseInt(formData.fbEngagements) || 0,
+          fbPostsPerWeek: parseInt(formData.fbPostsPerWeek) || 0,
+          xFollowers: parseInt(formData.xFollowers) || 0,
+          xImpressions: parseInt(formData.xImpressions) || 0,
+          xEngagements: parseInt(formData.xEngagements) || 0,
+          xPostsPerWeek: parseInt(formData.xPostsPerWeek) || 0,
         }),
       })
 
@@ -136,7 +176,7 @@ export function SocialFormDialog({ open, onOpenChange, data, mode }: SocialFormD
                   />
                 </div>
 
-                <div className="space-y-2 col-span-2">
+                <div className="space-y-2">
                   <Label htmlFor="liEngagementRate">Engagement Rate (%)</Label>
                   <Input
                     id="liEngagementRate"
@@ -146,6 +186,16 @@ export function SocialFormDialog({ open, onOpenChange, data, mode }: SocialFormD
                     max="100"
                     value={formData.liEngagementRate}
                     onChange={(e) => setFormData({ ...formData, liEngagementRate: e.target.value })}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="liPostsPerWeek">Posts Per Week</Label>
+                  <Input
+                    id="liPostsPerWeek"
+                    type="number"
+                    value={formData.liPostsPerWeek}
+                    onChange={(e) => setFormData({ ...formData, liPostsPerWeek: e.target.value })}
                   />
                 </div>
               </div>
@@ -176,7 +226,7 @@ export function SocialFormDialog({ open, onOpenChange, data, mode }: SocialFormD
                   />
                 </div>
 
-                <div className="space-y-2 col-span-2">
+                <div className="space-y-2">
                   <Label htmlFor="igEngagementRate">Engagement Rate (%)</Label>
                   <Input
                     id="igEngagementRate"
@@ -186,6 +236,106 @@ export function SocialFormDialog({ open, onOpenChange, data, mode }: SocialFormD
                     max="100"
                     value={formData.igEngagementRate}
                     onChange={(e) => setFormData({ ...formData, igEngagementRate: e.target.value })}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="igPostsPerWeek">Posts Per Week</Label>
+                  <Input
+                    id="igPostsPerWeek"
+                    type="number"
+                    value={formData.igPostsPerWeek}
+                    onChange={(e) => setFormData({ ...formData, igPostsPerWeek: e.target.value })}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="border-t pt-4">
+              <h4 className="font-semibold mb-3 text-blue-500">Facebook Metrics</h4>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="fbFollowers">Followers</Label>
+                  <Input
+                    id="fbFollowers"
+                    type="number"
+                    value={formData.fbFollowers}
+                    onChange={(e) => setFormData({ ...formData, fbFollowers: e.target.value })}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="fbImpressions">Impressions</Label>
+                  <Input
+                    id="fbImpressions"
+                    type="number"
+                    value={formData.fbImpressions}
+                    onChange={(e) => setFormData({ ...formData, fbImpressions: e.target.value })}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="fbEngagements">Engagements</Label>
+                  <Input
+                    id="fbEngagements"
+                    type="number"
+                    value={formData.fbEngagements}
+                    onChange={(e) => setFormData({ ...formData, fbEngagements: e.target.value })}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="fbPostsPerWeek">Posts Per Week</Label>
+                  <Input
+                    id="fbPostsPerWeek"
+                    type="number"
+                    value={formData.fbPostsPerWeek}
+                    onChange={(e) => setFormData({ ...formData, fbPostsPerWeek: e.target.value })}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="border-t pt-4">
+              <h4 className="font-semibold mb-3 text-gray-900 dark:text-gray-100">X (Twitter) Metrics</h4>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="xFollowers">Followers</Label>
+                  <Input
+                    id="xFollowers"
+                    type="number"
+                    value={formData.xFollowers}
+                    onChange={(e) => setFormData({ ...formData, xFollowers: e.target.value })}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="xImpressions">Impressions</Label>
+                  <Input
+                    id="xImpressions"
+                    type="number"
+                    value={formData.xImpressions}
+                    onChange={(e) => setFormData({ ...formData, xImpressions: e.target.value })}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="xEngagements">Engagements</Label>
+                  <Input
+                    id="xEngagements"
+                    type="number"
+                    value={formData.xEngagements}
+                    onChange={(e) => setFormData({ ...formData, xEngagements: e.target.value })}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="xPostsPerWeek">Posts Per Week</Label>
+                  <Input
+                    id="xPostsPerWeek"
+                    type="number"
+                    value={formData.xPostsPerWeek}
+                    onChange={(e) => setFormData({ ...formData, xPostsPerWeek: e.target.value })}
                   />
                 </div>
               </div>

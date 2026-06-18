@@ -28,6 +28,23 @@ export default async function PaidMediaPage() {
   const paidMedia = await prisma.paidMedia.findMany({
     where: { clientId: client.id },
     orderBy: { weekStarting: 'desc' },
+    select: {
+      id: true,
+      weekStarting: true,
+      liSpend: true,
+      liConversions: true,
+      liImpressions: true,
+      metaSpend: true,
+      metaConversions: true,
+      metaImpressions: true,
+      googleSearchSpend: true,
+      googleSearchConversions: true,
+      googleSearchImpressions: true,
+      googleDisplaySpend: true,
+      googleDisplayConversions: true,
+      googleDisplayImpressions: true,
+      clientId: true,
+    }
   })
 
   const totalSpend = paidMedia.reduce((sum, pm) => 

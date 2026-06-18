@@ -9,12 +9,16 @@ interface PaidMediaChartProps {
     weekStarting: Date
     liSpend: number | null
     liConversions: number | null
+    liImpressions: number | null
     metaSpend: number | null
     metaConversions: number | null
+    metaImpressions: number | null
     googleSearchSpend: number | null
     googleSearchConversions: number | null
+    googleSearchImpressions: number | null
     googleDisplaySpend: number | null
     googleDisplayConversions: number | null
+    googleDisplayImpressions: number | null
   }[]
 }
 
@@ -47,6 +51,15 @@ export function PaidMediaChart({ data }: PaidMediaChartProps) {
     if (hasMeta) point.Meta = item.metaConversions || 0
     if (hasGoogleSearch) point['Google Search'] = item.googleSearchConversions || 0
     if (hasGoogleDisplay) point['Google Display'] = item.googleDisplayConversions || 0
+    return point
+  })
+
+  const impressionData = sortedData.map(item => {
+    const point: any = { week: format(new Date(item.weekStarting), 'MMM dd') }
+    if (hasLinkedIn) point['LI Impressions'] = item.liImpressions || 0
+    if (hasMeta) point['FB Impressions'] = item.metaImpressions || 0
+    if (hasGoogleSearch) point['GS Impressions'] = item.googleSearchImpressions || 0
+    if (hasGoogleDisplay) point['GD Impressions'] = item.googleDisplayImpressions || 0
     return point
   })
 
@@ -144,6 +157,39 @@ export function PaidMediaChart({ data }: PaidMediaChartProps) {
                 />
               )}
             </LineChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+      <div>
+        <h3 className="text-lg font-semibold mb-4">Total Weekly Impressions</h3>
+        <div className="h-[350px]">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={impressionData}>
+              <CartesianGrid strokeDasharray="3 3" opacity={0.1} />
+              <XAxis 
+                dataKey="week" 
+                tick={{ fontSize: 12 }}
+                angle={-45}
+                textAnchor="end"
+                height={80}
+              />
+              <YAxis 
+                tickFormatter={(value) => value >= 1000 ? `${(value / 1000).toFixed(0)}k` : value}
+              />
+              <Tooltip content={<UniversalTooltip valueFormatter={numberFormatter} showTotal />} />
+              <Legend 
+                wrapperStyle={{
+                  fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
+                  fontSize: '13px',
+                  fontWeight: 500,
+                }}
+              />
+              {hasLinkedIn && <Bar dataKey="LI Impressions" stackId="a" fill="#0077B5" radius={[0, 0, 0, 0]} />}
+              {hasMeta && <Bar dataKey="FB Impressions" stackId="a" fill="#1877F2" radius={[0, 0, 0, 0]} />}
+              {hasGoogleSearch && <Bar dataKey="GS Impressions" stackId="a" fill="#4285F4" radius={[0, 0, 0, 0]} />}
+              {hasGoogleDisplay && <Bar dataKey="GD Impressions" stackId="a" fill="#10b981" radius={[8, 8, 0, 0]} />}
+            </BarChart>
           </ResponsiveContainer>
         </div>
       </div>
