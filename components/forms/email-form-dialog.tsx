@@ -49,6 +49,7 @@ export function EmailFormDialog({ open, onOpenChange, data, mode }: EmailFormDia
       setFormData({
         deploymentDate: '',
         name: '',
+        subjectLine: '',
         audience: '',
         campaignType: '',
         openRate: '',
