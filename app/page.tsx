@@ -559,11 +559,11 @@ export default function Home() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
-              { icon: Zap, title: "Real-Time Updates", desc: "Live data sync across all channels" },
+              { icon: Zap, title: "Real-Time Updates", desc: "Visitor data, SEO health scores, UTM campaign tracking" },
               { icon: Target, title: "Advanced Analytics", desc: "Deep insights into campaign performance" },
               { icon: Users, title: "Team Collaboration", desc: "Share insights with your entire team" },
-              { icon: Clock, title: "Automated Reports", desc: "Schedule reports, save 100+ hours/year" },
-              { icon: LineChart, title: "Predictive Insights", desc: "AI-powered recommendations" },
+              { icon: Clock, title: "Automated Reports", desc: "Schedule and share beautiful reports with stakeholders automatically" },
+              { icon: BarChart3, title: "Multi-Channel Tracking", desc: "Email, social, paid, web, and event data unified" },
               { icon: Activity, title: "Custom Dashboards", desc: "Build views tailored to your needs" },
             ].map((feature, i) => (
               <div
