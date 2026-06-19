@@ -42,6 +42,7 @@ model User {
   revenueProjections   RevenueProjection[]
   ga4Registrations     GA4Registration[]
   calendarEvents       CalendarEvent[]
+  shareLinks           ShareLink[]
 }
 
 model Account {
@@ -430,6 +431,7 @@ model Client {
   revenueProjections    RevenueProjection[]      // For ATC - Revenue projections
   ga4Registrations      GA4Registration[]        // For ATC - GA4 registration tracking by traffic source
   calendarEvents        CalendarEvent[]          // Marketing calendar events
+  shareLinks            ShareLink[]              // Shareable dashboard links
   
   @@index([slug])
 }
@@ -676,4 +678,59 @@ model CalendarEvent {
   @@index([date])
   @@index([clientId])
   @@index([category])
+}
+
+// ============================================
+// SHAREABLE DASHBOARD LINKS
+// ============================================
+
+model ShareLink {
+  id                    String    @id @default(cuid())
+  
+  // What client dashboard to share
+  client                Client    @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  clientId              String
+  
+  // Who created this share link
+  createdBy             User      @relation(fields: [createdById], references: [id])
+  createdById           String
+  
+  // Link configuration
+  isActive              Boolean   @default(true)
+  expiresAt             DateTime?
+  
+  // Analytics summary
+  viewCount             Int       @default(0)
+  lastViewedAt          DateTime?
+  
+  // Timestamps
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  
+  // Relations
+  views                 ShareLinkView[]
+  
+  @@index([clientId])
+  @@index([createdById])
+  @@index([isActive])
+}
+
+model ShareLinkView {
+  id                    String    @id @default(cuid())
+  
+  // Which share link was accessed
+  shareLink             ShareLink @relation(fields: [shareLinkId], references: [id], onDelete: Cascade)
+  shareLinkId           String
+  
+  // View details
+  viewedAt              DateTime  @default(now())
+  ipAddress             String?
+  userAgent             String?
+  
+  // Engagement tracking
+  durationSeconds       Int?      // How long they stayed
+  pagesViewed           String[]  // Array of pages they visited (e.g., ["dashboard", "email", "social"])
+  
+  @@index([shareLinkId])
+  @@index([viewedAt])
 }

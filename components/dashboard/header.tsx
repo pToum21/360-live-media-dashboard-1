@@ -4,6 +4,8 @@ import { usePathname } from "next/navigation"
 import { UserNav } from "@/components/auth/user-nav"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { ClientSwitcher } from "@/components/dashboard/client-switcher"
+import { ShareButton } from "@/components/dashboard/share-button"
+import { useClient } from "@/contexts/client-context"
 import { 
   LayoutDashboard, 
   BarChart3, 
@@ -75,6 +77,7 @@ const pageInfo: Record<string, { title: string; description: string; icon: any; 
 
 export function DashboardHeader() {
   const pathname = usePathname()
+  const { selectedClient } = useClient()
   const info = pageInfo[pathname || "/dashboard"] || pageInfo["/dashboard"]
   const Icon = info.icon
 
@@ -124,6 +127,7 @@ export function DashboardHeader() {
 
       <div className="flex items-center gap-3 relative z-10">
         <ClientSwitcher />
+        {selectedClient && <ShareButton clientId={selectedClient.id} clientName={selectedClient.name} />}
         <ThemeToggle />
         <UserNav />
       </div>
