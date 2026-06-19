@@ -15,6 +15,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { useRouter } from 'next/navigation'
+import { useReadOnly } from '@/contexts/readonly-context'
 
 interface GA4Registration {
   id: string
@@ -34,6 +35,7 @@ interface GA4RegistrationManagementProps {
 
 export function GA4RegistrationManagement({ registrations, clientId }: GA4RegistrationManagementProps) {
   const router = useRouter()
+  const { isReadOnly } = useReadOnly()
   const [isOpen, setIsOpen] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -140,12 +142,14 @@ export function GA4RegistrationManagement({ registrations, clientId }: GA4Regist
         setIsOpen(open)
         if (!open) resetForm()
       }}>
-        <DialogTrigger asChild>
-          <Button className="w-full sm:w-auto">
-            <Plus className="w-4 h-4 mr-2" />
-            Add GA4 Registration Data
-          </Button>
-        </DialogTrigger>
+        {!isReadOnly && (
+          <DialogTrigger asChild>
+            <Button className="w-full sm:w-auto">
+              <Plus className="w-4 h-4 mr-2" />
+              Add GA4 Registration Data
+            </Button>
+          </DialogTrigger>
+        )}
         <DialogContent className="sm:max-w-[525px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editingId ? 'Edit' : 'Add'} GA4 Registration Data</DialogTitle>
@@ -272,7 +276,7 @@ export function GA4RegistrationManagement({ registrations, clientId }: GA4Regist
                 <th className="text-right py-3 px-4 text-sm font-semibold text-gray-700 dark:text-gray-300">Direct</th>
                 <th className="text-right py-3 px-4 text-sm font-semibold text-gray-700 dark:text-gray-300">Paid Social</th>
                 <th className="text-right py-3 px-4 text-sm font-semibold text-gray-700 dark:text-gray-300">Referral</th>
-                <th className="text-right py-3 px-4 text-sm font-semibold text-gray-700 dark:text-gray-300">Actions</th>
+                {!isReadOnly && <th className="text-right py-3 px-4 text-sm font-semibold text-gray-700 dark:text-gray-300">Actions</th>}
               </tr>
             </thead>
             <tbody>
@@ -309,24 +313,26 @@ export function GA4RegistrationManagement({ registrations, clientId }: GA4Regist
                     <td className="text-right py-3 px-4 text-sm text-gray-900 dark:text-gray-100">
                       {registration.referral?.toLocaleString() || '-'}
                     </td>
-                    <td className="text-right py-3 px-4">
-                      <div className="flex gap-2 justify-end">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleEdit(registration)}
-                        >
-                          <Edit className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDelete(registration.id)}
-                        >
-                          <Trash2 className="w-4 h-4 text-red-600" />
-                        </Button>
-                      </div>
-                    </td>
+                    {!isReadOnly && (
+                      <td className="text-right py-3 px-4">
+                        <div className="flex gap-2 justify-end">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleEdit(registration)}
+                          >
+                            <Edit className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDelete(registration.id)}
+                          >
+                            <Trash2 className="w-4 h-4 text-red-600" />
+                          </Button>
+                        </div>
+                      </td>
+                    )}
                   </tr>
                 ))
               )}

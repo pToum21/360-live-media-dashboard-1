@@ -1,6 +1,13 @@
 import { notFound } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
 import { ShareViewTracker } from '@/components/share/share-view-tracker';
+import { DashboardNav } from "@/components/dashboard/nav"
+import { DashboardHeader } from "@/components/dashboard/header"
+import { MobileNav } from "@/components/dashboard/mobile-nav"
+import { MainContentWrapper } from "@/components/dashboard/main-content-wrapper"
+import { Toaster } from "@/components/ui/sonner"
+import { ReadOnlyProvider } from "@/contexts/readonly-context"
+import { ShareClientProvider } from "@/contexts/client-context"
 
 interface ShareLayoutProps {
   children: React.ReactNode;
@@ -47,45 +54,49 @@ export default async function ShareLayout({ children, params }: ShareLayoutProps
     notFound();
   }
 
+  // Client context is provided via ShareClientProvider below
+  // Server components will detect share context via x-share-id header from middleware
+  
   return (
-    <div className="min-h-screen bg-background">
-      {/* Share Header */}
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-14 items-center justify-between">
-          <div className="flex items-center gap-4">
-            {shareLink.client.logo && (
-              <img
-                src={shareLink.client.logo}
-                alt={shareLink.client.name}
-                className="h-8 w-auto"
-              />
-            )}
-            <div>
-              <h1 className="text-sm font-semibold">{shareLink.client.name} Dashboard</h1>
-              <p className="text-xs text-muted-foreground">Shared by 360 Live Media</p>
-            </div>
+    <ShareClientProvider client={{
+      id: shareLink.client.id,
+      name: shareLink.client.name,
+      slug: shareLink.client.slug || 'client',
+      logo: shareLink.client.logo
+    }}>
+      <ReadOnlyProvider isReadOnly={true}>
+        <div className="flex min-h-screen relative overflow-hidden">
+          {/* Ultra Soft gradient background - Apple Liquid Glass style */}
+          <div className="fixed inset-0 -z-10 bg-gradient-to-br from-blue-100/40 via-purple-100/30 to-pink-100/25 dark:from-gray-950 dark:via-gray-900 dark:to-black">
+            {/* Large soft floating orbs */}
+            <div className="absolute -top-20 left-1/4 w-[500px] h-[500px] bg-blue-300/20 dark:bg-gray-800/30 rounded-full filter blur-[120px] opacity-50 animate-blob"></div>
+            <div className="absolute top-1/3 right-1/4 w-[600px] h-[600px] bg-purple-300/15 dark:bg-gray-700/25 rounded-full filter blur-[150px] opacity-40 animate-blob animation-delay-2000"></div>
+            <div className="absolute bottom-0 left-1/2 w-[550px] h-[550px] bg-green-200/15 dark:bg-green-950/40 rounded-full filter blur-[140px] opacity-35 animate-blob animation-delay-4000"></div>
           </div>
-          <div className="text-xs text-muted-foreground">
-            Read-only view
+          
+          {/* Desktop Sidebar */}
+          <div className="hidden lg:block">
+            <DashboardNav />
           </div>
+          
+          {/* Mobile Navigation */}
+          <MobileNav />
+          
+          {/* Main Content */}
+          <MainContentWrapper>
+            <DashboardHeader />
+            <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 mt-16 lg:mt-0">
+              <div className="max-w-[1600px] mx-auto">
+                {children}
+              </div>
+            </main>
+          </MainContentWrapper>
+          <Toaster position="top-right" richColors />
         </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="container py-6">
-        {children}
-      </main>
-
-      {/* View Tracker */}
-      <ShareViewTracker shareLinkId={id} />
-
-      {/* Footer Notice */}
-      <footer className="border-t py-4 text-center text-xs text-muted-foreground">
-        <p>
-          This is a shared view of the {shareLink.client.name} dashboard. 
-          Your viewing activity is tracked for analytics purposes.
-        </p>
-      </footer>
-    </div>
+        
+        {/* View Tracker */}
+        <ShareViewTracker shareLinkId={id} />
+      </ReadOnlyProvider>
+    </ShareClientProvider>
   );
 }

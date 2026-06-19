@@ -6,6 +6,7 @@ import { ThemeToggle } from "@/components/theme-toggle"
 import { ClientSwitcher } from "@/components/dashboard/client-switcher"
 import { ShareButton } from "@/components/dashboard/share-button"
 import { useClient } from "@/contexts/client-context"
+import { useReadOnly } from "@/contexts/readonly-context"
 import { 
   LayoutDashboard, 
   BarChart3, 
@@ -15,7 +16,8 @@ import {
   Building2, 
   FlaskConical, 
   Settings,
-  Sparkles
+  Sparkles,
+  Eye
 } from "lucide-react"
 
 const pageInfo: Record<string, { title: string; description: string; icon: any; gradient: string }> = {
@@ -77,7 +79,9 @@ const pageInfo: Record<string, { title: string; description: string; icon: any; 
 
 export function DashboardHeader() {
   const pathname = usePathname()
+  const { isReadOnly } = useReadOnly()
   const { selectedClient } = useClient()
+  
   const info = pageInfo[pathname || "/dashboard"] || pageInfo["/dashboard"]
   const Icon = info.icon
 
@@ -126,10 +130,20 @@ export function DashboardHeader() {
       </div>
 
       <div className="flex items-center gap-3 relative z-10">
-        <ClientSwitcher />
-        {selectedClient && <ShareButton clientId={selectedClient.id} clientName={selectedClient.name} />}
+        {!isReadOnly && (
+          <>
+            <ClientSwitcher />
+            {selectedClient && <ShareButton clientId={selectedClient.id} clientName={selectedClient.name} />}
+          </>
+        )}
+        {isReadOnly && (
+          <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-blue-100 dark:bg-blue-900/30 border border-blue-300 dark:border-blue-700">
+            <Eye className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+            <span className="text-sm font-semibold text-blue-700 dark:text-blue-300">Read-Only View</span>
+          </div>
+        )}
         <ThemeToggle />
-        <UserNav />
+        {!isReadOnly && <UserNav />}
       </div>
     </header>
   )

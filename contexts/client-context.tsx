@@ -84,3 +84,37 @@ export function useClient() {
   }
   return context
 }
+
+// Optional hook that works in both authenticated and share contexts
+export function useClientSafe() {
+  const context = useContext(ClientContext)
+  return context
+}
+
+// Share Client Provider - for read-only shared dashboards
+export function ShareClientProvider({ 
+  children, 
+  client 
+}: { 
+  children: ReactNode
+  client: { id: string; name: string; slug: string; logo?: string | null }
+}) {
+  // Set cookie for server-side rendering to work with existing dashboard pages
+  useEffect(() => {
+    document.cookie = `selectedClientId=${client.id}; path=/; max-age=31536000`
+    document.cookie = `selectedClient=${client.slug}; path=/; max-age=31536000`
+  }, [client])
+
+  return (
+    <ClientContext.Provider
+      value={{
+        selectedClient: client,
+        setSelectedClient: () => {}, // No-op for shared views
+        clients: [client], // Only the shared client
+        isLoading: false,
+      }}
+    >
+      {children}
+    </ClientContext.Provider>
+  )
+}

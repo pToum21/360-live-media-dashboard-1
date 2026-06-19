@@ -18,6 +18,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { CalendarEventDialog } from '@/components/forms/calendar-event-dialog';
 import { toast } from '@/components/ui/use-toast';
+import { useReadOnly } from '@/contexts/readonly-context';
 
 interface CalendarManagementProps {
   events: any[];
@@ -26,6 +27,7 @@ interface CalendarManagementProps {
 
 export function CalendarManagement({ events, clientId }: CalendarManagementProps) {
   const router = useRouter();
+  const { isReadOnly } = useReadOnly();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedEvent, setSelectedEvent] = useState<any>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -151,7 +153,7 @@ export function CalendarManagement({ events, clientId }: CalendarManagementProps
                   <th className="text-left p-4 font-medium text-sm">Event</th>
                   <th className="text-left p-4 font-medium text-sm">Category</th>
                   <th className="text-left p-4 font-medium text-sm">Status</th>
-                  <th className="text-right p-4 font-medium text-sm">Actions</th>
+                  {!isReadOnly && <th className="text-right p-4 font-medium text-sm">Actions</th>}
                 </tr>
               </thead>
               <tbody>
@@ -203,25 +205,27 @@ export function CalendarManagement({ events, clientId }: CalendarManagementProps
                           {event.status || 'Planned'}
                         </span>
                       </td>
-                      <td className="p-4">
-                        <div className="flex items-center justify-end gap-2">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleEdit(event)}
-                          >
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleDelete(event)}
-                            className="text-destructive hover:text-destructive"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </td>
+                      {!isReadOnly && (
+                        <td className="p-4">
+                          <div className="flex items-center justify-end gap-2">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleEdit(event)}
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleDelete(event)}
+                              className="text-destructive hover:text-destructive"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </td>
+                      )}
                     </tr>
                   ))
                 )}

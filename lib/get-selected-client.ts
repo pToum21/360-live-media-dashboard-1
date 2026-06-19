@@ -1,10 +1,31 @@
-import { cookies } from 'next/headers'
+import { cookies, headers } from 'next/headers'
 import { prisma } from '@/lib/prisma'
 
 /**
- * Get the selected client ID from cookies or default to 360 Live Media
+ * Get the selected client ID from cookies or share context, or default to 360 Live Media
  */
 export async function getSelectedClientId(): Promise<string> {
+  // Check if we're in a share context first
+  const headersList = await headers()
+  const shareId = headersList.get('x-share-id')
+  
+  if (shareId) {
+    // In share context - get client from share link
+    const shareLink = await prisma.shareLink.findUnique({
+      where: { id: shareId },
+      select: {
+        client: {
+          select: { id: true }
+        }
+      }
+    })
+    
+    if (shareLink) {
+      return shareLink.client.id
+    }
+  }
+
+  // Not in share context - check cookies
   const cookieStore = await cookies()
   const selectedClientId = cookieStore.get('selectedClientId')?.value
 

@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge'
 import { ClientFormDialog } from '@/components/forms/client-form-dialog'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
+import { useReadOnly } from '@/contexts/readonly-context'
 
 interface ClientManagementProps {
   clients: any[]
@@ -14,6 +15,7 @@ interface ClientManagementProps {
 
 export function ClientManagement({ clients }: ClientManagementProps) {
   const router = useRouter()
+  const { isReadOnly } = useReadOnly()
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editData, setEditData] = useState<any>(null)
   const [mode, setMode] = useState<'create' | 'edit'>('create')
@@ -54,13 +56,15 @@ export function ClientManagement({ clients }: ClientManagementProps) {
     <>
       <div className="flex justify-between items-center mb-6">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">All Clients</h3>
-        <Button 
-          onClick={handleAdd}
-          className="bg-[#2E8741] hover:bg-[#236933] dark:bg-[#2E8741] dark:hover:bg-[#3a9d54]"
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Add Client
-        </Button>
+        {!isReadOnly && (
+          <Button 
+            onClick={handleAdd}
+            className="bg-[#2E8741] hover:bg-[#236933] dark:bg-[#2E8741] dark:hover:bg-[#3a9d54]"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Add Client
+          </Button>
+        )}
       </div>
 
       <div className="space-y-3">
@@ -89,24 +93,26 @@ export function ClientManagement({ clients }: ClientManagementProps) {
                 </div>
               </div>
 
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleEdit(client)}
-                  className="hover:bg-gray-100 dark:hover:bg-gray-700"
-                >
-                  <Pencil className="h-4 w-4 text-gray-600 dark:text-gray-400" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleDelete(client.id)}
-                  className="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/30"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </div>
+              {!isReadOnly && (
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleEdit(client)}
+                    className="hover:bg-gray-100 dark:hover:bg-gray-700"
+                  >
+                    <Pencil className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleDelete(client.id)}
+                    className="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/30"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
         ))}

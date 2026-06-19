@@ -6,6 +6,7 @@ import { Plus, Pencil, Trash2 } from 'lucide-react'
 import { SocialFormDialog } from '@/components/forms/social-form-dialog'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
+import { useReadOnly } from '@/contexts/readonly-context'
 
 interface SocialManagementProps {
   metrics: any[]
@@ -13,6 +14,7 @@ interface SocialManagementProps {
 
 export function SocialManagement({ metrics }: SocialManagementProps) {
   const router = useRouter()
+  const { isReadOnly } = useReadOnly()
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editData, setEditData] = useState<any>(null)
   const [mode, setMode] = useState<'create' | 'edit'>('create')
@@ -53,13 +55,15 @@ export function SocialManagement({ metrics }: SocialManagementProps) {
     <>
       <div className="flex justify-between items-center mb-6">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Recent Weeks</h3>
-        <Button 
-          onClick={handleAdd}
-          className="bg-[#2E8741] hover:bg-[#236933]"
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Add Week
-        </Button>
+        {!isReadOnly && (
+          <Button 
+            onClick={handleAdd}
+            className="bg-[#2E8741] hover:bg-[#236933]"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Add Week
+          </Button>
+        )}
       </div>
 
       <div className="space-y-3">
@@ -76,24 +80,26 @@ export function SocialManagement({ metrics }: SocialManagementProps) {
                   year: 'numeric'
                 })}
               </p>
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleEdit(metric)}
-                  className="dark:hover:bg-gray-700"
-                >
-                  <Pencil className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleDelete(metric.id)}
-                  className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-950/50"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </div>
+              {!isReadOnly && (
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleEdit(metric)}
+                    className="dark:hover:bg-gray-700"
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleDelete(metric.id)}
+                    className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-950/50"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              )}
             </div>
 
             <div className="grid grid-cols-2 gap-6">

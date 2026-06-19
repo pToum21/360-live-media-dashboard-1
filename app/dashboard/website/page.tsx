@@ -3,23 +3,17 @@ import { BarChart3, TrendingUp, Users, Clock } from "lucide-react"
 import { prisma } from "@/lib/prisma"
 import { FilterableWebsiteChart } from "@/components/charts/filterable-website-chart"
 import { WebsiteManagement } from "@/components/dashboard/website-management"
-import { cookies } from "next/headers"
-import { redirect } from "next/navigation"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth"
+import { requireAuth } from "@/lib/auth-check"
+import { getSelectedClientId } from "@/lib/get-selected-client"
 
 export default async function WebsiteAnalyticsPage() {
-  const session = await getServerSession(authOptions)
-  if (!session) {
-    redirect('/auth/signin')
-  }
+  await requireAuth()
 
-  // Get selected client from cookies
-  const cookieStore = await cookies()
-  const selectedClientSlug = cookieStore.get('selectedClient')?.value || '360-live-media'
+  // Get selected client ID (works in both authenticated and share contexts)
+  const clientId = await getSelectedClientId()
 
   const client = await prisma.client.findUnique({
-    where: { slug: selectedClientSlug },
+    where: { id: clientId },
   })
 
   if (!client) {

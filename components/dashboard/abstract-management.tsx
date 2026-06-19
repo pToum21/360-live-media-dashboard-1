@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/table'
 import { Pencil, Trash2, Plus } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { useReadOnly } from '@/contexts/readonly-context'
 
 interface AbstractSubmission {
   id: string
@@ -27,6 +28,7 @@ interface AbstractManagementProps {
 }
 
 export function AbstractManagement({ abstracts, clientId }: AbstractManagementProps) {
+  const { isReadOnly } = useReadOnly()
   const [editingAbstract, setEditingAbstract] = useState<AbstractSubmission | null>(null)
   const [isFormOpen, setIsFormOpen] = useState(false)
   const router = useRouter()
@@ -42,18 +44,20 @@ export function AbstractManagement({ abstracts, clientId }: AbstractManagementPr
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-end">
-        <Button
-          onClick={() => {
-            setEditingAbstract(null)
-            setIsFormOpen(true)
-          }}
-          className="bg-green-600 hover:bg-green-700"
-        >
-          <Plus className="mr-2 h-4 w-4" />
-          Add Abstract Record
-        </Button>
-      </div>
+      {!isReadOnly && (
+        <div className="flex justify-end">
+          <Button
+            onClick={() => {
+              setEditingAbstract(null)
+              setIsFormOpen(true)
+            }}
+            className="bg-green-600 hover:bg-green-700"
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            Add Abstract Record
+          </Button>
+        </div>
+      )}
 
       <div className="rounded-md border">
         <Table>
@@ -62,7 +66,7 @@ export function AbstractManagement({ abstracts, clientId }: AbstractManagementPr
               <TableHead>Year</TableHead>
               <TableHead>Submission Type</TableHead>
               <TableHead className="text-right">Submissions</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              {!isReadOnly && <TableHead className="text-right">Actions</TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -71,27 +75,29 @@ export function AbstractManagement({ abstracts, clientId }: AbstractManagementPr
                 <TableCell className="font-medium">{abstract.year}</TableCell>
                 <TableCell>{abstract.submissionType || 'General'}</TableCell>
                 <TableCell className="text-right">{abstract.submissionCount.toLocaleString()}</TableCell>
-                <TableCell className="text-right">
-                  <div className="flex justify-end gap-2">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => {
-                        setEditingAbstract(abstract)
-                        setIsFormOpen(true)
-                      }}
-                    >
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleDelete(abstract.id)}
-                    >
-                      <Trash2 className="h-4 w-4 text-red-500" />
-                    </Button>
-                  </div>
-                </TableCell>
+                {!isReadOnly && (
+                  <TableCell className="text-right">
+                    <div className="flex justify-end gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          setEditingAbstract(abstract)
+                          setIsFormOpen(true)
+                        }}
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDelete(abstract.id)}
+                      >
+                        <Trash2 className="h-4 w-4 text-red-500" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                )}
               </TableRow>
             ))}
           </TableBody>

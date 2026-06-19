@@ -14,6 +14,7 @@ import {
 import { Pencil, Trash2, Plus } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { format } from 'date-fns'
+import { useReadOnly } from '@/contexts/readonly-context'
 
 interface EventRegistration {
   id: string
@@ -36,6 +37,7 @@ interface RegistrationManagementProps {
 }
 
 export function RegistrationManagement({ registrations, clientId }: RegistrationManagementProps) {
+  const { isReadOnly } = useReadOnly()
   const [editingRegistration, setEditingRegistration] = useState<EventRegistration | null>(null)
   const [isFormOpen, setIsFormOpen] = useState(false)
   const router = useRouter()
@@ -51,18 +53,20 @@ export function RegistrationManagement({ registrations, clientId }: Registration
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-end">
-        <Button
-          onClick={() => {
-            setEditingRegistration(null)
-            setIsFormOpen(true)
-          }}
-          className="bg-green-600 hover:bg-green-700"
-        >
-          <Plus className="mr-2 h-4 w-4" />
-          Add Registration Record
-        </Button>
-      </div>
+      {!isReadOnly && (
+        <div className="flex justify-end">
+          <Button
+            onClick={() => {
+              setEditingRegistration(null)
+              setIsFormOpen(true)
+            }}
+            className="bg-green-600 hover:bg-green-700"
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            Add Registration Record
+          </Button>
+        </div>
+      )}
 
       <div className="rounded-md border">
         <Table>
@@ -74,7 +78,7 @@ export function RegistrationManagement({ registrations, clientId }: Registration
               <TableHead className="text-right">Comp</TableHead>
               <TableHead className="text-right">Revenue</TableHead>
               <TableHead className="text-right">Goal %</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              {!isReadOnly && <TableHead className="text-right">Actions</TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -90,27 +94,29 @@ export function RegistrationManagement({ registrations, clientId }: Registration
                 <TableCell className="text-right">
                   {registration.percentOfGoal ? `${(registration.percentOfGoal * 100).toFixed(0)}%` : '-'}
                 </TableCell>
-                <TableCell className="text-right">
-                  <div className="flex justify-end gap-2">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => {
-                        setEditingRegistration(registration)
-                        setIsFormOpen(true)
-                      }}
-                    >
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleDelete(registration.id)}
-                    >
-                      <Trash2 className="h-4 w-4 text-red-500" />
-                    </Button>
-                  </div>
-                </TableCell>
+                {!isReadOnly && (
+                  <TableCell className="text-right">
+                    <div className="flex justify-end gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          setEditingRegistration(registration)
+                          setIsFormOpen(true)
+                        }}
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDelete(registration.id)}
+                      >
+                        <Trash2 className="h-4 w-4 text-red-500" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                )}
               </TableRow>
             ))}
           </TableBody>

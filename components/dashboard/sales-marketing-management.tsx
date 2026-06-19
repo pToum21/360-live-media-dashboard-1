@@ -6,6 +6,7 @@ import { Plus, Pencil, Trash2, ChevronLeft, ChevronRight } from 'lucide-react'
 import { SalesMarketingFormDialog } from '@/components/forms/sales-marketing-form-dialog'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
+import { useReadOnly } from '@/contexts/readonly-context'
 
 interface SalesMarketingManagementProps {
   campaigns: any[]
@@ -15,6 +16,7 @@ const ITEMS_PER_PAGE = 15
 
 export function SalesMarketingManagement({ campaigns }: SalesMarketingManagementProps) {
   const router = useRouter()
+  const { isReadOnly } = useReadOnly()
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editData, setEditData] = useState<any>(null)
   const [mode, setMode] = useState<'create' | 'edit'>('create')
@@ -76,13 +78,15 @@ export function SalesMarketingManagement({ campaigns }: SalesMarketingManagement
             Showing {startIndex + 1}-{Math.min(endIndex, campaigns.length)} of {campaigns.length} campaigns
           </p>
         </div>
-        <Button 
-          onClick={handleAdd}
-          className="bg-[#2E8741] hover:bg-[#236933]"
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Add Campaign
-        </Button>
+        {!isReadOnly && (
+          <Button 
+            onClick={handleAdd}
+            className="bg-[#2E8741] hover:bg-[#236933]"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Add Campaign
+          </Button>
+        )}
       </div>
 
       <div className="rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
@@ -97,7 +101,7 @@ export function SalesMarketingManagement({ campaigns }: SalesMarketingManagement
                 <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Click Rate</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Visits</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Status</th>
-                <th className="px-4 py-3 text-right text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Actions</th>
+                {!isReadOnly && <th className="px-4 py-3 text-right text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Actions</th>}
               </tr>
             </thead>
             <tbody className="bg-white dark:bg-gray-900/50 divide-y divide-gray-200 dark:divide-gray-700">
@@ -150,28 +154,30 @@ export function SalesMarketingManagement({ campaigns }: SalesMarketingManagement
                       <span className="text-gray-400">-</span>
                     )}
                   </td>
-                  <td className="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <div className="flex items-center justify-end gap-2">
-                      <Button
-                        onClick={() => handleEdit(campaign)}
-                        size="sm"
-                        variant="outline"
-                        className="h-8 px-3"
-                      >
-                        <Pencil className="h-3.5 w-3.5 mr-1.5" />
-                        Edit
-                      </Button>
-                      <Button
-                        onClick={() => handleDelete(campaign.id)}
-                        size="sm"
-                        variant="outline"
-                        className="h-8 px-3 text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
-                      >
-                        <Trash2 className="h-3.5 w-3.5 mr-1.5" />
-                        Delete
-                      </Button>
-                    </div>
-                  </td>
+                  {!isReadOnly && (
+                    <td className="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      <div className="flex items-center justify-end gap-2">
+                        <Button
+                          onClick={() => handleEdit(campaign)}
+                          size="sm"
+                          variant="outline"
+                          className="h-8 px-3"
+                        >
+                          <Pencil className="h-3.5 w-3.5 mr-1.5" />
+                          Edit
+                        </Button>
+                        <Button
+                          onClick={() => handleDelete(campaign.id)}
+                          size="sm"
+                          variant="outline"
+                          className="h-8 px-3 text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
+                        >
+                          <Trash2 className="h-3.5 w-3.5 mr-1.5" />
+                          Delete
+                        </Button>
+                      </div>
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>

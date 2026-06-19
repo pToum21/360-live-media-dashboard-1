@@ -6,6 +6,7 @@ import { Plus, Pencil, Trash2, ChevronLeft, ChevronRight } from 'lucide-react'
 import { EmailFormDialog } from '@/components/forms/email-form-dialog'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
+import { useReadOnly } from '@/contexts/readonly-context'
 
 interface EmailManagementProps {
   campaigns: any[]
@@ -15,6 +16,7 @@ const ITEMS_PER_PAGE = 15
 
 export function EmailManagement({ campaigns }: EmailManagementProps) {
   const router = useRouter()
+  const { isReadOnly } = useReadOnly()
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editData, setEditData] = useState<any>(null)
   const [mode, setMode] = useState<'create' | 'edit'>('create')
@@ -72,25 +74,29 @@ export function EmailManagement({ campaigns }: EmailManagementProps) {
             Showing {startIndex + 1}-{Math.min(endIndex, campaigns.length)} of {campaigns.length} campaigns
           </p>
         </div>
-        <Button 
-          onClick={handleAdd}
-          className="bg-[#2E8741] hover:bg-[#236933]"
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Add Campaign
-        </Button>
-      </div>
-
-      {campaigns.length === 0 ? (
-        <div className="text-center py-12 border border-dashed border-gray-300 dark:border-gray-700 rounded-lg">
-          <p className="text-gray-500 dark:text-gray-400 mb-4">No campaigns found</p>
+        {!isReadOnly && (
           <Button 
             onClick={handleAdd}
             className="bg-[#2E8741] hover:bg-[#236933]"
           >
             <Plus className="h-4 w-4 mr-2" />
-            Add Your First Campaign
+            Add Campaign
           </Button>
+        )}
+      </div>
+
+      {campaigns.length === 0 ? (
+        <div className="text-center py-12 border border-dashed border-gray-300 dark:border-gray-700 rounded-lg">
+          <p className="text-gray-500 dark:text-gray-400 mb-4">No campaigns found</p>
+          {!isReadOnly && (
+            <Button 
+              onClick={handleAdd}
+              className="bg-[#2E8741] hover:bg-[#236933]"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Add Your First Campaign
+            </Button>
+          )}
         </div>
       ) : (
         <div className="space-y-3">
@@ -110,24 +116,26 @@ export function EmailManagement({ campaigns }: EmailManagementProps) {
                   })}
                 </p>
               </div>
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleEdit(campaign)}
-                  className="dark:hover:bg-gray-700"
-                >
-                  <Pencil className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleDelete(campaign.id)}
-                  className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-950/50"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </div>
+              {!isReadOnly && (
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleEdit(campaign)}
+                    className="dark:hover:bg-gray-700"
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleDelete(campaign.id)}
+                    className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-950/50"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              )}
             </div>
 
             <div className="grid grid-cols-4 gap-4 text-sm">

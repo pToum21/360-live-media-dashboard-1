@@ -3,22 +3,16 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { PassTypeManagement } from '@/components/dashboard/pass-type-management'
 import { PassTypeChart } from '@/components/charts/pass-type-chart'
 import { prisma } from '@/lib/prisma'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth'
-import { redirect } from 'next/navigation'
-import { cookies } from 'next/headers'
+import { requireAuth } from '@/lib/auth-check'
+import { getSelectedClientId } from '@/lib/get-selected-client'
 
 export default async function PassTypesPage() {
-  const session = await getServerSession(authOptions)
-  if (!session) {
-    redirect('/auth/signin')
-  }
+  await requireAuth()
 
-  const cookieStore = await cookies()
-  const selectedClientSlug = cookieStore.get('selectedClient')?.value || '360-live-media'
+  const clientId = await getSelectedClientId()
 
   const client = await prisma.client.findUnique({
-    where: { slug: selectedClientSlug },
+    where: { id: clientId },
   })
 
   if (!client) {

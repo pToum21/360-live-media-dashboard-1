@@ -5,6 +5,7 @@ import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { useEffect, useState } from "react"
+import { useClient } from "@/contexts/client-context"
 import {
   LayoutDashboard,
   BarChart3,
@@ -156,9 +157,21 @@ const allNavItems = [
 
 export function DashboardNav() {
   const pathname = usePathname()
-  const [selectedClient, setSelectedClient] = useState<string>("360-live-media")
+  const { selectedClient } = useClient()
   const [openDropdowns, setOpenDropdowns] = useState<Record<string, boolean>>({})
   const [isCollapsed, setIsCollapsed] = useState<boolean>(false)
+  
+  // Detect if we're in a share context
+  const isShareContext = pathname?.startsWith('/share/')
+  const shareId = isShareContext ? pathname?.split('/')[2] : null
+  
+  // Helper function to build href based on context
+  const buildHref = (basePath: string) => {
+    if (isShareContext && shareId) {
+      return `/share/${shareId}${basePath.replace('/dashboard', '')}`
+    }
+    return basePath
+  }
 
   // Toggle dropdown
   const toggleDropdown = (title: string) => {
@@ -184,35 +197,10 @@ export function DashboardNav() {
     window.dispatchEvent(new Event('sidebarToggle'))
   }
 
-  // Get selected client from cookies
-  useEffect(() => {
-    const getClientFromCookie = () => {
-      const cookies = document.cookie.split(';')
-      const clientCookie = cookies.find(c => c.trim().startsWith('selectedClient='))
-      if (clientCookie) {
-        const client = clientCookie.split('=')[1]
-        setSelectedClient(client)
-      }
-    }
-    
-    getClientFromCookie()
-    
-    // Listen for client changes
-    const handleClientChange = () => {
-      getClientFromCookie()
-    }
-    
-    window.addEventListener('storage', handleClientChange)
-    window.addEventListener('client-changed', handleClientChange)
-    
-    return () => {
-      window.removeEventListener('storage', handleClientChange)
-      window.removeEventListener('client-changed', handleClientChange)
-    }
-  }, [])
-
   // Filter nav items based on selected client
-  const navItems = allNavItems.filter(item => item.clients.includes(selectedClient))
+  const navItems = allNavItems.filter(item => 
+    selectedClient && item.clients.includes(selectedClient.slug)
+  )
 
   return (
     <aside className={cn(
@@ -222,7 +210,7 @@ export function DashboardNav() {
       {/* Logo */}
       <div className="h-20 flex items-center justify-center px-6 border-b border-white/30 dark:border-white/10 relative">
         {!isCollapsed && (
-          <Link href="/dashboard" className="group">
+          <Link href={buildHref("/dashboard")} className="group">
             <div className="w-32 flex items-center justify-center group-hover:scale-105 transition-all duration-300">
               <Image 
                 src="/Logos/Info=Basic, Color=Green.png" 
@@ -236,7 +224,7 @@ export function DashboardNav() {
           </Link>
         )}
         {isCollapsed && (
-          <Link href="/dashboard" className="group">
+          <Link href={buildHref("/dashboard")} className="group">
             <div className="w-10 flex items-center justify-center group-hover:scale-110 transition-all duration-300">
               <Image 
                 src="/Logos/Info=Basic, Color=Green.png" 
@@ -280,7 +268,7 @@ export function DashboardNav() {
           if (hasChildren) {
             // Filter children by client
             const visibleChildren = item.children?.filter((child: any) => 
-              child.clients.includes(selectedClient)
+              selectedClient && child.clients.includes(selectedClient.slug)
             )
 
             // When collapsed, don't show dropdowns - instead link to first child
@@ -295,7 +283,7 @@ export function DashboardNav() {
               return (
                 <Link
                   key={item.title}
-                  href={firstChild.href}
+                  href={buildHref(firstChild.href)}
                   className={cn(
                     "flex items-center justify-center p-3 rounded-2xl text-sm font-medium transition-all duration-300 group relative overflow-hidden",
                     isAnyChildActive
@@ -338,7 +326,7 @@ export function DashboardNav() {
                       return (
                         <Link
                           key={child.href}
-                          href={child.href}
+                          href={buildHref(child.href)}
                           className={cn(
                             "flex items-center gap-3 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300",
                             childIsActive
@@ -362,7 +350,7 @@ export function DashboardNav() {
           return (
             <Link
               key={item.href}
-              href={item.href!}
+              href={buildHref(item.href!)}
               className={cn(
                 "flex items-center rounded-2xl text-sm font-medium transition-all duration-300 group relative overflow-hidden",
                 isCollapsed ? "justify-center p-3" : "gap-3 px-4 py-2.5",

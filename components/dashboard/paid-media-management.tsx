@@ -14,6 +14,7 @@ import {
 import { Pencil, Trash2, Plus } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { format } from 'date-fns'
+import { useReadOnly } from '@/contexts/readonly-context'
 
 interface PaidMedia {
   id: string
@@ -58,6 +59,7 @@ interface PaidMediaManagementProps {
 }
 
 export function PaidMediaManagement({ paidMedia, clientId }: PaidMediaManagementProps) {
+  const { isReadOnly } = useReadOnly()
   const [editingMedia, setEditingMedia] = useState<PaidMedia | null>(null)
   const [isFormOpen, setIsFormOpen] = useState(false)
   const router = useRouter()
@@ -73,18 +75,20 @@ export function PaidMediaManagement({ paidMedia, clientId }: PaidMediaManagement
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-end">
-        <Button
-          onClick={() => {
-            setEditingMedia(null)
-            setIsFormOpen(true)
-          }}
-          className="bg-green-600 hover:bg-green-700"
-        >
-          <Plus className="mr-2 h-4 w-4" />
-          Add Paid Media Record
-        </Button>
-      </div>
+      {!isReadOnly && (
+        <div className="flex justify-end">
+          <Button
+            onClick={() => {
+              setEditingMedia(null)
+              setIsFormOpen(true)
+            }}
+            className="bg-green-600 hover:bg-green-700"
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            Add Paid Media Record
+          </Button>
+        </div>
+      )}
 
       <div className="rounded-md border overflow-x-auto">
         <Table>
@@ -96,7 +100,7 @@ export function PaidMediaManagement({ paidMedia, clientId }: PaidMediaManagement
               <TableHead className="text-right">Google Search</TableHead>
               <TableHead className="text-right">Google Display</TableHead>
               <TableHead className="text-right">Total Conversions</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              {!isReadOnly && <TableHead className="text-right">Actions</TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -112,27 +116,29 @@ export function PaidMediaManagement({ paidMedia, clientId }: PaidMediaManagement
                   <TableCell className="text-right">{media.googleSearchSpend ? `$${media.googleSearchSpend.toLocaleString()}` : '-'}</TableCell>
                   <TableCell className="text-right">{media.googleDisplaySpend ? `$${media.googleDisplaySpend.toLocaleString()}` : '-'}</TableCell>
                   <TableCell className="text-right">{totalConversions}</TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => {
-                          setEditingMedia(media)
-                          setIsFormOpen(true)
-                        }}
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleDelete(media.id)}
-                      >
-                        <Trash2 className="h-4 w-4 text-red-500" />
-                      </Button>
-                    </div>
-                  </TableCell>
+                  {!isReadOnly && (
+                    <TableCell className="text-right">
+                      <div className="flex justify-end gap-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            setEditingMedia(media)
+                            setIsFormOpen(true)
+                          }}
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDelete(media.id)}
+                        >
+                          <Trash2 className="h-4 w-4 text-red-500" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  )}
                 </TableRow>
               )
             })}

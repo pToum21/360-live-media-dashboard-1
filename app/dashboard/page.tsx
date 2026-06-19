@@ -1,5 +1,3 @@
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -29,21 +27,17 @@ import { SixRsFramework } from "@/components/dashboard/six-rs-framework"
 import { MultiYearRegistrationChart } from "@/components/charts/multi-year-registration-chart"
 import { RegistrationActualsVsGoalChart } from "@/components/charts/registration-actuals-vs-goal-chart"
 import { RevenueGaugeChart } from "@/components/charts/revenue-gauge-chart"
-import { cookies } from "next/headers"
-import { redirect } from "next/navigation"
+import { requireAuth } from "@/lib/auth-check"
+import { getSelectedClientId } from "@/lib/get-selected-client"
 
 export default async function DashboardPage() {
-  const session = await getServerSession(authOptions)
-  if (!session) {
-    redirect('/auth/signin')
-  }
+  const session = await requireAuth()
 
-  // Get selected client from cookies
-  const cookieStore = await cookies()
-  const selectedClientSlug = cookieStore.get('selectedClient')?.value || '360-live-media'
+  // Get selected client ID (works in both authenticated and share contexts)
+  const clientId = await getSelectedClientId()
 
   const client = await prisma.client.findUnique({
-    where: { slug: selectedClientSlug },
+    where: { id: clientId },
   })
 
   if (!client) {

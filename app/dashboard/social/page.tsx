@@ -7,23 +7,17 @@ import { OrganicSocialImpressionsChart } from "@/components/charts/organic-socia
 import { EngagementsByChannelChart } from "@/components/charts/engagements-by-channel-chart"
 import { PostFrequencyByChannelChart } from "@/components/charts/post-frequency-by-channel-chart"
 import { SocialManagement } from "@/components/dashboard/social-management"
-import { cookies } from "next/headers"
-import { redirect } from "next/navigation"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth"
+import { requireAuth } from "@/lib/auth-check"
+import { getSelectedClientId } from "@/lib/get-selected-client"
 
 export default async function SocialMediaPage() {
-  const session = await getServerSession(authOptions)
-  if (!session) {
-    redirect('/auth/signin')
-  }
+  await requireAuth()
 
-  // Get selected client from cookies
-  const cookieStore = await cookies()
-  const selectedClientSlug = cookieStore.get('selectedClient')?.value || '360-live-media'
+  // Get selected client ID (works in both authenticated and share contexts)
+  const clientId = await getSelectedClientId()
 
   const client = await prisma.client.findUnique({
-    where: { slug: selectedClientSlug },
+    where: { id: clientId },
   })
 
   if (!client) {

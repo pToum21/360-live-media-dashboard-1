@@ -2,25 +2,18 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { prisma } from "@/lib/prisma"
 import { GA4RegistrationChart } from "@/components/charts/ga4-registration-chart"
 import { GA4RegistrationManagement } from "@/components/dashboard/ga4-registration-management"
-import { cookies } from "next/headers"
-import { redirect } from "next/navigation"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth"
+import { requireAuth } from "@/lib/auth-check"
+import { getSelectedClientId } from "@/lib/get-selected-client"
 import { LineChart as LineChartIcon, TrendingUp, Users, Target } from "lucide-react"
 import { Suspense } from "react"
 
 export default async function GA4RegistrationsPage() {
-  const session = await getServerSession(authOptions)
-  if (!session) {
-    redirect('/auth/signin')
-  }
+  await requireAuth()
 
-  // Get selected client from cookies
-  const cookieStore = await cookies()
-  const selectedClientSlug = cookieStore.get('selectedClient')?.value || '360-live-media'
+  const clientId = await getSelectedClientId()
 
   const client = await prisma.client.findUnique({
-    where: { slug: selectedClientSlug },
+    where: { id: clientId },
   })
 
   if (!client) {

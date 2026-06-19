@@ -6,6 +6,7 @@ import { Plus, Pencil, Trash2 } from 'lucide-react'
 import { TestFormDialog } from '@/components/forms/test-form-dialog'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
+import { useReadOnly } from '@/contexts/readonly-context'
 
 interface TestManagementProps {
   tests: any[]
@@ -13,6 +14,7 @@ interface TestManagementProps {
 
 export function TestManagement({ tests }: TestManagementProps) {
   const router = useRouter()
+  const { isReadOnly } = useReadOnly()
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editData, setEditData] = useState<any>(null)
   const [mode, setMode] = useState<'create' | 'edit'>('create')
@@ -53,13 +55,15 @@ export function TestManagement({ tests }: TestManagementProps) {
     <>
       <div className="flex justify-between items-center mb-6">
         <h3 className="text-lg font-semibold text-gray-900">All Tests</h3>
-        <Button 
-          onClick={handleAdd}
-          className="bg-[#2E8741] hover:bg-[#236933]"
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Add Test
-        </Button>
+        {!isReadOnly && (
+          <Button 
+            onClick={handleAdd}
+            className="bg-[#2E8741] hover:bg-[#236933]"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Add Test
+          </Button>
+        )}
       </div>
 
       <div className="space-y-3">
@@ -94,23 +98,25 @@ export function TestManagement({ tests }: TestManagementProps) {
                 )}
               </div>
 
-              <div className="flex items-center gap-2 ml-4">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleEdit(test)}
-                >
-                  <Pencil className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleDelete(test.id)}
-                  className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </div>
+              {!isReadOnly && (
+                <div className="flex items-center gap-2 ml-4">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleEdit(test)}
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleDelete(test.id)}
+                    className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
         ))}

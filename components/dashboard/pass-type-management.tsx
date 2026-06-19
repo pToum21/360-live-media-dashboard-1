@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/table'
 import { Pencil, Trash2, Plus } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { useReadOnly } from '@/contexts/readonly-context'
 
 interface PassType {
   id: string
@@ -29,6 +30,7 @@ interface PassTypeManagementProps {
 }
 
 export function PassTypeManagement({ passTypes, clientId }: PassTypeManagementProps) {
+  const { isReadOnly } = useReadOnly()
   const [editingPassType, setEditingPassType] = useState<PassType | null>(null)
   const [isFormOpen, setIsFormOpen] = useState(false)
   const router = useRouter()
@@ -44,18 +46,20 @@ export function PassTypeManagement({ passTypes, clientId }: PassTypeManagementPr
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-end">
-        <Button
-          onClick={() => {
-            setEditingPassType(null)
-            setIsFormOpen(true)
-          }}
-          className="bg-green-600 hover:bg-green-700"
-        >
-          <Plus className="mr-2 h-4 w-4" />
-          Add Pass Type
-        </Button>
-      </div>
+      {!isReadOnly && (
+        <div className="flex justify-end">
+          <Button
+            onClick={() => {
+              setEditingPassType(null)
+              setIsFormOpen(true)
+            }}
+            className="bg-green-600 hover:bg-green-700"
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            Add Pass Type
+          </Button>
+        </div>
+      )}
 
       <div className="rounded-md border">
         <Table>
@@ -66,7 +70,7 @@ export function PassTypeManagement({ passTypes, clientId }: PassTypeManagementPr
               <TableHead className="text-right">Registrations</TableHead>
               <TableHead className="text-right">% of Total</TableHead>
               <TableHead className="text-right">Revenue</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              {!isReadOnly && <TableHead className="text-right">Actions</TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -81,27 +85,29 @@ export function PassTypeManagement({ passTypes, clientId }: PassTypeManagementPr
                 <TableCell className="text-right">
                   {passType.revenue ? `$${passType.revenue.toLocaleString()}` : '-'}
                 </TableCell>
-                <TableCell className="text-right">
-                  <div className="flex justify-end gap-2">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => {
-                        setEditingPassType(passType)
-                        setIsFormOpen(true)
-                      }}
-                    >
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleDelete(passType.id)}
-                    >
-                      <Trash2 className="h-4 w-4 text-red-500" />
-                    </Button>
-                  </div>
-                </TableCell>
+                {!isReadOnly && (
+                  <TableCell className="text-right">
+                    <div className="flex justify-end gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          setEditingPassType(passType)
+                          setIsFormOpen(true)
+                        }}
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDelete(passType.id)}
+                      >
+                        <Trash2 className="h-4 w-4 text-red-500" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                )}
               </TableRow>
             ))}
           </TableBody>

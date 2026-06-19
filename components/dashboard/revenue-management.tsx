@@ -14,6 +14,7 @@ import {
 import { Pencil, Trash2, Plus } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { format } from 'date-fns'
+import { useReadOnly } from '@/contexts/readonly-context'
 
 interface RevenueProjection {
   id: string
@@ -31,6 +32,7 @@ interface RevenueManagementProps {
 }
 
 export function RevenueManagement({ projections, clientId }: RevenueManagementProps) {
+  const { isReadOnly } = useReadOnly()
   const [editingProjection, setEditingProjection] = useState<RevenueProjection | null>(null)
   const [isFormOpen, setIsFormOpen] = useState(false)
   const router = useRouter()
@@ -46,18 +48,20 @@ export function RevenueManagement({ projections, clientId }: RevenueManagementPr
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-end">
-        <Button
-          onClick={() => {
-            setEditingProjection(null)
-            setIsFormOpen(true)
-          }}
-          className="bg-green-600 hover:bg-green-700"
-        >
-          <Plus className="mr-2 h-4 w-4" />
-          Add Revenue Record
-        </Button>
-      </div>
+      {!isReadOnly && (
+        <div className="flex justify-end">
+          <Button
+            onClick={() => {
+              setEditingProjection(null)
+              setIsFormOpen(true)
+            }}
+            className="bg-green-600 hover:bg-green-700"
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            Add Revenue Record
+          </Button>
+        </div>
+      )}
 
       <div className="rounded-md border">
         <Table>
@@ -68,7 +72,7 @@ export function RevenueManagement({ projections, clientId }: RevenueManagementPr
               <TableHead className="text-right">Projected Revenue</TableHead>
               <TableHead className="text-right">Actual Revenue</TableHead>
               <TableHead className="text-right">Variance</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              {!isReadOnly && <TableHead className="text-right">Actions</TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -94,27 +98,29 @@ export function RevenueManagement({ projections, clientId }: RevenueManagementPr
                       </span>
                     ) : '-'}
                   </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => {
-                          setEditingProjection(projection)
-                          setIsFormOpen(true)
-                        }}
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleDelete(projection.id)}
-                      >
-                        <Trash2 className="h-4 w-4 text-red-500" />
-                      </Button>
-                    </div>
-                  </TableCell>
+                  {!isReadOnly && (
+                    <TableCell className="text-right">
+                      <div className="flex justify-end gap-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            setEditingProjection(projection)
+                            setIsFormOpen(true)
+                          }}
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDelete(projection.id)}
+                        >
+                          <Trash2 className="h-4 w-4 text-red-500" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  )}
                 </TableRow>
               )
             })}
