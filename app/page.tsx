@@ -72,7 +72,7 @@ export default function Home() {
   const { theme, setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
   const [activeTab, setActiveTab] = useState<'overview' | 'email' | 'social' | 'traffic'>('overview')
-  const [liveData, setLiveData] = useState(generateRealisticData())
+  const [chartData] = useState(generateRealisticData())
   const [animatedMetrics, setAnimatedMetrics] = useState({
     openRate: 0,
     clickRate: 0,
@@ -93,28 +93,8 @@ export default function Home() {
       })
     }, 500)
 
-    // Simulate live data updates every 3 seconds
-    const interval = setInterval(() => {
-      setLiveData(prev => {
-        const newData = [...prev]
-        const lastPoint = newData[newData.length - 1]
-        newData.shift()
-        newData.push({
-          day: lastPoint.day + 1,
-          visits: Math.round(lastPoint.visits + (Math.random() - 0.5) * 200),
-          openRate: Math.max(20, Math.min(60, lastPoint.openRate + (Math.random() - 0.5) * 3)),
-          clickRate: Math.max(3, Math.min(20, lastPoint.clickRate + (Math.random() - 0.5) * 1.5)),
-          revenue: Math.round(lastPoint.revenue + (Math.random() - 0.3) * 1500),
-          conversions: Math.round(lastPoint.conversions + (Math.random() - 0.3) * 5),
-          engagement: Math.max(5, Math.min(25, lastPoint.engagement + (Math.random() - 0.5) * 2))
-        })
-        return newData
-      })
-    }, 3000)
-
     return () => {
       clearTimeout(timer)
-      clearInterval(interval)
     }
   }, [])
 
@@ -183,7 +163,7 @@ export default function Home() {
         <div className="text-center max-w-5xl mx-auto mb-16">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#2E8741]/10 dark:bg-[#2E8741]/20 border border-[#2E8741]/20 dark:border-[#2E8741]/30 mb-8 backdrop-blur-sm">
             <Sparkles className="w-4 h-4 text-[#2E8741]" />
-            <span className="text-sm font-medium text-[#2E8741] dark:text-[#84BE41]">Live Dashboard Preview</span>
+            <span className="text-sm font-medium text-[#2E8741] dark:text-[#84BE41]">Interactive Dashboard Preview</span>
           </div>
           
           <h1 className="text-5xl md:text-7xl font-bold mb-8 tracking-tight" style={{ lineHeight: '1.2' }}>
@@ -292,20 +272,16 @@ export default function Home() {
 
                 {/* Main Charts Grid */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                  {/* Real-time Traffic */}
+                  {/* Website Traffic */}
                   <div className="glass-card p-6 border border-gray-200 dark:border-gray-800">
                     <div className="flex items-center justify-between mb-6">
                       <div>
-                        <h3 className="text-lg font-bold text-gray-900 dark:text-white">Real-Time Website Traffic</h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">Live visitor data • Updates every 3 seconds</p>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                        <span className="text-xs font-medium text-green-600 dark:text-green-400">LIVE</span>
+                        <h3 className="text-lg font-bold text-gray-900 dark:text-white">Website Traffic</h3>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">30-day visitor trends</p>
                       </div>
                     </div>
                     <ResponsiveContainer width="100%" height={300}>
-                      <AreaChart data={liveData}>
+                      <AreaChart data={chartData}>
                         <defs>
                           <linearGradient id="trafficGradient" x1="0" y1="0" x2="0" y2="1">
                             <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.4}/>
@@ -329,7 +305,6 @@ export default function Home() {
                           stroke="#3b82f6" 
                           strokeWidth={3}
                           fill="url(#trafficGradient)"
-                          animationDuration={300}
                         />
                       </AreaChart>
                     </ResponsiveContainer>
@@ -344,7 +319,7 @@ export default function Home() {
                       </div>
                     </div>
                     <ResponsiveContainer width="100%" height={300}>
-                      <RechartsLine data={liveData}>
+                      <RechartsLine data={chartData}>
                         <defs>
                           <linearGradient id="revenueGradient" x1="0" y1="0" x2="0" y2="1">
                             <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
@@ -385,7 +360,7 @@ export default function Home() {
                   <div className="glass-card p-6 border border-gray-200 dark:border-gray-800">
                     <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-6">Email Performance Trends</h3>
                     <ResponsiveContainer width="100%" height={350}>
-                      <RechartsLine data={liveData}>
+                      <RechartsLine data={chartData}>
                         <CartesianGrid strokeDasharray="3 3" stroke="#374151" opacity={0.1} />
                         <XAxis dataKey="day" stroke="#6b7280" style={{ fontSize: '12px' }} />
                         <YAxis stroke="#6b7280" style={{ fontSize: '12px' }} />
@@ -499,7 +474,7 @@ export default function Home() {
                 <div className="glass-card p-6 border border-gray-200 dark:border-gray-800">
                   <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-6">Engagement & Conversions</h3>
                   <ResponsiveContainer width="100%" height={400}>
-                    <RechartsBar data={liveData}>
+                    <RechartsBar data={chartData}>
                       <defs>
                         <linearGradient id="conversionsGradient" x1="0" y1="0" x2="0" y2="1">
                           <stop offset="5%" stopColor="#8b5cf6" stopOpacity={1}/>
