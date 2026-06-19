@@ -6,6 +6,10 @@ import { ThemeProvider } from "@/components/theme-provider";
 export const metadata: Metadata = {
   title: "360 Live Media - Marketing Dashboard",
   description: "Transform scattered data into actionable insights. Real-time analytics, automated reporting, and intelligent recommendations.",
+  icons: {
+    icon: '/Logos/Info=Basic, Color=Green-cropped.png',
+    apple: '/Logos/Info=Basic, Color=Green-cropped.png',
+  },
 };
 
 export default function RootLayout({
