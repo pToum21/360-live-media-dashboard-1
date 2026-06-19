@@ -5,7 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import { Menu, X, LayoutDashboard, Globe, Mail, Share2, Tag, Briefcase, FlaskConical, Megaphone } from 'lucide-react'
+import { Menu, X, LayoutDashboard, Globe, Mail, Share2, Tag, Briefcase, FlaskConical, Megaphone, CalendarDays } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const navigation = [
@@ -13,6 +13,7 @@ const navigation = [
   { name: 'Website Analytics', href: '/dashboard/website', icon: Globe },
   { name: 'Email Campaigns', href: '/dashboard/email', icon: Mail },
   { name: 'Sales Marketing', href: '/dashboard/sales-marketing', icon: Megaphone },
+  { name: 'Marketing Calendar', href: '/dashboard/calendar', icon: CalendarDays },
   { name: 'Social Media', href: '/dashboard/social', icon: Share2 },
   { name: 'Content Tagging', href: '/dashboard/tagging', icon: Tag },
   { name: 'Client Projects', href: '/dashboard/clients', icon: Briefcase },

@@ -23,6 +23,7 @@ import {
   ChevronRight,
   LineChart,
   Calendar,
+  CalendarDays,
   Cog,
   PanelLeftClose,
   PanelLeftOpen,
@@ -80,6 +81,12 @@ const allNavItems = [
     title: "Sales Marketing",
     href: "/dashboard/sales-marketing",
     icon: Megaphone,
+    clients: ["atc-2026"],
+  },
+  {
+    title: "Marketing Calendar",
+    href: "/dashboard/calendar",
+    icon: CalendarDays,
     clients: ["atc-2026"],
   },
   {

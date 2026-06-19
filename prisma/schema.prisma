@@ -41,6 +41,7 @@ model User {
   abstractSubmissions  AbstractSubmission[]
   revenueProjections   RevenueProjection[]
   ga4Registrations     GA4Registration[]
+  calendarEvents       CalendarEvent[]
 }
 
 model Account {
@@ -428,6 +429,7 @@ model Client {
   abstractSubmissions   AbstractSubmission[]     // For ATC - Abstract submissions
   revenueProjections    RevenueProjection[]      // For ATC - Revenue projections
   ga4Registrations      GA4Registration[]        // For ATC - GA4 registration tracking by traffic source
+  calendarEvents        CalendarEvent[]          // Marketing calendar events
   
   @@index([slug])
 }
@@ -631,4 +633,47 @@ model RevenueProjection {
   
   @@index([date])
   @@index([clientId])
+}
+
+// ============================================
+// MARKETING CALENDAR
+// ============================================
+
+model CalendarEvent {
+  id                    String    @id @default(cuid())
+  date                  DateTime
+  title                 String
+  description           String?
+  
+  // Category from Excel Content KEY
+  category              String?   // "Important Date", "ATC Attendee Marketing", "ATC Exhibitor Marketing", etc.
+  
+  // Visual properties
+  color                 String?   // Hex color for calendar display
+  
+  // Time (if specific time is needed)
+  startTime             String?   // e.g., "09:00"
+  endTime               String?   // e.g., "17:00"
+  allDay                Boolean   @default(true)
+  
+  // Additional metadata
+  location              String?
+  url                   String?
+  notes                 String?
+  
+  // Status
+  status                String?   // "Planned", "In Progress", "Completed", "Cancelled"
+  
+  // Client Association
+  client                Client?   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  clientId              String?
+  
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  createdBy             User      @relation(fields: [createdById], references: [id])
+  createdById           String
+  
+  @@index([date])
+  @@index([clientId])
+  @@index([category])
 }

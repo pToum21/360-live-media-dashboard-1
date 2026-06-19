@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { SessionProvider } from "@/components/auth/session-provider";
 import { ThemeProvider } from "@/components/theme-provider";
+import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
   title: "360 Live Media - Marketing Dashboard",
@@ -28,6 +29,7 @@ export default function RootLayout({
         >
           <SessionProvider>
             {children}
+            <Toaster />
           </SessionProvider>
         </ThemeProvider>
       </body>
