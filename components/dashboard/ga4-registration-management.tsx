@@ -16,6 +16,8 @@ import {
 } from '@/components/ui/dialog'
 import { useRouter } from 'next/navigation'
 import { useReadOnly } from '@/contexts/readonly-context'
+import { ExportButtons } from '@/components/ui/export-buttons'
+import { formatDateForExport, formatNumberForExport } from '@/lib/export-utils'
 
 interface GA4Registration {
   id: string
@@ -138,6 +140,27 @@ export function GA4RegistrationManagement({ registrations, clientId }: GA4Regist
 
   return (
     <div className="space-y-4">
+      {!isReadOnly && (
+        <div className="flex gap-2">
+          <ExportButtons
+            exportOptions={{
+              filename: 'ga4-registrations',
+              title: 'GA4 Registration Data',
+              columns: [
+                { header: 'Week Starting', key: 'weekStarting', formatter: formatDateForExport },
+                { header: 'Total Registrations', key: 'totalRegistrations', formatter: formatNumberForExport },
+                { header: 'Organic Search', key: 'organicSearch', formatter: formatNumberForExport },
+                { header: 'Email', key: 'email', formatter: formatNumberForExport },
+                { header: 'Direct', key: 'direct', formatter: formatNumberForExport },
+                { header: 'Paid Social', key: 'paidSocial', formatter: formatNumberForExport },
+                { header: 'Referral', key: 'referral', formatter: formatNumberForExport },
+              ]
+            }}
+            getData={() => registrations}
+          />
+        </div>
+      )}
+
       <Dialog open={isOpen} onOpenChange={(open) => {
         setIsOpen(open)
         if (!open) resetForm()

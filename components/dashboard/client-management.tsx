@@ -8,6 +8,7 @@ import { ClientFormDialog } from '@/components/forms/client-form-dialog'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { useReadOnly } from '@/contexts/readonly-context'
+import { ExportButtons } from '@/components/ui/export-buttons'
 
 interface ClientManagementProps {
   clients: any[]
@@ -57,13 +58,29 @@ export function ClientManagement({ clients }: ClientManagementProps) {
       <div className="flex justify-between items-center mb-6">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">All Clients</h3>
         {!isReadOnly && (
-          <Button 
-            onClick={handleAdd}
-            className="bg-[#2E8741] hover:bg-[#236933] dark:bg-[#2E8741] dark:hover:bg-[#3a9d54]"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Add Client
-          </Button>
+          <div className="flex gap-2">
+            <ExportButtons
+              exportOptions={{
+                filename: 'clients',
+                title: 'Clients',
+                columns: [
+                  { header: 'Client Name', key: 'name' },
+                  { header: 'Slug', key: 'slug' },
+                  { header: 'Event Name', key: 'eventName' },
+                  { header: 'UTM Tracking', key: 'utmTracking', formatter: (v) => v ? 'Yes' : 'No' },
+                  { header: 'Conversion Tracking', key: 'conversionTracking', formatter: (v) => v ? 'Yes' : 'No' },
+                ]
+              }}
+              getData={() => clients}
+            />
+            <Button 
+              onClick={handleAdd}
+              className="bg-[#2E8741] hover:bg-[#236933] dark:bg-[#2E8741] dark:hover:bg-[#3a9d54]"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Add Client
+            </Button>
+          </div>
         )}
       </div>
 

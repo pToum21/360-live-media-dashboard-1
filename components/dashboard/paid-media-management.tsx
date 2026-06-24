@@ -15,6 +15,8 @@ import { Pencil, Trash2, Plus } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { format } from 'date-fns'
 import { useReadOnly } from '@/contexts/readonly-context'
+import { ExportButtons } from '@/components/ui/export-buttons'
+import { formatDateForExport, formatCurrencyForExport, formatPercentageForExport, formatNumberForExport } from '@/lib/export-utils'
 
 interface PaidMedia {
   id: string
@@ -76,7 +78,29 @@ export function PaidMediaManagement({ paidMedia, clientId }: PaidMediaManagement
   return (
     <div className="space-y-4">
       {!isReadOnly && (
-        <div className="flex justify-end">
+        <div className="flex justify-end gap-2">
+          <ExportButtons
+            exportOptions={{
+              filename: 'paid-media',
+              title: 'Paid Media Performance',
+              columns: [
+                { header: 'Week Starting', key: 'weekStarting', formatter: formatDateForExport },
+                { header: 'LinkedIn Spend', key: 'liSpend', formatter: formatCurrencyForExport },
+                { header: 'LinkedIn Impressions', key: 'liImpressions', formatter: formatNumberForExport },
+                { header: 'LinkedIn Clicks', key: 'liClicks', formatter: formatNumberForExport },
+                { header: 'LinkedIn CTR', key: 'liCTR', formatter: formatPercentageForExport },
+                { header: 'LinkedIn Conversions', key: 'liConversions', formatter: formatNumberForExport },
+                { header: 'Meta Spend', key: 'metaSpend', formatter: formatCurrencyForExport },
+                { header: 'Meta Impressions', key: 'metaImpressions', formatter: formatNumberForExport },
+                { header: 'Meta Clicks', key: 'metaClicks', formatter: formatNumberForExport },
+                { header: 'Meta CTR', key: 'metaCTR', formatter: formatPercentageForExport },
+                { header: 'Meta Conversions', key: 'metaConversions', formatter: formatNumberForExport },
+                { header: 'Google Search Spend', key: 'googleSearchSpend', formatter: formatCurrencyForExport },
+                { header: 'Google Display Spend', key: 'googleDisplaySpend', formatter: formatCurrencyForExport },
+              ]
+            }}
+            getData={() => paidMedia}
+          />
           <Button
             onClick={() => {
               setEditingMedia(null)

@@ -108,9 +108,9 @@ export default async function DashboardPage() {
     prisma.gA4Registration.count({ where: { clientId: client.id } }).then(count => count > 0),
   ])
 
-  // ATC-SPECIFIC: Fetch additional data for 6 Rs and charts
+  // CLIENT-SPECIFIC: Fetch additional data for 6 Rs and charts
   let atcData = null
-  if (client.slug === 'atc-2026') {
+  if (client.slug === 'atc-2026' || client.slug === '360-live-media') {
     const [allRegistrations, allRevenue, allPassTypes] = await Promise.all([
       prisma.eventRegistration.findMany({
         where: { clientId: client.id },
@@ -317,205 +317,228 @@ export default async function DashboardPage() {
         </div>
       </div>
 
-      {/* ATC-SPECIFIC: Performance Summary Section - TOP OF PAGE */}
-      {client.slug === 'atc-2026' && atcData && (
+      {/* CLIENT-SPECIFIC: Performance Summary Section - TOP OF PAGE */}
+      {(client.slug === 'atc-2026' || client.slug === '360-live-media') && atcData && (
         <>
-          {/* The 6 Rs Framework with Real Data */}
-          <SixRsFramework 
-            showImage={true}
-            relevanceActual={latestWebsite?.totalUsers || 0}
-            relevanceGoal={10000}
-            retentionActual={atcData.compRegistrations}
-            retentionGoal={1725}
-            revenueActual={atcData.totalRevenue}
-            revenueGoal={atcData.targetRevenue}
-            reachActual={atcData.totalRegistrations}
-            reachGoal={8000}
-            reputationActual={undefined}
-            reputationGoal={undefined}
-            roiActual={undefined}
-            roiGoal={undefined}
-          />
-
-          {/* Multi-Year Registration Chart & Revenue Gauge */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2">
-              <MultiYearRegistrationChart 
-                data={atcData.multiYearChartData}
-                passTypePercentages={atcData.passTypePercentages}
-              />
-            </div>
-            <div className="lg:col-span-1">
-              <RevenueGaugeChart
-                actual={atcData.totalRevenue}
-                target={atcData.targetRevenue}
-                title="Revenue Progress"
-                subtitle="Year to Date"
-              />
-            </div>
-          </div>
-
-          {/* Actuals vs Goal & Key Performance Metrics */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <RegistrationActualsVsGoalChart
-              compActual={atcData.compRegistrations}
-              compGoal={1725}
-              paidActual={atcData.paidRegistrations}
-              paidGoal={675}
-              year="2026"
+          {/* Only show 6 Rs Framework if there's meaningful data */}
+          {(atcData.totalRegistrations > 0 || atcData.totalRevenue > 0 || (latestWebsite?.totalUsers || 0) > 0) && (
+            <SixRsFramework 
+              showImage={true}
+              relevanceActual={latestWebsite?.totalUsers || 0}
+              relevanceGoal={10000}
+              retentionActual={atcData.compRegistrations}
+              retentionGoal={1725}
+              revenueActual={atcData.totalRevenue}
+              revenueGoal={atcData.targetRevenue}
+              reachActual={atcData.totalRegistrations}
+              reachGoal={8000}
+              reputationActual={undefined}
+              reputationGoal={undefined}
+              roiActual={undefined}
+              roiGoal={undefined}
             />
-            
-            {/* Key Performance Metrics Summary */}
-            <div className="grid grid-cols-2 gap-4">
-              <Card className="glass-card border-0 shadow-lg">
-                <CardContent className="pt-6">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-green-600 to-emerald-600 flex items-center justify-center">
-                      <UserCheck className="w-5 h-5 text-white" />
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">Total Registrations</p>
-                      <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                        {atcData.totalRegistrations.toLocaleString()}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2 text-xs">
-                    <TrendingUp className="w-3 h-3 text-green-600" />
-                    <span className="text-green-600 font-medium">On track</span>
-                  </div>
-                </CardContent>
-              </Card>
+          )}
 
-              <Card className="glass-card border-0 shadow-lg">
-                <CardContent className="pt-6">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-cyan-600 flex items-center justify-center">
-                      <Users className="w-5 h-5 text-white" />
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">Comp Registrations</p>
-                      <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                        {atcData.compRegistrations.toLocaleString()}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2 text-xs">
-                    <span className="text-gray-500 dark:text-gray-400">60% of total</span>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="glass-card border-0 shadow-lg">
-                <CardContent className="pt-6">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center">
-                      <Ticket className="w-5 h-5 text-white" />
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">Paid Registrations</p>
-                      <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                        {atcData.paidRegistrations.toLocaleString()}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2 text-xs">
-                    <span className="text-gray-500 dark:text-gray-400">40% of total</span>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="glass-card border-0 shadow-lg">
-                <CardContent className="pt-6">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-600 to-red-600 flex items-center justify-center">
-                      <BarChart3 className="w-5 h-5 text-white" />
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">Website Visitors</p>
-                      <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                        {(latestWebsite?.totalUsers || 0).toLocaleString()}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2 text-xs">
-                    <span className="text-gray-500 dark:text-gray-400">Latest week</span>
-                  </div>
-                </CardContent>
-              </Card>
+          {/* Multi-Year Registration Chart & Revenue Gauge - Only show if data exists */}
+          {(atcData.totalRegistrations > 0 || atcData.totalRevenue > 0) && (
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Only show registration chart if there's registration data */}
+              {atcData.totalRegistrations > 0 && (
+                <div className="lg:col-span-2">
+                  <MultiYearRegistrationChart 
+                    data={atcData.multiYearChartData}
+                    passTypePercentages={atcData.passTypePercentages}
+                  />
+                </div>
+              )}
+              
+              {/* Only show revenue gauge if there's revenue data */}
+              {atcData.totalRevenue > 0 && (
+                <div className={atcData.totalRegistrations > 0 ? "lg:col-span-1" : "lg:col-span-3"}>
+                  <RevenueGaugeChart
+                    actual={atcData.totalRevenue}
+                    target={atcData.targetRevenue}
+                    title="Revenue Progress"
+                    subtitle="Year to Date"
+                  />
+                </div>
+              )}
             </div>
-          </div>
+          )}
 
-          {/* Quick Action Links - Bottom of ATC Section */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <Card className="card-hover">
-              <CardHeader className="pb-3">
-                <CardTitle className="flex items-center gap-2 text-base">
-                  <UserCheck className="w-5 h-5 text-green-600" />
-                  Registrations
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Link href="/dashboard/registrations">
-                  <button className="w-full text-left p-3 rounded-xl border border-green-500/30 hover:border-green-500/50 hover:bg-green-500/10 transition-all">
-                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300">View Dashboard</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Daily trends & goals</p>
-                  </button>
-                </Link>
-              </CardContent>
-            </Card>
+          {/* Actuals vs Goal & Key Performance Metrics - Only show if registration data exists */}
+          {atcData.totalRegistrations > 0 && (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <RegistrationActualsVsGoalChart
+                compActual={atcData.compRegistrations}
+                compGoal={1725}
+                paidActual={atcData.paidRegistrations}
+                paidGoal={675}
+                year="2026"
+              />
+              
+              {/* Key Performance Metrics Summary */}
+              <div className="grid grid-cols-2 gap-4">
+                <Card className="glass-card border-0 shadow-lg">
+                  <CardContent className="pt-6">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-green-600 to-emerald-600 flex items-center justify-center">
+                        <UserCheck className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">Total Registrations</p>
+                        <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                          {atcData.totalRegistrations.toLocaleString()}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs">
+                      <TrendingUp className="w-3 h-3 text-green-600" />
+                      <span className="text-green-600 font-medium">On track</span>
+                    </div>
+                  </CardContent>
+                </Card>
 
-            <Card className="card-hover">
-              <CardHeader className="pb-3">
-                <CardTitle className="flex items-center gap-2 text-base">
-                  <DollarSign className="w-5 h-5 text-green-600" />
-                  Revenue
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Link href="/dashboard/revenue">
-                  <button className="w-full text-left p-3 rounded-xl border border-green-500/30 hover:border-green-500/50 hover:bg-green-500/10 transition-all">
-                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300">View Dashboard</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Financial tracking</p>
-                  </button>
-                </Link>
-              </CardContent>
-            </Card>
+                <Card className="glass-card border-0 shadow-lg">
+                  <CardContent className="pt-6">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-cyan-600 flex items-center justify-center">
+                        <Users className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">Comp Registrations</p>
+                        <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                          {atcData.compRegistrations.toLocaleString()}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs">
+                      <span className="text-gray-500 dark:text-gray-400">60% of total</span>
+                    </div>
+                  </CardContent>
+                </Card>
 
-            <Card className="card-hover">
-              <CardHeader className="pb-3">
-                <CardTitle className="flex items-center gap-2 text-base">
-                  <Ticket className="w-5 h-5 text-green-600" />
-                  Pass Types
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Link href="/dashboard/pass-types">
-                  <button className="w-full text-left p-3 rounded-xl border border-green-500/30 hover:border-green-500/50 hover:bg-green-500/10 transition-all">
-                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300">View Dashboard</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Ticket breakdown</p>
-                  </button>
-                </Link>
-              </CardContent>
-            </Card>
+                <Card className="glass-card border-0 shadow-lg">
+                  <CardContent className="pt-6">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center">
+                        <Ticket className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">Paid Registrations</p>
+                        <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                          {atcData.paidRegistrations.toLocaleString()}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs">
+                      <span className="text-gray-500 dark:text-gray-400">40% of total</span>
+                    </div>
+                  </CardContent>
+                </Card>
 
-            <Card className="card-hover">
-              <CardHeader className="pb-3">
-                <CardTitle className="flex items-center gap-2 text-base">
-                  <BarChart3 className="w-5 h-5 text-green-600" />
-                  Paid Media
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Link href="/dashboard/paid-media">
-                  <button className="w-full text-left p-3 rounded-xl border border-green-500/30 hover:border-green-500/50 hover:bg-green-500/10 transition-all">
-                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300">View Dashboard</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Ad performance</p>
-                  </button>
-                </Link>
-              </CardContent>
-            </Card>
-          </div>
+                <Card className="glass-card border-0 shadow-lg">
+                  <CardContent className="pt-6">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-600 to-red-600 flex items-center justify-center">
+                        <BarChart3 className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">Website Visitors</p>
+                        <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                          {(latestWebsite?.totalUsers || 0).toLocaleString()}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs">
+                      <span className="text-gray-500 dark:text-gray-400">Latest week</span>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          )}
+
+          {/* Quick Action Links - Only show if there's data for these sections */}
+          {(hasEventRegistrations || hasRevenueData || hasPassTypes || hasPaidMedia) && (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {hasEventRegistrations && (
+                <Card className="card-hover">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="flex items-center gap-2 text-base">
+                      <UserCheck className="w-5 h-5 text-green-600" />
+                      Registrations
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <Link href="/dashboard/registrations">
+                      <button className="w-full text-left p-3 rounded-xl border border-green-500/30 hover:border-green-500/50 hover:bg-green-500/10 transition-all">
+                        <p className="text-sm font-medium text-gray-700 dark:text-gray-300">View Dashboard</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Daily trends & goals</p>
+                      </button>
+                    </Link>
+                  </CardContent>
+                </Card>
+              )}
+
+              {hasRevenueData && (
+                <Card className="card-hover">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="flex items-center gap-2 text-base">
+                      <DollarSign className="w-5 h-5 text-green-600" />
+                      Revenue
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <Link href="/dashboard/revenue">
+                      <button className="w-full text-left p-3 rounded-xl border border-green-500/30 hover:border-green-500/50 hover:bg-green-500/10 transition-all">
+                        <p className="text-sm font-medium text-gray-700 dark:text-gray-300">View Dashboard</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Financial tracking</p>
+                      </button>
+                    </Link>
+                  </CardContent>
+                </Card>
+              )}
+
+              {hasPassTypes && (
+                <Card className="card-hover">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="flex items-center gap-2 text-base">
+                      <Ticket className="w-5 h-5 text-green-600" />
+                      Pass Types
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <Link href="/dashboard/pass-types">
+                      <button className="w-full text-left p-3 rounded-xl border border-green-500/30 hover:border-green-500/50 hover:bg-green-500/10 transition-all">
+                        <p className="text-sm font-medium text-gray-700 dark:text-gray-300">View Dashboard</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Ticket breakdown</p>
+                      </button>
+                    </Link>
+                  </CardContent>
+                </Card>
+              )}
+
+              {hasPaidMedia && (
+                <Card className="card-hover">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="flex items-center gap-2 text-base">
+                      <BarChart3 className="w-5 h-5 text-green-600" />
+                      Paid Media
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <Link href="/dashboard/paid-media">
+                      <button className="w-full text-left p-3 rounded-xl border border-green-500/30 hover:border-green-500/50 hover:bg-green-500/10 transition-all">
+                        <p className="text-sm font-medium text-gray-700 dark:text-gray-300">View Dashboard</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Ad performance</p>
+                      </button>
+                    </Link>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          )}
         </>
       )}
 
@@ -675,49 +698,55 @@ export default async function DashboardPage() {
         </Link>
       </div>
 
-      {/* Interactive Filterable Charts */}
+      {/* Interactive Filterable Charts - Only show if data exists */}
       <div className="grid gap-4">
-        <Card className="chart-card border-0 overflow-hidden shadow-lg">
-          <CardHeader className="bg-gradient-to-r from-blue-50/10 dark:from-blue-900/20 to-transparent border-b border-gray-200 dark:border-gray-700">
-            <CardTitle className="text-lg font-semibold text-gray-900 dark:text-gray-100">Website Analytics</CardTitle>
-            <CardDescription className="text-sm text-gray-600 dark:text-gray-400">
-              Filter by metrics, view trends over time, or analyze traffic sources
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="pt-6">
-            <FilterableWebsiteChart data={websiteChartData} />
-          </CardContent>
-        </Card>
+        {websiteChartData.length > 0 && (
+          <Card className="chart-card border-0 overflow-hidden shadow-lg">
+            <CardHeader className="bg-gradient-to-r from-blue-50/10 dark:from-blue-900/20 to-transparent border-b border-gray-200 dark:border-gray-700">
+              <CardTitle className="text-lg font-semibold text-gray-900 dark:text-gray-100">Website Analytics</CardTitle>
+              <CardDescription className="text-sm text-gray-600 dark:text-gray-400">
+                Filter by metrics, view trends over time, or analyze traffic sources
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="pt-6">
+              <FilterableWebsiteChart data={websiteChartData} />
+            </CardContent>
+          </Card>
+        )}
 
-        <Card className="chart-card border-0 overflow-hidden shadow-lg">
-          <CardHeader className="bg-gradient-to-r from-green-50/10 dark:from-green-900/20 to-transparent border-b border-gray-200 dark:border-gray-700">
-            <CardTitle className="flex items-center gap-2 text-lg font-semibold text-gray-900 dark:text-gray-100">
-              <Mail className="w-5 h-5 text-[#2E8741]" />
-              Email Campaign Performance
-            </CardTitle>
-            <CardDescription className="text-sm text-gray-600 dark:text-gray-400">
-              Filter campaigns by audience, type, and metrics for detailed analysis
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="pt-6">
-            <FilterableEmailChart data={emailChartDataFormatted} />
-          </CardContent>
-        </Card>
+        {emailChartData.length > 0 && (
+          <Card className="chart-card border-0 overflow-hidden shadow-lg">
+            <CardHeader className="bg-gradient-to-r from-green-50/10 dark:from-green-900/20 to-transparent border-b border-gray-200 dark:border-gray-700">
+              <CardTitle className="flex items-center gap-2 text-lg font-semibold text-gray-900 dark:text-gray-100">
+                <Mail className="w-5 h-5 text-[#2E8741]" />
+                Email Campaign Performance
+              </CardTitle>
+              <CardDescription className="text-sm text-gray-600 dark:text-gray-400">
+                Filter campaigns by audience, type, and metrics for detailed analysis
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="pt-6">
+              <FilterableEmailChart data={emailChartDataFormatted} />
+            </CardContent>
+          </Card>
+        )}
 
-        <Card className="chart-card border-0 overflow-hidden shadow-lg">
-          <CardHeader className="bg-gradient-to-r from-purple-50/10 dark:from-purple-900/20 to-transparent border-b border-gray-200 dark:border-gray-700">
-            <CardTitle className="flex items-center gap-2 text-lg font-semibold text-gray-900 dark:text-gray-100">
-              <Users className="w-5 h-5 text-purple-600" />
-              Social Media Performance
-            </CardTitle>
-            <CardDescription className="text-sm text-gray-600 dark:text-gray-400">
-              Filter by platform, metrics, and time range to explore social media growth
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="pt-6">
-            <FilterableSocialChart data={socialChartData} />
-          </CardContent>
-        </Card>
+        {socialChartData.length > 0 && (
+          <Card className="chart-card border-0 overflow-hidden shadow-lg">
+            <CardHeader className="bg-gradient-to-r from-purple-50/10 dark:from-purple-900/20 to-transparent border-b border-gray-200 dark:border-gray-700">
+              <CardTitle className="flex items-center gap-2 text-lg font-semibold text-gray-900 dark:text-gray-100">
+                <Users className="w-5 h-5 text-purple-600" />
+                Social Media Performance
+              </CardTitle>
+              <CardDescription className="text-sm text-gray-600 dark:text-gray-400">
+                Filter by platform, metrics, and time range to explore social media growth
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="pt-6">
+              <FilterableSocialChart data={socialChartData} />
+            </CardContent>
+          </Card>
+        )}
       </div>
 
       {/* Performance Insights & Goal Tracking - Only show if we have real data */}
@@ -783,22 +812,25 @@ export default async function DashboardPage() {
         </div>
       )}
 
-      {/* Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Card className="card-hover">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base font-semibold text-gray-700 dark:text-gray-200">
-              <Clock className="w-4 h-4 text-green-600 dark:text-green-500" />
-              Recent Activity
-            </CardTitle>
-            <CardDescription className="text-sm text-gray-500 dark:text-gray-400">
-              {client.eventName 
-                ? `Latest updates for ${client.eventName} ${client.year || ''}`
-                : 'Latest updates across all channels'}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
+      {/* Quick Actions - Only show if there's some activity or data */}
+      {(latestEmail || latestWebsite || latestSocial || latestEventRegistration || latestAbstract || latestRevenue || hasEventRegistrations || hasRevenueData || hasPaidMedia) && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Only show Recent Activity card if there's actual recent data */}
+          {(latestEmail || latestWebsite || latestSocial || latestEventRegistration || latestAbstract || latestRevenue) && (
+            <Card className="card-hover">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-base font-semibold text-gray-700 dark:text-gray-200">
+                  <Clock className="w-4 h-4 text-green-600 dark:text-green-500" />
+                  Recent Activity
+                </CardTitle>
+                <CardDescription className="text-sm text-gray-500 dark:text-gray-400">
+                  {client.eventName 
+                    ? `Latest updates for ${client.eventName} ${client.year || ''}`
+                    : 'Latest updates across all channels'}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
               {/* Core Activities - Email, Website, Social */}
               {latestEmail && (
                 <div className="flex items-start gap-3 p-2.5 rounded-xl bg-white/40 dark:bg-white/5 backdrop-blur-sm border border-white/40 dark:border-white/10">
@@ -886,71 +918,73 @@ export default async function DashboardPage() {
                   </div>
                 </div>
               )}
-            </div>
-          </CardContent>
-        </Card>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
-        <Card className="card-hover">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base font-semibold text-gray-700 dark:text-gray-200">
-              <ArrowUpRight className="w-4 h-4 text-green-600 dark:text-green-500" />
-              Quick Actions
-            </CardTitle>
-            <CardDescription className="text-sm text-gray-500 dark:text-gray-400">Navigate to key sections</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              {/* Core Analytics - Always shown */}
-              <Link href="/dashboard/website">
-                <button className="w-full text-left p-2.5 rounded-xl border border-white/40 dark:border-white/20 hover:border-white/60 dark:hover:border-white/30 hover:bg-white/30 dark:hover:bg-white/5 transition-all backdrop-blur-sm">
-                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Website Analytics</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">View traffic and engagement</p>
-                </button>
-              </Link>
-              <Link href="/dashboard/email">
-                <button className="w-full text-left p-2.5 rounded-xl border border-white/40 dark:border-white/20 hover:border-white/60 dark:hover:border-white/30 hover:bg-white/30 dark:hover:bg-white/5 transition-all backdrop-blur-sm">
-                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Email Campaigns</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Review campaign performance</p>
-                </button>
-              </Link>
-              <Link href="/dashboard/social">
-                <button className="w-full text-left p-2.5 rounded-xl border border-white/40 dark:border-white/20 hover:border-white/60 dark:hover:border-white/30 hover:bg-white/30 dark:hover:bg-white/5 transition-all backdrop-blur-sm">
-                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Social Media</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Check LinkedIn & Instagram</p>
-                </button>
-              </Link>
-              
-              {/* Client-specific actions */}
-              {hasEventRegistrations && (
-                <Link href="/dashboard/registrations">
-                  <button className="w-full text-left p-2.5 rounded-xl border border-green-500/40 dark:border-green-500/20 hover:border-green-500/60 dark:hover:border-green-500/30 hover:bg-green-500/10 dark:hover:bg-green-500/5 transition-all backdrop-blur-sm">
-                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Event Registrations</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Track attendee sign-ups</p>
+          <Card className="card-hover">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-base font-semibold text-gray-700 dark:text-gray-200">
+                <ArrowUpRight className="w-4 h-4 text-green-600 dark:text-green-500" />
+                Quick Actions
+              </CardTitle>
+              <CardDescription className="text-sm text-gray-500 dark:text-gray-400">Navigate to key sections</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                {/* Core Analytics - Always shown */}
+                <Link href="/dashboard/website">
+                  <button className="w-full text-left p-2.5 rounded-xl border border-white/40 dark:border-white/20 hover:border-white/60 dark:hover:border-white/30 hover:bg-white/30 dark:hover:bg-white/5 transition-all backdrop-blur-sm">
+                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Website Analytics</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">View traffic and engagement</p>
                   </button>
                 </Link>
-              )}
-              
-              {hasRevenueData && (
-                <Link href="/dashboard/revenue">
-                  <button className="w-full text-left p-2.5 rounded-xl border border-green-500/40 dark:border-green-500/20 hover:border-green-500/60 dark:hover:border-green-500/30 hover:bg-green-500/10 dark:hover:bg-green-500/5 transition-all backdrop-blur-sm">
-                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Revenue Tracking</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Monitor financial performance</p>
+                <Link href="/dashboard/email">
+                  <button className="w-full text-left p-2.5 rounded-xl border border-white/40 dark:border-white/20 hover:border-white/60 dark:hover:border-white/30 hover:bg-white/30 dark:hover:bg-white/5 transition-all backdrop-blur-sm">
+                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Email Campaigns</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Review campaign performance</p>
                   </button>
                 </Link>
-              )}
-              
-              {hasPaidMedia && (
-                <Link href="/dashboard/paid-media">
-                  <button className="w-full text-left p-2.5 rounded-xl border border-blue-500/40 dark:border-blue-500/20 hover:border-blue-500/60 dark:hover:border-blue-500/30 hover:bg-blue-500/10 dark:hover:bg-blue-500/5 transition-all backdrop-blur-sm">
-                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Paid Media</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Ad performance & spend</p>
+                <Link href="/dashboard/social">
+                  <button className="w-full text-left p-2.5 rounded-xl border border-white/40 dark:border-white/20 hover:border-white/60 dark:hover:border-white/30 hover:bg-white/30 dark:hover:bg-white/5 transition-all backdrop-blur-sm">
+                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Social Media</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Check LinkedIn & Instagram</p>
                   </button>
                 </Link>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+                
+                {/* Client-specific actions */}
+                {hasEventRegistrations && (
+                  <Link href="/dashboard/registrations">
+                    <button className="w-full text-left p-2.5 rounded-xl border border-green-500/40 dark:border-green-500/20 hover:border-green-500/60 dark:hover:border-green-500/30 hover:bg-green-500/10 dark:hover:bg-green-500/5 transition-all backdrop-blur-sm">
+                      <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Event Registrations</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Track attendee sign-ups</p>
+                    </button>
+                  </Link>
+                )}
+                
+                {hasRevenueData && (
+                  <Link href="/dashboard/revenue">
+                    <button className="w-full text-left p-2.5 rounded-xl border border-green-500/40 dark:border-green-500/20 hover:border-green-500/60 dark:hover:border-green-500/30 hover:bg-green-500/10 dark:hover:bg-green-500/5 transition-all backdrop-blur-sm">
+                      <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Revenue Tracking</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Monitor financial performance</p>
+                    </button>
+                  </Link>
+                )}
+                
+                {hasPaidMedia && (
+                  <Link href="/dashboard/paid-media">
+                    <button className="w-full text-left p-2.5 rounded-xl border border-blue-500/40 dark:border-blue-500/20 hover:border-blue-500/60 dark:hover:border-blue-500/30 hover:bg-blue-500/10 dark:hover:bg-blue-500/5 transition-all backdrop-blur-sm">
+                      <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Paid Media</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Ad performance & spend</p>
+                    </button>
+                  </Link>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
     </div>
   )

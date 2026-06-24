@@ -7,6 +7,8 @@ import { SalesMarketingFormDialog } from '@/components/forms/sales-marketing-for
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { useReadOnly } from '@/contexts/readonly-context'
+import { ExportButtons } from '@/components/ui/export-buttons'
+import { formatDateForExport, formatNumberForExport, formatPercentageForExport } from '@/lib/export-utils'
 
 interface SalesMarketingManagementProps {
   campaigns: any[]
@@ -79,13 +81,34 @@ export function SalesMarketingManagement({ campaigns }: SalesMarketingManagement
           </p>
         </div>
         {!isReadOnly && (
-          <Button 
-            onClick={handleAdd}
-            className="bg-[#2E8741] hover:bg-[#236933]"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Add Campaign
-          </Button>
+          <div className="flex gap-2">
+            <ExportButtons
+              exportOptions={{
+                filename: 'sales-marketing-campaigns',
+                title: 'Sales Marketing Campaigns',
+                columns: [
+                  { header: 'Week Of', key: 'weekOf', formatter: formatDateForExport },
+                  { header: 'Target Send Date', key: 'targetSendDate', formatter: formatDateForExport },
+                  { header: 'Audience', key: 'audience' },
+                  { header: 'Subject/Message', key: 'subjectMessage' },
+                  { header: 'Microsite Visits', key: 'micrositeVisits', formatter: formatNumberForExport },
+                  { header: 'Open Rate', key: 'openRate', formatter: formatPercentageForExport },
+                  { header: 'Click Rate', key: 'clickRate', formatter: formatPercentageForExport },
+                  { header: 'Bounces', key: 'bounces', formatter: formatNumberForExport },
+                  { header: 'Unsubs', key: 'unsubs', formatter: formatNumberForExport },
+                  { header: 'Status', key: 'status' },
+                ]
+              }}
+              getData={() => campaigns}
+            />
+            <Button 
+              onClick={handleAdd}
+              className="bg-[#2E8741] hover:bg-[#236933]"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Add Campaign
+            </Button>
+          </div>
         )}
       </div>
 

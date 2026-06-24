@@ -7,6 +7,7 @@ import { TestFormDialog } from '@/components/forms/test-form-dialog'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { useReadOnly } from '@/contexts/readonly-context'
+import { ExportButtons } from '@/components/ui/export-buttons'
 
 interface TestManagementProps {
   tests: any[]
@@ -56,13 +57,30 @@ export function TestManagement({ tests }: TestManagementProps) {
       <div className="flex justify-between items-center mb-6">
         <h3 className="text-lg font-semibold text-gray-900">All Tests</h3>
         {!isReadOnly && (
-          <Button 
-            onClick={handleAdd}
-            className="bg-[#2E8741] hover:bg-[#236933]"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Add Test
-          </Button>
+          <div className="flex gap-2">
+            <ExportButtons
+              exportOptions={{
+                filename: 'optimization-tests',
+                title: 'Website Optimization Tests',
+                columns: [
+                  { header: 'Month', key: 'month' },
+                  { header: 'Channel', key: 'channel' },
+                  { header: 'Control Test (A)', key: 'controlTest' },
+                  { header: 'Test Variant (B)', key: 'testVariant' },
+                  { header: 'Results', key: 'results' },
+                  { header: 'Conclusions', key: 'conclusions' },
+                ]
+              }}
+              getData={() => tests}
+            />
+            <Button 
+              onClick={handleAdd}
+              className="bg-[#2E8741] hover:bg-[#236933]"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Add Test
+            </Button>
+          </div>
         )}
       </div>
 

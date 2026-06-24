@@ -4,10 +4,11 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Plus, Pencil, Trash2 } from 'lucide-react'
 import { WebsiteFormDialog } from '@/components/forms/website-form-dialog'
-import { ExportButton } from '@/components/ui/export-button'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { useReadOnly } from '@/contexts/readonly-context'
+import { ExportButtons } from '@/components/ui/export-buttons'
+import { formatDateForExport, formatNumberForExport } from '@/lib/export-utils'
 
 interface WebsiteManagementProps {
   metrics: any[]
@@ -56,9 +57,22 @@ export function WebsiteManagement({ metrics }: WebsiteManagementProps) {
     <>
       <div className="flex justify-between items-center mb-6 flex-wrap gap-3">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Recent Weeks</h3>
-        <div className="flex gap-2">
-          <ExportButton data={metrics} filename="website-analytics" type="website" />
-          {!isReadOnly && (
+        {!isReadOnly && (
+          <div className="flex gap-2">
+            <ExportButtons
+              exportOptions={{
+                filename: 'website-analytics',
+                title: 'Website Analytics',
+                columns: [
+                  { header: 'Week Starting', key: 'weekStarting', formatter: formatDateForExport },
+                  { header: 'Total Users', key: 'totalUsers', formatter: formatNumberForExport },
+                  { header: 'New Users', key: 'newUsers', formatter: formatNumberForExport },
+                  { header: 'Engagement (sec)', key: 'avgEngagementTimeSec', formatter: formatNumberForExport },
+                  { header: 'Health Score', key: 'healthScore', formatter: formatNumberForExport },
+                ]
+              }}
+              getData={() => metrics}
+            />
             <Button 
               onClick={handleAdd}
               className="bg-[#2E8741] hover:bg-[#236933] dark:bg-[#2E8741] dark:hover:bg-[#3a9d54]"
@@ -66,12 +80,12 @@ export function WebsiteManagement({ metrics }: WebsiteManagementProps) {
               <Plus className="h-4 w-4 mr-2" />
               Add Week
             </Button>
-          )}
-        </div>
+          </div>
+        )}
       </div>
 
       <div className="space-y-3">
-        {metrics.slice(0, 10).map((metric) => (
+        {metrics.slice(-10).reverse().map((metric) => (
           <div
             key={metric.id}
             className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors flex items-center justify-between relative overflow-hidden group"

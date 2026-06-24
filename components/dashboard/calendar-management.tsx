@@ -19,6 +19,8 @@ import {
 import { CalendarEventDialog } from '@/components/forms/calendar-event-dialog';
 import { toast } from '@/components/ui/use-toast';
 import { useReadOnly } from '@/contexts/readonly-context';
+import { ExportButtons } from '@/components/ui/export-buttons';
+import { formatDateForExport } from '@/lib/export-utils';
 
 interface CalendarManagementProps {
   events: any[];
@@ -126,19 +128,37 @@ export function CalendarManagement({ events, clientId }: CalendarManagementProps
               </CardDescription>
             </div>
 
-            <div className="w-full sm:w-64">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search events..."
-                  value={searchQuery}
-                  onChange={(e) => {
-                    setSearchQuery(e.target.value);
-                    setCurrentPage(1);
-                  }}
-                  className="pl-9"
-                />
+            <div className="flex items-center gap-2">
+              <div className="w-full sm:w-64">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search events..."
+                    value={searchQuery}
+                    onChange={(e) => {
+                      setSearchQuery(e.target.value);
+                      setCurrentPage(1);
+                    }}
+                    className="pl-9"
+                  />
+                </div>
               </div>
+              {!isReadOnly && (
+                <ExportButtons
+                  exportOptions={{
+                    filename: 'calendar-events',
+                    title: 'Calendar Events',
+                    columns: [
+                      { header: 'Date', key: 'date', formatter: formatDateForExport },
+                      { header: 'Title', key: 'title' },
+                      { header: 'Category', key: 'category' },
+                      { header: 'Status', key: 'status' },
+                      { header: 'Description', key: 'description' },
+                    ]
+                  }}
+                  getData={() => events}
+                />
+              )}
             </div>
           </div>
         </CardHeader>

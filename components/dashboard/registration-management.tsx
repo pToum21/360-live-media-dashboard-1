@@ -15,6 +15,8 @@ import { Pencil, Trash2, Plus } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { format } from 'date-fns'
 import { useReadOnly } from '@/contexts/readonly-context'
+import { ExportButtons } from '@/components/ui/export-buttons'
+import { formatDateForExport, formatCurrencyForExport, formatPercentageForExport, formatNumberForExport } from '@/lib/export-utils'
 
 interface EventRegistration {
   id: string
@@ -54,7 +56,27 @@ export function RegistrationManagement({ registrations, clientId }: Registration
   return (
     <div className="space-y-4">
       {!isReadOnly && (
-        <div className="flex justify-end">
+        <div className="flex justify-end gap-2">
+          <ExportButtons
+            exportOptions={{
+              filename: 'event-registrations',
+              title: 'Event Registrations',
+              columns: [
+                { header: 'Date', key: 'date', formatter: formatDateForExport },
+                { header: 'Total Registrations', key: 'totalRegistrations', formatter: formatNumberForExport },
+                { header: 'Complimentary', key: 'compRegistrations', formatter: formatNumberForExport },
+                { header: 'Paid', key: 'paidRegistrations', formatter: formatNumberForExport },
+                { header: 'Revenue', key: 'revenue', formatter: formatCurrencyForExport },
+                { header: 'Members', key: 'memberCount', formatter: formatNumberForExport },
+                { header: 'Non-Members', key: 'nonMemberCount', formatter: formatNumberForExport },
+                { header: 'Students', key: 'studentCount', formatter: formatNumberForExport },
+                { header: 'Sponsors', key: 'sponsorCount', formatter: formatNumberForExport },
+                { header: 'Goal', key: 'registrationGoal', formatter: formatNumberForExport },
+                { header: '% of Goal', key: 'percentOfGoal', formatter: formatPercentageForExport },
+              ]
+            }}
+            getData={() => registrations}
+          />
           <Button
             onClick={() => {
               setEditingRegistration(null)

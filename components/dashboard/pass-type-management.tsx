@@ -14,6 +14,8 @@ import {
 import { Pencil, Trash2, Plus } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useReadOnly } from '@/contexts/readonly-context'
+import { ExportButtons } from '@/components/ui/export-buttons'
+import { formatCurrencyForExport, formatPercentageForExport, formatNumberForExport } from '@/lib/export-utils'
 
 interface PassType {
   id: string
@@ -47,7 +49,21 @@ export function PassTypeManagement({ passTypes, clientId }: PassTypeManagementPr
   return (
     <div className="space-y-4">
       {!isReadOnly && (
-        <div className="flex justify-end">
+        <div className="flex justify-end gap-2">
+          <ExportButtons
+            exportOptions={{
+              filename: 'pass-types',
+              title: 'Registration Pass Types',
+              columns: [
+                { header: 'Pass Type', key: 'passTypeName' },
+                { header: 'Year', key: 'year', formatter: formatNumberForExport },
+                { header: 'Registrations', key: 'registrationCount', formatter: formatNumberForExport },
+                { header: '% of Total', key: 'percentOfTotal', formatter: formatPercentageForExport },
+                { header: 'Revenue', key: 'revenue', formatter: formatCurrencyForExport },
+              ]
+            }}
+            getData={() => passTypes}
+          />
           <Button
             onClick={() => {
               setEditingPassType(null)

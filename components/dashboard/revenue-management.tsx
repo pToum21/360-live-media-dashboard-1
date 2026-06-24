@@ -15,6 +15,8 @@ import { Pencil, Trash2, Plus } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { format } from 'date-fns'
 import { useReadOnly } from '@/contexts/readonly-context'
+import { ExportButtons } from '@/components/ui/export-buttons'
+import { formatDateForExport, formatCurrencyForExport, formatNumberForExport } from '@/lib/export-utils'
 
 interface RevenueProjection {
   id: string
@@ -49,7 +51,22 @@ export function RevenueManagement({ projections, clientId }: RevenueManagementPr
   return (
     <div className="space-y-4">
       {!isReadOnly && (
-        <div className="flex justify-end">
+        <div className="flex justify-end gap-2">
+          <ExportButtons
+            exportOptions={{
+              filename: 'revenue-projections',
+              title: 'Revenue Projections',
+              columns: [
+                { header: 'Date', key: 'date', formatter: formatDateForExport },
+                { header: 'Category', key: 'category' },
+                { header: 'Projected Revenue', key: 'projectedRevenue', formatter: formatCurrencyForExport },
+                { header: 'Actual Revenue', key: 'actualRevenue', formatter: formatCurrencyForExport },
+                { header: 'Projected Registrations', key: 'projectedRegistrations', formatter: formatNumberForExport },
+                { header: 'Actual Registrations', key: 'actualRegistrations', formatter: formatNumberForExport },
+              ]
+            }}
+            getData={() => projections}
+          />
           <Button
             onClick={() => {
               setEditingProjection(null)

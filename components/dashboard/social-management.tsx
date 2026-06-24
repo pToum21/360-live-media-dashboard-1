@@ -7,6 +7,8 @@ import { SocialFormDialog } from '@/components/forms/social-form-dialog'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { useReadOnly } from '@/contexts/readonly-context'
+import { ExportButtons } from '@/components/ui/export-buttons'
+import { formatDateForExport, formatPercentageForExport, formatNumberForExport } from '@/lib/export-utils'
 
 interface SocialManagementProps {
   metrics: any[]
@@ -56,13 +58,37 @@ export function SocialManagement({ metrics }: SocialManagementProps) {
       <div className="flex justify-between items-center mb-6">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Recent Weeks</h3>
         {!isReadOnly && (
-          <Button 
-            onClick={handleAdd}
-            className="bg-[#2E8741] hover:bg-[#236933]"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Add Week
-          </Button>
+          <div className="flex gap-2">
+            <ExportButtons
+              exportOptions={{
+                filename: 'social-media-metrics',
+                title: 'Social Media Metrics',
+                columns: [
+                  { header: 'Week Starting', key: 'weekStarting', formatter: formatDateForExport },
+                  { header: 'LinkedIn Followers', key: 'liFollowers', formatter: formatNumberForExport },
+                  { header: 'LinkedIn Impressions', key: 'liImpressions', formatter: formatNumberForExport },
+                  { header: 'LinkedIn Engagement Rate', key: 'liEngagementRate', formatter: formatPercentageForExport },
+                  { header: 'Instagram Followers', key: 'igFollowers', formatter: formatNumberForExport },
+                  { header: 'Instagram Impressions', key: 'igImpressions', formatter: formatNumberForExport },
+                  { header: 'Instagram Engagement Rate', key: 'igEngagementRate', formatter: formatPercentageForExport },
+                  { header: 'Facebook Followers', key: 'fbFollowers', formatter: formatNumberForExport },
+                  { header: 'Facebook Impressions', key: 'fbImpressions', formatter: formatNumberForExport },
+                  { header: 'Facebook Engagements', key: 'fbEngagements', formatter: formatNumberForExport },
+                  { header: 'X Followers', key: 'xFollowers', formatter: formatNumberForExport },
+                  { header: 'X Impressions', key: 'xImpressions', formatter: formatNumberForExport },
+                  { header: 'X Engagements', key: 'xEngagements', formatter: formatNumberForExport },
+                ]
+              }}
+              getData={() => metrics}
+            />
+            <Button 
+              onClick={handleAdd}
+              className="bg-[#2E8741] hover:bg-[#236933]"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Add Week
+            </Button>
+          </div>
         )}
       </div>
 

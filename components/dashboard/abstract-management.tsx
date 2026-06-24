@@ -14,6 +14,8 @@ import {
 import { Pencil, Trash2, Plus } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useReadOnly } from '@/contexts/readonly-context'
+import { ExportButtons } from '@/components/ui/export-buttons'
+import { formatNumberForExport } from '@/lib/export-utils'
 
 interface AbstractSubmission {
   id: string
@@ -45,7 +47,19 @@ export function AbstractManagement({ abstracts, clientId }: AbstractManagementPr
   return (
     <div className="space-y-4">
       {!isReadOnly && (
-        <div className="flex justify-end">
+        <div className="flex justify-end gap-2">
+          <ExportButtons
+            exportOptions={{
+              filename: 'abstract-submissions',
+              title: 'Abstract Submissions',
+              columns: [
+                { header: 'Year', key: 'year', formatter: formatNumberForExport },
+                { header: 'Submission Type', key: 'submissionType' },
+                { header: 'Submission Count', key: 'submissionCount', formatter: formatNumberForExport },
+              ]
+            }}
+            getData={() => abstracts}
+          />
           <Button
             onClick={() => {
               setEditingAbstract(null)

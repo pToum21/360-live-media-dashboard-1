@@ -7,6 +7,8 @@ import { EmailFormDialog } from '@/components/forms/email-form-dialog'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { useReadOnly } from '@/contexts/readonly-context'
+import { ExportButtons } from '@/components/ui/export-buttons'
+import { formatDateForExport, formatPercentageForExport, formatNumberForExport } from '@/lib/export-utils'
 
 interface EmailManagementProps {
   campaigns: any[]
@@ -75,13 +77,33 @@ export function EmailManagement({ campaigns }: EmailManagementProps) {
           </p>
         </div>
         {!isReadOnly && (
-          <Button 
-            onClick={handleAdd}
-            className="bg-[#2E8741] hover:bg-[#236933]"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Add Campaign
-          </Button>
+          <div className="flex gap-2">
+            <ExportButtons
+              exportOptions={{
+                filename: 'email-campaigns',
+                title: 'Email Campaigns',
+                columns: [
+                  { header: 'Campaign Name', key: 'name' },
+                  { header: 'Type', key: 'campaignType' },
+                  { header: 'Deployment Date', key: 'deploymentDate', formatter: formatDateForExport },
+                  { header: 'Total Sent', key: 'totalSent', formatter: formatNumberForExport },
+                  { header: 'Open Rate', key: 'openRate', formatter: formatPercentageForExport },
+                  { header: 'Click Rate', key: 'clickRate', formatter: formatPercentageForExport },
+                  { header: 'Delivery Rate', key: 'deliveryRate', formatter: formatPercentageForExport },
+                  { header: 'Unsubscribe Rate', key: 'unsubscribeRate', formatter: formatPercentageForExport },
+                  { header: 'Subject Line', key: 'subjectLine' },
+                ]
+              }}
+              getData={() => campaigns}
+            />
+            <Button 
+              onClick={handleAdd}
+              className="bg-[#2E8741] hover:bg-[#236933]"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Add Campaign
+            </Button>
+          </div>
         )}
       </div>
 
